@@ -36,12 +36,12 @@ function AdminPanel() {
         {
             label: "Módulos",
             subButtons: [
-                { label: "Listar Módulos", link: "/cursos/create" },
+                { label: "Listar Módulos", link: "/modules" },
                 { label: "Adicionar Módulos", link: "/addModule" },
                 { label: "Editar Módulos", link: "/cursos/manage" },
                 { label: "Apagar Módulos", link: "/cursos/manage" },
-                { label: "Listar Submódulos", link: "/cursos/create" },
-                { label: "Adicionar Submódulos", link: "/cursos/create" },
+                { label: "Listar Submódulos", link: "/subModules" },
+                { label: "Adicionar Submódulos", link: "/addSubmodule" },
                 { label: "Editar Submódulos", link: "/cursos/manage" },
                 { label: "Apagar Submódulos", link: "/cursos/manage" },
                 {

@@ -2,54 +2,55 @@ import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 
-const ModulesList = () => {
-    const [modules, setModules] = useState([]);
+const SubModulesList = () => {
+    const [subModules, setSubModules] = useState([]);
     const { accessTokenData } = useAuth();
 
-    // Fetch modules from API
+    // Fetch submodules from API
     useEffect(() => {
-        fetch(endpoints.GET_MODULES, {
+        fetch(endpoints.GET_SUBMODULES, {
+            // Assuming GET_SUBMODULES is the correct endpoint for fetching submodules
             headers: {
                 Authorization: `Bearer ${accessTokenData.access_token}`,
             },
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error("Failed to fetch modules");
+                    throw new Error("Failed to fetch submodules");
                 }
                 return response.json();
             })
             .then((data) => {
-                console.log("modules", data.modules);
-                setModules(data.modules);
+                console.log("submodules", data.submodules);
+                setSubModules(data.submodules);
             })
             .catch((error) => {
-                console.error("Error fetching modules:", error);
-                alert("Failed to load modules.");
+                console.error("Error fetching submodules:", error);
+                alert("Failed to load submodules.");
             });
     }, [accessTokenData.access_token]);
 
     return (
         <div className="table-list-container">
             <header>
-                <h1>Módulos Disponíveis</h1>
+                <h1>SubMódulos Disponíveis</h1>
             </header>
             <table className="table-list" border="1" cellPadding="10">
                 <thead>
                     <tr>
                         <th>Nome</th>
                         <th>Abreviatura</th>
-                        <th>ECTS</th>
                         <th>Horas de Contacto</th>
+                        <th>Módulo Principal</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {modules.map((module) => (
-                        <tr key={module.module_id}>
-                            <td>{module.name}</td>
-                            <td>{module.abbreviation}</td>
-                            <td>{module.ects}</td>
-                            <td>{module.contact_hours}</td>
+                    {subModules.map((subModule) => (
+                        <tr key={subModule.submodule_id}>
+                            <td>{subModule.name}</td>
+                            <td>{subModule.abbreviation}</td>
+                            <td>{subModule.contact_hours}</td>
+                            <td>{subModule.module_id}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -58,4 +59,4 @@ const ModulesList = () => {
     );
 };
 
-export default ModulesList;
+export default SubModulesList;

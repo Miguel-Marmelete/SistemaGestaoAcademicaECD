@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CourseModule;
 use Illuminate\Http\Request;
 use App\Models\Module;
+use App\Models\ProfessorInChargeOfModule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 
 class ModuleController extends Controller
@@ -51,34 +54,30 @@ class ModuleController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
-    {
-        try {
-            // Validate the request
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'contact_hours' => 'required|integer',
-                'abbreviation' => 'required|string|max:10',
-                'ects' => 'required|integer',
-            ]);
+{
+    try {
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'contact_hours' => 'required|integer',
+            'abbreviation' => 'required|string|max:10',
+            'ects' => 'required|integer',
+            
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 400);
-            }
-            $module = Module::create($validator->validated());
-            // Create the module
-            /*
-            $module = Module::create([
-                'name' => $request->name,
-                'contact_hours' => $request->contact_hours,
-                'abbreviation' => $request->abbreviation,
-                'ects' => $request->ects,
-            ]);*/
-
-            return response()->json(['message' => 'Module created successfully', 'module' => $module], 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while creating the module', 'details' => $e->getMessage()], 500);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
         }
+
+        // Create the Module
+        $module = Module::create($validator->validated());
+        
+        return response()->json(['message' => 'Module created successfully', 'module' => $module], 201);
+    } catch (\Exception $e) {
+        Log::error('Error while creating module', ['error' => $e->getMessage()]);
+        return response()->json(['error' => 'An error occurred while creating the module', 'details' => $e->getMessage()], 500);
     }
+}
 
     /**
      * Update the specified module.
