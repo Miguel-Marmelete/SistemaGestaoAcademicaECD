@@ -220,11 +220,11 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
 
   //------------------SUBMODULE ROUTES-----------------------------
      // Get all Submodule
-     Route::get('/getAllSubmodules', [SubmoduleController::class, 'index']);
+     Route::get('/getAllSubModules', [SubmoduleController::class, 'index']);
      // Get a specific Submodule by ID
      Route::get('/getSubmodule/{id}', [SubmoduleController::class, 'show']);
      // Create a new Submodule
-     Route::post('/createSubmodule', [SubmoduleController::class, 'store']);
+     Route::post('/addSubmodule', [SubmoduleController::class, 'store']);
      // Update an existing Submodule by ID
      Route::put('/editSubmodule/{id}', [SubmoduleController::class, 'update']);
      // Delete a Submodule by ID

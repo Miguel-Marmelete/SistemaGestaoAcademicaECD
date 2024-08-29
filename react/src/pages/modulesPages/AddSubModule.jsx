@@ -2,15 +2,41 @@ import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 
-const AddModule = () => {
+const AddSubModule = () => {
     const { accessTokenData } = useAuth();
-
+    const [modules, setModules] = useState([]); // State for fetched modules
     const [formData, setFormData] = useState({
         name: "",
         contact_hours: "",
         abbreviation: "",
-        ects: "",
+        module_id: "",
     });
+
+    // Fetch modules on component mount
+    useEffect(() => {
+        const fetchModules = async () => {
+            try {
+                const response = await fetch(endpoints.GET_MODULES, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setModules(data.modules);
+                } else {
+                    alert("Failed to fetch modules");
+                }
+            } catch (error) {
+                alert(error);
+                console.error("Error:", error);
+            }
+        };
+
+        fetchModules();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -25,7 +51,7 @@ const AddModule = () => {
 
         try {
             console.log("formdata", formData);
-            const response = await fetch(endpoints.ADD_MODULES, {
+            const response = await fetch(endpoints.ADD_SUBMODULES, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -35,20 +61,20 @@ const AddModule = () => {
             });
 
             if (response.ok) {
-                alert("Module added successfully!");
+                alert("SubModule added successfully!");
                 // Reset form
                 setFormData({
                     name: "",
                     contact_hours: "",
                     abbreviation: "",
-                    ects: "",
+                    module_id: "",
                 });
             } else {
-                alert("Failed to add module");
+                alert("Failed to add Submodule");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred while adding the module");
+            alert("An error occurred while adding the submodule");
         }
     };
 
@@ -89,15 +115,23 @@ const AddModule = () => {
                 />
             </div>
             <div>
-                <label>ECTS</label>
-                <input
-                    type="text"
-                    name="ects"
-                    value={formData.ects}
+                <label>Módulo</label>
+                <select
+                    name="module_id"
+                    value={formData.module_id}
                     onChange={handleChange}
                     required
-                    maxLength={255}
-                />
+                >
+                    <option value="" disabled>
+                        Select a module
+                    </option>
+                    {modules.map((module) => (
+                        <option key={module.module_id} value={module.module_id}>
+                            {module.name}
+                        </option>
+                    ))}
+                </select>
+                )}
             </div>
 
             <button type="submit">Submeter</button>
@@ -105,4 +139,4 @@ const AddModule = () => {
     );
 };
 
-export default AddModule;
+export default AddSubModule;
