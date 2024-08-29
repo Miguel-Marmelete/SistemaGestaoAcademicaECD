@@ -1,0 +1,570 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", Arial, sans-serif; /* Ensuring consistency across the entire document */
+}
+
+/* Estilo geral da Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #343a40;
+    padding: 1px 1%;
+    color: white;
+    height: 60px;
+    box-shadow: 0 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Estilo para a seção esquerda da Navbar (logos e título) */
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-left .logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.navbar-left h3 {
+    margin: 0;
+    font-size: 1rem; /* Use rem for font size to ensure scalability */
+    line-height: 1.2;
+}
+
+/* Estilo para a seção direita da Navbar (nome do professor e botões) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem; /* Slightly smaller font size */
+}
+
+.navbar-info {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-info span {
+    margin-right: 15px;
+}
+
+.auth-buttons button,
+.admin_panel_button,
+.logout_button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.auth-buttons button:hover,
+.logout_button:hover {
+    background-color: #0056b3;
+}
+
+button a {
+    color: white;
+    text-decoration: none;
+}
+
+/* ---------------VERIFY EMAIL CSS ------------------*/
+.verify-email-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.verify-email-container {
+    text-align: center;
+    padding: 20px;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    width: 90%; /* Responsive width */
+    max-width: 500px; /* Upper limit */
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+.verify-email-title {
+    font-size: 1.875rem; /* Responsive font size */
+    margin-bottom: 25px;
+    color: #1a1a1a;
+}
+
+.verify-email-message {
+    font-size: 1.25rem;
+    color: #444444;
+    line-height: 1.8;
+}
+
+/*-------------LOGIN AND SIGNUP CSS---------------------*/
+
+form {
+    width: 90%; /* Responsive width */
+    max-width: 300px; /* Upper limit */
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+h1.login_header,
+h1.signup_header {
+    text-align: center;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form_button {
+    width: 100%;
+    max-width: 150px; /* Limit button width */
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form_button:hover {
+    background-color: #0056b3;
+}
+
+.login_button_container,
+.signup_button_container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/*------------------MENU BAR CSS---------------------*/
+
+.menu-bar {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap on small screens */
+    background-color: #f0f0f0;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.menu-item-container {
+    position: relative;
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.menu-item {
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+    padding: 5px 10px;
+    display: inline-block;
+}
+
+.menu-item:hover,
+.menu-item-container:hover > .menu-item {
+    color: #000;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #f0f0f0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 5px 0;
+    z-index: 1000;
+    white-space: nowrap;
+    min-width: 100%;
+}
+
+.dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #e0e0e0;
+}
+
+/*-----------------------ADMIN PANEL CSS----------------*/
+
+/* Center the panel container on the screen and reduce space above title */
+.panel-container {
+    padding: 15px;
+    max-width: 800px; /* Adjusted width for responsiveness */
+    margin: 30px auto; /* Center the container horizontally and vertically */
+    background-color: #343a40;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    text-align: center;
+    position: relative; /* Allows absolute positioning of the back button */
+}
+
+/* Style the title, reducing space between title and container top */
+.panel-container h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* Style the container for the buttons with responsiveness */
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center; /* Center the buttons */
+    margin-top: 30px;
+    margin-bottom: 40px; /* Space below buttons, ensuring room for back button */
+}
+
+/* Style the panel buttons */
+.panel-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 20px; /* Smaller padding for buttons */
+    margin-bottom: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.875rem; /* Smaller font size */
+    box-shadow: 0 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+    flex: 1 1 auto; /* Allows buttons to grow and shrink */
+    max-width: 260px; /* Limits button width on larger screens */
+}
+
+/* Change button color on hover */
+.panel-button:hover {
+    background-color: #0056b3;
+}
+
+/* Focused state */
+.panel-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+/* Specific style for the back button */
+.back-button {
+    background-color: #869099;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: background-color 0.3s ease;
+}
+
+/* Change back button color on hover */
+.back-button:hover {
+    background-color: #5a6268;
+}
+
+/* Focus state for the back button */
+.back-button:focus {
+    box-shadow: 0 0 0 3px rgba(132, 141, 148, 0.5);
+}
+
+/*----------STUDENTS LIST PAGE CSS--------*/
+
+/* General layout and typography for StudentsList component */
+/* Container for the Students List component */
+.table-list-container {
+    margin-left: 10px;
+    padding: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.table-list-container h1 {
+    font-size: 1.5rem;
+    color: #343a40;
+    margin-bottom: 20px;
+}
+
+/* Dropdown styling */
+.course-select-container {
+    margin-bottom: 20px;
+}
+
+.course-select-container label {
+    font-size: 1rem;
+    margin-right: 10px;
+    color: #333333;
+}
+
+.course-select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #333333;
+    background-color: #f8f9fa;
+    box-sizing: border-box;
+    appearance: none; /* Remove default styling */
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.course-select:focus {
+    outline: none;
+    border-color: #007bff;
+    background-color: #ffffff;
+}
+
+.course-select:hover {
+    border-color: #0056b3;
+}
+
+/* Add a custom dropdown arrow */
+.course-select-container select {
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6L8 10L12 6H4Z' fill='%23333333'/%3E%3C/svg%3E%0A");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    padding-right: 30px; /* Adjust padding to make space for arrow */
+}
+
+/* Table styling */
+.table-list {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #333333;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-list th,
+.table-list td {
+    padding: 12px 15px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+}
+
+.table-list th {
+    background-color: #343a40;
+    color: white;
+    font-weight: normal;
+}
+
+.table-list tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.table-list tr:hover {
+    background-color: #e9ecef;
+}
+
+/*--------------FORM CSS-----------*/
+/*--------------GENERAL FORM CSS-----------*/
+/* General form styling */
+form {
+    max-width: 80%; /* Increased width for the form to reduce scrolling */
+    margin: 20px auto; /* Centering the form */
+    padding: 20px;
+    background-color: #343a40; /* Dark grey background */
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for better aesthetics */
+    display: grid; /* Use CSS Grid for layout */
+    grid-template-columns: repeat(2, 1fr); /* Two columns for inputs */
+    gap: 20px; /* Space between rows and inputs */
+}
+
+/* Form title styling */
+form h2 {
+    grid-column: span 2; /* Make title span across both columns */
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+/* Input fields and labels */
+form div {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Label styling */
+form label {
+    font-size: 0.875rem; /* Slightly smaller font size */
+}
+
+/* Input styling */
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="date"],
+form button {
+    padding: 10px;
+    font-size: 0.875rem; /* Font size consistent with the navbar buttons */
+    border: 1px solid #ced4da; /* Border color matching neutral tone */
+    border-radius: 4px;
+    background-color: #ffffff; /* White background for inputs */
+    box-sizing: border-box; /* Ensuring padding doesn't affect the width */
+    width: 100%; /* Making input fields take the full width of their container */
+}
+
+/* Specific adjustment for date input */
+form input[type="date"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 10px;
+    font-size: 0.875rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #ffffff;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Button styling */
+form button {
+    grid-column: 1 / 2; /* Make button span only the first column */
+    width: 100px; /* Button size based on content */
+    align-self: start; /* Align button to the start of the grid */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    margin-top: 20px; /* Space above the button */
+}
+
+form button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Optional small text styling */
+form small {
+    font-size: 0.75rem; /* Smaller font size */
+    color: #ccc; /* Lighter color for optional text */
+}
+
+/*--------------LOGIN/SIGNUP FORM CSS-----------*/
+.login_container,
+.signup_container {
+    max-width: 400px; /* Constrain width for login/signup forms */
+    margin: 0 auto; /* Center the login/signup container */
+}
+
+.login_form,
+.signup_form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #343a40; /* Same dark grey background */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login_form h1,
+.signup_form h1 {
+    margin-bottom: -20px;
+    font-size: 1.5rem;
+    text-align: center;
+    color: white;
+}
+
+.login_form div,
+.signup_form div {
+    margin-bottom: 0px; /* Add some space between form fields */
+}
+
+.login_form label {
+    font-size: 0.875rem;
+    margin-bottom: 0px;
+    color: #ced4da; /* Light grey for labels */
+}
+.signup_form label {
+    font-size: 0.875rem;
+    margin-bottom: -20px;
+    color: #ced4da; /* Light grey for labels */
+}
+
+.login_form input[type="text"],
+.login_form input[type="password"],
+.signup_form input[type="text"],
+.signup_form input[type="password"],
+.signup_form input[type="email"] {
+    padding: 10px;
+    font-size: 0.875rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #ffffff;
+    width: 100%;
+}
+
+.signup_form button,
+.login_form button {
+    padding: 10px;
+    font-size: 0.875rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #ffffff;
+    width: 100%;
+    margin-left: 30%;
+}
+
+.login_button_container,
+.signup_button_container {
+    display: flex;
+    justify-content: center; /* Center the button */
+    margin-top: 0px;
+}
+
+.login_button_container button,
+.signup_button_container button {
+    width: 100px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+}
+
+.login_button_container button:hover,
+.signup_button_container button:hover {
+    background-color: #0056b3;
+}
