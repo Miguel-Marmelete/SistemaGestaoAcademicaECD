@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Lesson;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Models\ProfessorInChargeOfLesson;
 
 class LessonController extends Controller
 {
@@ -16,9 +18,11 @@ class LessonController extends Controller
     public function index()
     {
         try {
-            $lessons = Lesson::with(['professor', 'module', 'course'])->get();
+            $lessons = Lesson::with([ 'submodule', 'course','professors'])->get();
+            Log::info('Lessons Data: ' . $lessons->toJson());
             return response()->json(['lessons' => $lessons], 200);
         } catch (\Exception $e) {
+            Log::info($e->getMessage());
             return response()->json(['error' => 'An error occurred while retrieving lessons', 'details' => $e->getMessage()], 500);
         }
     }
@@ -50,6 +54,7 @@ class LessonController extends Controller
     public function store(Request $request)
     {
         try {
+            // Validation
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
                 'type' => 'required|string|in:Teórica,Laboratorial,Teórica-Prática',
@@ -57,19 +62,32 @@ class LessonController extends Controller
                 'submodule_id' => 'required|exists:submodules,submodule_id',
                 'course_id' => 'required|exists:courses,course_id',
                 'date' => 'required|date_format:Y-m-d H:00:00',
+                'professor_ids' => 'required|array',
+                'professor_ids.*' => 'exists:professors,professor_id',
             ]);
-
+    
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
-        
+    
+            // Create the Lesson
             $lesson = Lesson::create($validator->validated());
-
+    
+            // Attach Professors to the Lesson using the ProfessorInChargeOfLesson model
+            $professorIds = $request->input('professor_ids');
+            foreach ($professorIds as $professorId) {
+                ProfessorInChargeOfLesson::create([
+                    'professor_id' => $professorId,
+                    'lesson_id' => $lesson->lesson_id,
+                ]);
+            }
+    
             return response()->json(['message' => 'Lesson created successfully', 'lesson' => $lesson], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while creating the lesson', 'details' => $e->getMessage()], 500);
         }
     }
+    
 
     /**
      * Update the specified lesson.

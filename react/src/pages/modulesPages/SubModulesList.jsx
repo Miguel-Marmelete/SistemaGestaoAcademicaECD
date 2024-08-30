@@ -21,6 +21,7 @@ const SubModulesList = () => {
                 return response.json();
             })
             .then((data) => {
+                console.log(data);
                 console.log("submodules", data.submodules);
                 setSubModules(data.submodules);
             })
@@ -50,7 +51,7 @@ const SubModulesList = () => {
                             <td>{subModule.name}</td>
                             <td>{subModule.abbreviation}</td>
                             <td>{subModule.contact_hours}</td>
-                            <td>{subModule.module_id}</td>
+                            <td>{subModule.module.name}</td>
                         </tr>
                     ))}
                 </tbody>

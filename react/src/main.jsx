@@ -18,6 +18,8 @@ import AddModule from "./pages/modulesPages/AddModule.jsx";
 import ModulesList from "./pages/modulesPages/ModulesList.jsx";
 import AddSubModule from "./pages/modulesPages/AddSubModule.jsx";
 import SubModulesList from "./pages/modulesPages/SubModulesList.jsx";
+import AddLesson from "./pages/lessonPages/AddLessons.jsx";
+import LessonsList from "./pages/lessonPages/LessonsList.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
@@ -89,6 +91,22 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         element={
                             <PrivateRoute>
                                 <SubModulesList />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/addLesson"
+                        element={
+                            <PrivateRoute>
+                                <AddLesson />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/lessons"
+                        element={
+                            <PrivateRoute>
+                                <LessonsList />
                             </PrivateRoute>
                         }
                     />

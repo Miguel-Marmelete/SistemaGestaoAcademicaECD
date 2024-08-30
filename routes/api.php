@@ -142,7 +142,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     // Get a specific lesson by ID
     Route::get('/getLesson/{id}', [LessonController::class, 'show']);
     // Create a new lesson
-    Route::post('/createLesson', [LessonController::class, 'store']);
+    Route::post('/addLessons', [LessonController::class, 'store']);
     // Update an existing lesson by ID
     Route::put('/editLesson/{id}', [LessonController::class, 'update']);
     // Delete a student by ID

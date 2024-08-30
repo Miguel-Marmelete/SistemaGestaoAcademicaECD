@@ -55,6 +55,6 @@ class Professor extends Authenticatable implements JWTSubject
     
     public function lessons()
     {
-        return $this->hasMany(Lesson::class, 'professor_id');
+        return $this->belongsToMany(Lesson::class, 'professor_in_charge_of_lesson', 'professor_id', 'lesson_id');
     }
 }
