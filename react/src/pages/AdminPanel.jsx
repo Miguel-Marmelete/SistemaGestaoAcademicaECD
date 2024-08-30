@@ -27,8 +27,8 @@ function AdminPanel() {
         {
             label: "Aulas",
             subButtons: [
-                { label: "Listar Aulas", link: "/cursos/create" },
-                { label: "Adicionar Aulas", link: "/cursos/create" },
+                { label: "Listar Aulas", link: "/lessons" },
+                { label: "Adicionar Aulas", link: "/addLesson" },
                 { label: "Editar Aulas", link: "/cursos/manage" },
                 { label: "Apagar Aulas", link: "/cursos/manage" },
             ],

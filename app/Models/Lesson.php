@@ -36,4 +36,8 @@ class Lesson extends Model
     {
         return $this->belongsToMany(Student::class, 'attendance', 'lesson_id', 'student_id');
     }
+    public function professors()
+    {
+        return $this->belongsToMany(Professor::class, 'professor_in_charge_of_lesson', 'lesson_id', 'professor_id');
+    }
 }

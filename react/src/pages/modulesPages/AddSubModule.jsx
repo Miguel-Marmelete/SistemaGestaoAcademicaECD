@@ -131,7 +131,6 @@ const AddSubModule = () => {
                         </option>
                     ))}
                 </select>
-                )}
             </div>
 
             <button type="submit">Submeter</button>

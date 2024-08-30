@@ -15,12 +15,13 @@ const endpoints = {
     GET_FILTERED_STUDENTS: `${API_BASE_URL}/students/search`,
     GET_MODULES: `${API_BASE_URL}/getAllModules`,
     GET_SUBMODULES: `${API_BASE_URL}/getAllSubModules`,
+    GET_LESSONS: `${API_BASE_URL}/getAllLessons`,
     // Posts
     ADD_STUDENTS: `${API_BASE_URL}/addStudents`,
     ADD_COURSES: `${API_BASE_URL}/addCourses`,
     ADD_MODULES: `${API_BASE_URL}/addModules`,
     ADD_SUBMODULES: `${API_BASE_URL}/addSubmodule`,
-
+    ADD_LESSONS: `${API_BASE_URL}/addLessons`,
     // Comments
     GET_COMMENTS: `${API_BASE_URL}/comments`,
     CREATE_COMMENT: `${API_BASE_URL}/comments`,
