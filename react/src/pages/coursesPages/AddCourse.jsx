@@ -4,6 +4,7 @@ import { useAuth } from "../../auth/AuthContext";
 
 const AddCourse = () => {
     const { accessTokenData } = useAuth();
+    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         abbreviation: "",
@@ -44,24 +45,30 @@ const AddCourse = () => {
         return true;
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!validateForm()) {
-            return;
-        }
+        if (loading) return;
+        if (!validateForm()) return;
 
-        try {
-            const response = await fetch(endpoints.ADD_COURSES, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-                body: JSON.stringify(formData),
-            });
+        setLoading(true);
 
-            if (response.ok) {
+        fetch(endpoints.ADD_COURSES, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessTokenData.access_token}`,
+            },
+            body: JSON.stringify(formData),
+        })
+            .then(async (response) => {
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Failed to add course");
+                }
+                return response.json();
+            })
+            .then(() => {
                 alert("Course added successfully!");
                 // Reset form
                 setFormData({
@@ -70,20 +77,21 @@ const AddCourse = () => {
                     date: "",
                     schedule: "",
                 });
-            } else {
-                alert("Failed to add course");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("An error occurred while adding the course");
-        }
+            })
+            .catch((error) => {
+                console.error("Error:", error.message);
+                alert(error.message);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <h2>Adicionar Curso</h2>
+            <h2>Add Course</h2>
             <div>
-                <label>Nome</label>
+                <label>Course Name</label>
                 <input
                     type="text"
                     name="name"
@@ -92,9 +100,9 @@ const AddCourse = () => {
                     required
                     maxLength={255}
                 />
-            </div>{" "}
+            </div>
             <div>
-                <label>Abreviatura</label>
+                <label>Abbreviation</label>
                 <input
                     type="text"
                     name="abbreviation"
@@ -105,7 +113,7 @@ const AddCourse = () => {
                 />
             </div>
             <div className="date_input_container">
-                <label className="date_input_label">Data de Inicio</label>
+                <label className="date_input_label">Start Date</label>
                 <input
                     type="date"
                     name="date"
@@ -116,9 +124,9 @@ const AddCourse = () => {
             </div>
             <div>
                 <label>
-                    Horário
+                    Schedule
                     <small style={{ fontSize: "0.6rem", paddingLeft: "5px" }}>
-                        (Campo Opcional)
+                        (Optional)
                     </small>
                 </label>
                 <input
@@ -129,7 +137,9 @@ const AddCourse = () => {
                     maxLength={255}
                 />
             </div>
-            <button type="submit">Submeter</button>
+            <button type="submit" disabled={loading}>
+                {loading ? "Submitting..." : "Submit"}
+            </button>
         </form>
     );
 };

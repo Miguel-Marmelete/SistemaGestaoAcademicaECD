@@ -27,7 +27,7 @@ const SubModulesList = () => {
             })
             .catch((error) => {
                 console.error("Error fetching submodules:", error);
-                alert("Failed to load submodules.");
+                alert(error.message);
             });
     }, [accessTokenData.access_token]);
 

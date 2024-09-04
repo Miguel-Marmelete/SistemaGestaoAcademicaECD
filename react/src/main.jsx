@@ -20,6 +20,10 @@ import AddSubModule from "./pages/modulesPages/AddSubModule.jsx";
 import SubModulesList from "./pages/modulesPages/SubModulesList.jsx";
 import AddLesson from "./pages/lessonPages/AddLessons.jsx";
 import LessonsList from "./pages/lessonPages/LessonsList.jsx";
+import EnrollStudents from "./pages/studentsPages/EnrollStudents.jsx";
+import AssociateModulesToCourse from "./pages/modulesPages/AssociateModulesToCourse.jsx";
+import AddEvaluationMoment from "./pages/evaluationMomentsPages/AddEvaluationMoment.jsx";
+import EvaluationMomentsList from "./pages/evaluationMomentsPages/EvaluationMomentsList.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
@@ -79,6 +83,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         }
                     />
                     <Route
+                        path="/associateModulesToCourse"
+                        element={
+                            <PrivateRoute>
+                                <AssociateModulesToCourse />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
                         path="/addSubmodule"
                         element={
                             <PrivateRoute>
@@ -107,6 +119,30 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         element={
                             <PrivateRoute>
                                 <LessonsList />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/enrollStudents"
+                        element={
+                            <PrivateRoute>
+                                <EnrollStudents />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/addEvaluationMoment"
+                        element={
+                            <PrivateRoute>
+                                <AddEvaluationMoment />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/evaluationMoments"
+                        element={
+                            <PrivateRoute>
+                                <EvaluationMomentsList />
                             </PrivateRoute>
                         }
                     />

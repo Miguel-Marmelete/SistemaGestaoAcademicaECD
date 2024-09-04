@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.jsx";
+import endpoints from "../endpoints.js";
 
-const LOGIN_ENDPOINT = "http://localhost:8000/api/login";
 function Login() {
     const { login } = useAuth();
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: "",
@@ -20,8 +21,9 @@ function Login() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        fetch(LOGIN_ENDPOINT, {
+        if (loading) return;
+        setLoading(true);
+        fetch(endpoints.LOGIN, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -39,6 +41,7 @@ function Login() {
                 if (data.token_data && data.professor) {
                     login(data.professor, data.token_data);
                     console.log(data.token_data);
+                    setLoading(false);
                     alert("Login successful");
                     navigate("/");
                 }

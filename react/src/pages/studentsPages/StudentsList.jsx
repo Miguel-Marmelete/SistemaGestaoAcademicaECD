@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import { fetchCourses } from "../../../scripts/getCourses";
+
 const StudentsList = () => {
     const [courses, setCourses] = useState([]);
-    const [selectedCourse, setSelectedCourse] = useState(null);
+    const [selectedCourse, setSelectedCourse] = useState(""); // Set initial state to an empty string
     const [students, setStudents] = useState([]);
     const navigate = useNavigate();
     const { accessTokenData } = useAuth();
@@ -14,16 +15,16 @@ const StudentsList = () => {
     useEffect(() => {
         fetchCourses(accessTokenData.access_token)
             .then((courses) => {
-                setCourses(courses);
+                setCourses(courses.reverse()); // Reverse to show latest courses first
             })
             .catch((error) => {
                 alert(error);
             });
-    }, []);
+    }, [accessTokenData.access_token]);
 
     // Fetch students when the selected course changes
     useEffect(() => {
-        if (selectedCourse !== null) {
+        if (selectedCourse) {
             fetch(
                 endpoints.GET_FILTERED_STUDENTS + `?course_id=${selectedCourse}`
             )
@@ -39,6 +40,7 @@ const StudentsList = () => {
                 })
                 .catch((error) => {
                     console.error("Error fetching students:", error);
+                    alert(error.message);
                 });
 
             // Update query string
@@ -65,10 +67,13 @@ const StudentsList = () => {
                 <select
                     id="course-select"
                     className="course-select"
-                    value={selectedCourse || ""}
+                    value={selectedCourse}
                     onChange={handleCourseChange}
                     style={{ marginLeft: "10px" }}
                 >
+                    <option value="" disabled>
+                        Selecione um curso
+                    </option>
                     {courses.map((course) => (
                         <option key={course.course_id} value={course.course_id}>
                             {course.name}
@@ -85,13 +90,19 @@ const StudentsList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {students.map((student) => (
-                        <tr key={student.student_id}>
-                            <td>{student.name}</td>
-                            <td>{student.number}</td>
-                            <td>{student.personal_email}</td>
+                    {students.length > 0 ? (
+                        students.map((student) => (
+                            <tr key={student.student_id}>
+                                <td>{student.name}</td>
+                                <td>{student.number}</td>
+                                <td>{student.personal_email}</td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="3">Nenhum aluno inscrito.</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
         </div>

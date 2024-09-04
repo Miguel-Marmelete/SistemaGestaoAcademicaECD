@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EvaluationMoment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Log;
 class EvaluationMomentController extends Controller
 {
     /**
@@ -33,10 +33,11 @@ class EvaluationMomentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'type' => 'required|string|in:Trabalho,Exame,Exame Recurso',
+            'date' => 'required|date',
             'course_id' => 'required|exists:courses,course_id',
             'professor_id' => 'required|exists:professors,professor_id',
             'module_id' => 'required|exists:modules,module_id',
-            'submodule_id' => 'required|nullable|exists:submodules,submodule_id',
+            'submodule_id' => 'nullable|exists:submodules,submodule_id',
         ]);
 
         if ($validator->fails()) {
@@ -48,6 +49,7 @@ class EvaluationMomentController extends Controller
 
             return response()->json(['message' => 'Evaluation moment created successfully', 'evaluationMoment' => $evaluationMoment], 201);
         } catch (\Exception $e) {
+            Log::info($e->getMessage());
             return response()->json(['error' => 'An error occurred while creating the evaluation moment', 'details' => $e->getMessage()], 500);
         }
     }

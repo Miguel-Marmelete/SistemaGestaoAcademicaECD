@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const SIGNUP_ENDPOINT = "http://localhost:8000/api/signup";
+import endpoints from "../endpoints";
 
 function SignUp() {
     const navigate = useNavigate();
@@ -51,7 +50,7 @@ function SignUp() {
         }
 
         // Envio de dados para o backend
-        fetch(SIGNUP_ENDPOINT, {
+        fetch(endpoints.SIGNUP, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

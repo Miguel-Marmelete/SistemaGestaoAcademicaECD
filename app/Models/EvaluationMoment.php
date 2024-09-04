@@ -19,6 +19,7 @@ class EvaluationMoment extends Model
     // Define the fillable attributes
     protected $fillable = [
         'type',
+        'date',
         'course_id',
         'professor_id',
         'module_id',

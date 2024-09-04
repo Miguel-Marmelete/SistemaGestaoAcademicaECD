@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('is_coordinator')->default(false);
             $table->string('password');
             $table->string('profile_picture')->nullable();
-            $table->rememberToken();
+            //$table->rememberToken();
             $table->timestamps();
         });
     }

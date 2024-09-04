@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Enrollment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class EnrollmentController extends Controller
@@ -30,24 +31,42 @@ class EnrollmentController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'student_id' => 'required|exists:students,student_id',
-            'course_id' => 'required|exists:courses,course_id',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'student_ids' => 'required|array',
+        'student_ids.*' => 'required|exists:students,student_id',
+        'course_id' => 'required|exists:courses,course_id',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        try {
-            $enrollment = Enrollment::create($validator->validated());
-
-            return response()->json(['message' => 'Enrollment created successfully', 'enrollment' => $enrollment], 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while creating the enrollment', 'details' => $e->getMessage()], 500);
-        }
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
     }
+
+    $enrollments = [];
+
+    try {
+        foreach ($request->input('student_ids') as $studentId) {
+            $enrollmentData = [
+                'student_id' => $studentId,
+                'course_id' => $request->input('course_id'),
+            ];
+
+            $enrollments[] = Enrollment::create($enrollmentData);
+        }
+
+        return response()->json([
+            'message' => 'Enrollments created successfully',
+            'enrollments' => $enrollments
+        ], 201);
+    } catch (\Exception $e) {
+        Log::info('erro: ',$e);
+        return response()->json([
+            'error' => 'An error occurred while creating the enrollments',
+            'details' => $e->getMessage()
+        ], 500);
+    }
+}
+
 
     /**
      * Display the specified enrollment record.
