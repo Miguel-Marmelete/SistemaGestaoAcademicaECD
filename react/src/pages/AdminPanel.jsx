@@ -20,6 +20,7 @@ function AdminPanel() {
             subButtons: [
                 { label: "Listar Alunos", link: "/students" },
                 { label: "Adicionar Alunos", link: "/addStudents" },
+                { label: "Inscrições", link: "/enrollStudents" },
                 { label: "Editar Alunos", link: "/cursos/manage" },
                 { label: "Apagar Alunos", link: "/cursos/manage" },
             ],
@@ -46,7 +47,7 @@ function AdminPanel() {
                 { label: "Apagar Submódulos", link: "/cursos/manage" },
                 {
                     label: "Associar Módulos a Curso",
-                    link: "/cursos/manage",
+                    link: "/associateModulesToCourse",
                 },
             ],
         },
@@ -56,11 +57,11 @@ function AdminPanel() {
             subButtons: [
                 {
                     label: "Listar Momentos de Avaliação",
-                    link: "/cursos/create",
+                    link: "/evaluationMoments",
                 },
                 {
                     label: "Adicionar Momentos de Avaliação",
-                    link: "/cursos/create",
+                    link: "/addEvaluationMoment",
                 },
                 {
                     label: "Editar Momentos de Avaliação",

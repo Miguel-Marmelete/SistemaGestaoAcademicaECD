@@ -31,23 +31,39 @@ class CourseModuleController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate the incoming request data
         $validator = Validator::make($request->all(), [
-            'module_id' => 'required|exists:modules,module_id',
             'course_id' => 'required|exists:courses,course_id',
+            'module_ids' => 'required|array',
+            'module_ids.*' => 'exists:modules,module_id', // Validate each module_id in the array
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        try {
-            $courseModule = CourseModule::create($validator->validated());
+        // Retrieve the validated data
+        $validatedData = $validator->validated();
+        $course_id = $validatedData['course_id'];
+        $module_ids = $validatedData['module_ids'];
 
-            return response()->json(['message' => 'Course-Module relationship created successfully', 'courseModule' => $courseModule], 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while creating the course-module relationship', 'details' => $e->getMessage()], 500);
-        }
+        try {
+            // Iterate over each module_id and create a new CourseModule association
+            foreach ($module_ids as $module_id) {
+                CourseModule::updateOrCreate(
+                    ['course_id' => $course_id, 'module_id' => $module_id],
+                    ['course_id' => $course_id, 'module_id' => $module_id]
+                );
+            }
+
+        return response()->json(['message' => 'Modules associated with the course successfully.'], 201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred while associating modules with the course',
+            'details' => $e->getMessage()
+        ], 500);
     }
+}
 
     /**
      * Display the specified course-module relationship.

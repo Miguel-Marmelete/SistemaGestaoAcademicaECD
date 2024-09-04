@@ -366,6 +366,7 @@ input[type="password"] {
 /* Table styling */
 .table-list {
     width: 100%;
+    table-layout: fixed; /* Ensures cells do not expand beyond their allocated space */
     border-collapse: collapse;
     margin-top: 20px;
     font-size: 1rem;
@@ -380,6 +381,7 @@ input[type="password"] {
     padding: 12px 15px;
     border: 1px solid #dee2e6;
     text-align: left;
+    word-wrap: break-word; /* Ensure long words wrap to the next line */
 }
 
 .table-list th {

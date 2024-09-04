@@ -48,7 +48,7 @@ const AddModule = () => {
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred while adding the module");
+            alert(error.message);
         }
     };
 

@@ -19,10 +19,11 @@ const LessonsList = () => {
                 return response.json();
             })
             .then((data) => {
+                console.log(data);
                 setLessons(data.lessons); // Adjust according to the actual structure of the response
             })
             .catch((error) => {
-                alert("Failed to fetch lessons: " + error.message);
+                alert(error.message);
             });
     }, []);
 

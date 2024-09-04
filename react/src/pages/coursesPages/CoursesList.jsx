@@ -8,10 +8,10 @@ const CoursesList = () => {
     useEffect(() => {
         fetchCourses(accessTokenData.access_token)
             .then((courses) => {
-                setCourses(courses);
+                setCourses(courses.reverse());
             })
             .catch((error) => {
-                alert(error);
+                alert(error.message);
             });
     }, []);
 

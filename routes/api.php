@@ -83,11 +83,24 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
      // Get a specific Enrollment by ID
      Route::get('/getEnrollment/{student_id}/{course_id}', [EnrollmentController::class, 'show']);
      // Create a new Enrollment
-     Route::post('/createEnrollment', [EnrollmentController::class, 'store']);
+     Route::post('/enrollStudents', [EnrollmentController::class, 'store']);
      // Update an existing course by ID
      Route::put('/editEnrollment/{student_id}/{course_id}', [EnrollmentController::class, 'update']);
      // Delete a Enrollment by ID
      Route::delete('/deleteEnrollment/{student_id}/{course_id}', [EnrollmentController::class, 'destroy']);  
+  //---------------------------------------------------------------------
+
+    //------------------ASSOCIATE MODULES TO COURSE ROUTES-------------------------------
+     // Get all Enrollment
+     Route::get('/getAllModulesCourseAssociation', [CourseModuleController::class, 'index']);
+     // Get a specific Enrollment by ID
+     Route::get('/getModulesCourseAssociation/{module_id}/{course_id}', [CourseModuleController::class, 'show']);
+     // Create a new Enrollment
+     Route::post('/associateModulesToCourse', [CourseModuleController::class, 'store']);
+     // Update an existing course by ID
+     Route::put('/editModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'update']);
+     // Delete a Enrollment by ID
+     Route::delete('/deleteModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'destroy']);  
   //---------------------------------------------------------------------
 
   //------------------EVALUATION MOMENT ROUTES-------------------------------
@@ -96,7 +109,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
      // Get a specific EvaluationMoments by ID
      Route::get('/getEvaluationMoments/{id}', [EvaluationMomentController::class, 'show']);
      // Create a new EvaluationMoments
-     Route::post('/createEvaluationMoments', [EvaluationMomentController::class, 'store']);
+     Route::post('/addEvaluationMoment', [EvaluationMomentController::class, 'store']);
      // Update an existing EvaluationMoments by ID
      Route::put('/editEvaluationMoments/{id}', [EvaluationMomentController::class, 'update']);
      // Delete a EvaluationMoments by ID

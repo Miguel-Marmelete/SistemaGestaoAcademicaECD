@@ -74,7 +74,7 @@ const AddSubModule = () => {
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred while adding the submodule");
+            alert(error.message);
         }
     };
 

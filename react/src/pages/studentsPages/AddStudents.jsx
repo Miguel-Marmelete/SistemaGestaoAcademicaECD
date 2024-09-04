@@ -123,7 +123,7 @@ const AddStudents = () => {
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred while adding the student");
+            alert(error.message);
         }
     };
 

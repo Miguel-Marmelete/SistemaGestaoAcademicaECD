@@ -25,9 +25,9 @@ const ModulesList = () => {
             })
             .catch((error) => {
                 console.error("Error fetching modules:", error);
-                alert("Failed to load modules.");
+                alert(error.message);
             });
-    }, [accessTokenData.access_token]);
+    }, []);
 
     return (
         <div className="table-list-container">

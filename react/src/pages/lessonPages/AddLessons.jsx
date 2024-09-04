@@ -36,7 +36,7 @@ const AddLesson = () => {
             })
             .catch((error) => {
                 console.error("Error:", error);
-                alert("An error occurred while fetching submodules");
+                alert(error.message);
             });
 
         fetch(endpoints.GET_COURSES, {
@@ -57,7 +57,7 @@ const AddLesson = () => {
             })
             .catch((error) => {
                 console.error("Error:", error);
-                alert("An error occurred while fetching courses");
+                alert(error.message);
             });
 
         fetch(endpoints.GET_PROFESSORS, {
@@ -78,7 +78,7 @@ const AddLesson = () => {
             })
             .catch((error) => {
                 console.error("Error:", error);
-                alert("An error occurred while fetching professors");
+                alert(error.message);
             });
     }, []);
 
@@ -152,7 +152,7 @@ const AddLesson = () => {
             })
             .catch((error) => {
                 console.error("Error:", error);
-                alert("An error occurred while adding the lesson");
+                alert(error.message);
             });
     };
 
