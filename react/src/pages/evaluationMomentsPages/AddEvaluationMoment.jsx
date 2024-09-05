@@ -246,9 +246,7 @@ const AddEvaluationMoment = () => {
                     required
                 />
             </div>
-            <button type="submit" disabled={loading}>
-                {loading ? "Submitting..." : "Submit"}
-            </button>
+            <button type="submit">Submit</button>
         </form>
     );
 };

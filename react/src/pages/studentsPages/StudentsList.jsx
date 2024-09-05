@@ -59,11 +59,7 @@ const StudentsList = () => {
             <header>
                 <h1>Alunos Inscritos</h1>
             </header>
-            <div
-                className="course-select-container"
-                style={{ margin: "20px 0" }}
-            >
-                <label htmlFor="course-select">Selecione o Curso:</label>
+            <div className="course-select-container">
                 <select
                     id="course-select"
                     className="course-select"
