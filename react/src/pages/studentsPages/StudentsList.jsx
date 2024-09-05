@@ -59,23 +59,27 @@ const StudentsList = () => {
             <header>
                 <h1>Alunos Inscritos</h1>
             </header>
-            <div className="course-select-container">
-                <select
-                    id="course-select"
-                    className="course-select"
-                    value={selectedCourse}
-                    onChange={handleCourseChange}
-                    style={{ marginLeft: "10px" }}
-                >
-                    <option value="" disabled>
-                        Selecione um curso
-                    </option>
-                    {courses.map((course) => (
-                        <option key={course.course_id} value={course.course_id}>
-                            {course.name}
+            <div className="filters">
+                <label>
+                    Curso:
+                    <select
+                        id="course-select"
+                        value={selectedCourse}
+                        onChange={handleCourseChange}
+                    >
+                        <option value="" disabled>
+                            Selecione um curso
                         </option>
-                    ))}
-                </select>
+                        {courses.map((course) => (
+                            <option
+                                key={course.course_id}
+                                value={course.course_id}
+                            >
+                                {course.name}
+                            </option>
+                        ))}
+                    </select>
+                </label>
             </div>
             <table className="table-list" border="1" cellPadding="10">
                 <thead>

@@ -592,3 +592,18 @@ button[type="submit"]:hover {
     align-items: center;
     font-size: 14px;
 }
+/*----------------------filters css*/
+.filters {
+    display: flex;
+    gap: 20px; /* Space between filters */
+    margin-bottom: 20px; /* Space below filters */
+}
+
+.filters label {
+    display: flex;
+    flex-direction: column;
+}
+
+.filters select {
+    margin-top: 5px; /* Space between label and select box */
+}
