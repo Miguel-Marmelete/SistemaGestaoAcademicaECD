@@ -603,7 +603,8 @@ button[type="submit"]:hover {
     display: flex;
     flex-direction: column;
 }
-
+/*
 .filters select {
-    margin-top: 5px; /* Space between label and select box */
+    margin-top: 5px; 
 }
+*/ /* Space between label and select box */
