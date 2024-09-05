@@ -80,7 +80,7 @@ const AddLesson = () => {
                 console.error("Error:", error);
                 alert(error.message);
             });
-    }, []);
+    }, [accessTokenData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -90,17 +90,22 @@ const AddLesson = () => {
         });
     };
 
-    const handleProfessorChange = (e) => {
-        const { options } = e.target;
-        const selectedProfessors = [];
-        for (const option of options) {
-            if (option.selected) {
-                selectedProfessors.push(option.value);
+    const handleProfessorCheckboxChange = (e) => {
+        const { value, checked } = e.target;
+        setFormData((prevState) => {
+            if (checked) {
+                return {
+                    ...prevState,
+                    professor_ids: [...prevState.professor_ids, value],
+                };
+            } else {
+                return {
+                    ...prevState,
+                    professor_ids: prevState.professor_ids.filter(
+                        (id) => id !== value
+                    ),
+                };
             }
-        }
-        setFormData({
-            ...formData,
-            professor_ids: selectedProfessors,
         });
     };
 
@@ -236,22 +241,24 @@ const AddLesson = () => {
             </div>
             <div>
                 <label>Professors</label>
-                <select
-                    name="professor_ids"
-                    multiple
-                    value={formData.professor_ids}
-                    onChange={handleProfessorChange}
-                    required
-                >
+                <div className="professors-checkbox-group">
                     {professors.map((professor) => (
-                        <option
-                            key={professor.professor_id}
-                            value={professor.professor_id}
-                        >
-                            {professor.name}
-                        </option>
+                        <div key={professor.professor_id}>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="professor_ids"
+                                    value={professor.professor_id}
+                                    checked={formData.professor_ids.includes(
+                                        professor.professor_id
+                                    )}
+                                    onChange={handleProfessorCheckboxChange}
+                                />
+                                {professor.name}
+                            </label>
+                        </div>
                     ))}
-                </select>
+                </div>
             </div>
             <div>
                 <label>Date</label>
