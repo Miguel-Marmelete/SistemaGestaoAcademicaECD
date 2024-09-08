@@ -33,7 +33,7 @@ function Login() {
             .then(async (response) => {
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || "An error occurred");
+                    throw new Error(errorData.message);
                 }
                 return response.json();
             })
@@ -47,8 +47,11 @@ function Login() {
                 }
             })
             .catch((error) => {
-                console.error("Login error:", error.message);
-                alert(error.message);
+                console.error("Login error:", error);
+                alert(error);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 

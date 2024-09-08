@@ -22,30 +22,30 @@ const StudentsList = () => {
             });
     }, [accessTokenData.access_token]);
 
-    // Fetch students when the selected course changes
+    // Fetch students when the selected course changes or when no course is selected
     useEffect(() => {
-        if (selectedCourse) {
-            fetch(
-                endpoints.GET_FILTERED_STUDENTS + `?course_id=${selectedCourse}`
-            )
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch students");
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log("students data:", data);
-                    setStudents(data);
-                })
-                .catch((error) => {
-                    console.error("Error fetching students:", error);
-                    alert(error.message);
-                });
+        const fetchStudentsUrl = selectedCourse
+            ? `${endpoints.GET_FILTERED_STUDENTS}?course_id=${selectedCourse}`
+            : endpoints.GET_FILTERED_STUDENTS; // No course_id for fetching all students
 
-            // Update query string
-            navigate(`?course=${selectedCourse}`);
-        }
+        fetch(fetchStudentsUrl)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch students");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log("students data:", data);
+                setStudents(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching students:", error);
+                alert(error.message);
+            });
+
+        // Update query string
+        navigate(`?course=${selectedCourse}`);
     }, [selectedCourse, navigate]);
 
     const handleCourseChange = (event) => {
@@ -67,9 +67,7 @@ const StudentsList = () => {
                         value={selectedCourse}
                         onChange={handleCourseChange}
                     >
-                        <option value="" disabled>
-                            Selecione um curso
-                        </option>
+                        <option value="">Todos os cursos</option>
                         {courses.map((course) => (
                             <option
                                 key={course.course_id}
@@ -90,19 +88,13 @@ const StudentsList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {students.length > 0 ? (
-                        students.map((student) => (
-                            <tr key={student.student_id}>
-                                <td>{student.name}</td>
-                                <td>{student.number}</td>
-                                <td>{student.personal_email}</td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="3">Nenhum aluno inscrito.</td>
+                    {students.map((student) => (
+                        <tr key={student.student_id}>
+                            <td>{student.name}</td>
+                            <td>{student.number}</td>
+                            <td>{student.personal_email}</td>
                         </tr>
-                    )}
+                    ))}
                 </tbody>
             </table>
         </div>

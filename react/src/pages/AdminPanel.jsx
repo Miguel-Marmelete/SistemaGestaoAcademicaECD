@@ -30,8 +30,8 @@ function AdminPanel() {
             subButtons: [
                 { label: "Listar Aulas", link: "/lessons" },
                 { label: "Adicionar Aulas", link: "/addLesson" },
-                { label: "Editar Aulas", link: "/cursos/manage" },
-                { label: "Apagar Aulas", link: "/cursos/manage" },
+                { label: "Marcar Presenças", link: "/addAttendance" },
+                { label: "Ver Presenças", link: "/attendance" },
             ],
         },
         {
@@ -39,12 +39,13 @@ function AdminPanel() {
             subButtons: [
                 { label: "Listar Módulos", link: "/modules" },
                 { label: "Adicionar Módulos", link: "/addModule" },
-                { label: "Editar Módulos", link: "/cursos/manage" },
-                { label: "Apagar Módulos", link: "/cursos/manage" },
+                {
+                    label: "Atribuir Módulo a Professor",
+                    link: "/cursos/manage",
+                },
+
                 { label: "Listar Submódulos", link: "/subModules" },
                 { label: "Adicionar Submódulos", link: "/addSubmodule" },
-                { label: "Editar Submódulos", link: "/cursos/manage" },
-                { label: "Apagar Submódulos", link: "/cursos/manage" },
                 {
                     label: "Associar Módulos a Curso",
                     link: "/associateModulesToCourse",

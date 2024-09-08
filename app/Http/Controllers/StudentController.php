@@ -161,39 +161,46 @@ class StudentController extends Controller
 
 
     public function search(Request $request)
-{
-    // Validate request parameters
-    $request->validate([
-        'course_id' => 'required|integer|exists:courses,course_id',
-    ]);
-
-    try {
-        // Extract course_id from query parameters
-        $courseId = $request->query('course_id');
-
-        // Get student IDs from the enrollment table based on course_id
-        $studentIds = Enrollment::where('course_id', $courseId)
-            ->pluck('student_id');
-
-        // Retrieve students based on the obtained student IDs
-        $students = Student::whereIn('student_id', $studentIds)->get();
-
-        // Return students as a JSON response
-        return response()->json($students, 200);
-
-    } catch (\Exception $e) {
-        // Log the error for debugging purposes
-        Log::error('Search error: ' . $e->getMessage());
-
-        // Return a JSON response with the error message
-        return response()->json([
-            'error' => 'An unexpected error occurred.',
-            'message' => $e->getMessage()
-        ], 500);
+    {
+        // Validate course_id if it's present
+        $request->validate([
+            'course_id' => 'nullable|integer|exists:courses,course_id',
+        ]);
+    
+        try {
+            // Extract course_id from query parameters
+            $courseId = $request->query('course_id');
+    
+            // If course_id is provided, fetch students for that course
+            if ($courseId) {
+                // Get student IDs from the enrollment table based on course_id
+                $studentIds = Enrollment::where('course_id', $courseId)
+                    ->pluck('student_id');
+    
+                // Retrieve students based on the obtained student IDs
+                $students = Student::whereIn('student_id', $studentIds)->get();
+            } else {
+                // If no course_id is provided, return all students
+                $students = Student::all();
+            }
+    
+            // Return students as a JSON response
+            return response()->json($students, 200);
+    
+        } catch (\Exception $e) {
+            // Log the error for debugging purposes
+            Log::error('Search error: ' . $e->getMessage());
+    
+            // Return a JSON response with the error message
+            return response()->json([
+                'error' => 'An unexpected error occurred.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
+    
 }
 
-    
+ 
     
 
-}

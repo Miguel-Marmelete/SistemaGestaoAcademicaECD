@@ -21,46 +21,53 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
-    {
-        try {
-            // Validate request data
-            $validator = Validator::make($request->all(), [
-                'name' => 'required',
-                'email' => 'required|email|unique:pending_professors|unique:professors',
-                'password' => 'required|confirmed|min:8',
-            ]);
-
-            // Return validation errors if validation fails
-            if ($validator->fails()) {
-                return response()->json($validator->errors()->toJson(), 400);
-            }
-
-            // Generate a random token for email verification
-            $token = Str::random(60);
-
-            // Create a pending professor record
-            $pendingProfessor = PendingProfessor::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'verification_token' => $token
-            ]);
-
-            // Send verification email to the professor
-            Mail::send('emails.verify_professor', ['token' => $token], function($message) use ($request) {
-                $message->to($request->email);
-                $message->subject('Verify Email Address');
-            });
-
-            // Return success response
-            return response()->json(['message' => 'Registration initiated, please check your email for verification'], 201);
-
-        } catch (\Exception $e) {
-            // Log the error and return error response
-            Log::error('Error during registration: ' . $e->getMessage());
-            return response()->json(['message' => 'Registration failed'], 500);
+{
+    try {
+        // Check if the email is already in the pending_professors table
+        $pendingProfessor = PendingProfessor::where('email', $request->email)->first();
+        if ($pendingProfessor) {
+            return response()->json(['message' => 'Email is awaiting approval. Please check your inbox.'], 400);
         }
+
+        // Validate request data
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email|unique:pending_professors|unique:professors',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        // Return validation errors if validation fails
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        // Generate a random token for email verification
+        $token = Str::random(60);
+
+        // Create a pending professor record
+        $pendingProfessor = PendingProfessor::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'verification_token' => $token
+        ]);
+
+        // Send verification email to the professor
+        Mail::send('emails.verify_professor', ['token' => $token], function($message) use ($request) {
+            $message->to($request->email);
+            $message->subject('Verify Email Address');
+        });
+
+        // Return success response
+        return response()->json(['message' => 'Registration initiated, please check your email for verification'], 201);
+
+    } catch (\Exception $e) {
+        // Log the error and return error response
+        Log::error('Error during registration: ' . $e->getMessage());
+        return response()->json(['message' => 'Registration failed'], 500);
     }
+}
+
 
     /**
      * Confirm email address by professor.
@@ -142,26 +149,45 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    public function login(Request $request)
     {
         try {
+            // Validate input data
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'password' => 'required|min:8',
+            ]);
+    
+            // Return validation errors if validation fails
+            if ($validator->fails()) {
+                return response()->json($validator->errors()->toJson(), 400);
+            }
+    
+            // Check if the email is in pending professors
+            $pendingProfessor = PendingProfessor::where('email', $request->email)->first();
+            if ($pendingProfessor) {
+                return response()->json(['message' => 'Email is awaiting approval. Please check your inbox for verification.'], 400);
+            }
+    
             // Get credentials from request
-            $credentials = request(['email', 'password']);
-
+            $credentials = $request->only(['email', 'password']);
+    
             // Attempt to authenticate the user
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json(['error' => 'Invalid Credentials'], 401);
             }
+    
+            // Retrieve authenticated professor
             $professor = JWTAuth::user();
             $token_data = $this->respondWithToken($token)->getData();
-
+    
+            // Return success response with token and professor data
             return response()->json([
                 'message' => 'Successfully logged in',
-                'token_data' =>  $token_data ,
+                'token_data' =>  $token_data,
                 'professor' => $professor,
             ]);
-            return $token_data;
-
+    
         } catch (\Exception $e) {
             // Log the error and return error response
             Log::error('Error during login: ' . $e->getMessage());

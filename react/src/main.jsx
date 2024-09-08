@@ -24,6 +24,8 @@ import EnrollStudents from "./pages/studentsPages/EnrollStudents.jsx";
 import AssociateModulesToCourse from "./pages/modulesPages/AssociateModulesToCourse.jsx";
 import AddEvaluationMoment from "./pages/evaluationMomentsPages/AddEvaluationMoment.jsx";
 import EvaluationMomentsList from "./pages/evaluationMomentsPages/EvaluationMomentsList.jsx";
+import AddAttendance from "./pages/lessonPages/AddAttendance.jsx";
+import AttendanceList from "./pages/lessonPages/AttendanceList.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
@@ -143,6 +145,22 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         element={
                             <PrivateRoute>
                                 <EvaluationMomentsList />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/addAttendance"
+                        element={
+                            <PrivateRoute>
+                                <AddAttendance />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/attendance"
+                        element={
+                            <PrivateRoute>
+                                <AttendanceList />
                             </PrivateRoute>
                         }
                     />
