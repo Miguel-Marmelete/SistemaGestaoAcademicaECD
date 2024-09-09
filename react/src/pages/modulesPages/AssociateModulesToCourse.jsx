@@ -19,7 +19,7 @@ const AssociateModulesToCourse = () => {
             .catch((error) => {
                 alert(error);
             });
-    }, []);
+    }, [accessTokenData.access_token]); // Added dependency to useEffect
 
     // Fetch modules from API
     useEffect(() => {
@@ -42,23 +42,29 @@ const AssociateModulesToCourse = () => {
                 console.error("Error fetching modules:", error);
                 alert("Failed to load modules.");
             });
-    }, []);
+    }, [accessTokenData.access_token]); // Added dependency to useEffect
 
     // Handle course change
     const handleCourseChange = (event) => {
         setSelectedCourse(event.target.value);
     };
 
-    // Handle module selection
-    const handleModuleChange = (event) => {
-        const { options } = event.target;
-        const selected = [];
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].selected) {
-                selected.push(options[i].value);
+    // Handle module selection via checkboxes
+    const handleModuleCheckboxChange = (e) => {
+        const { value, checked } = e.target;
+        const numericValue = parseInt(value, 10); // Convert value to a number
+
+        setSelectedModules((prevSelectedModules) => {
+            if (checked) {
+                // Add module if checked
+                return [...prevSelectedModules, numericValue];
+            } else {
+                // Remove module if unchecked
+                return prevSelectedModules.filter(
+                    (module_id) => module_id !== numericValue
+                );
             }
-        }
-        setSelectedModules(selected);
+        });
     };
 
     // Handle form submission
@@ -98,14 +104,13 @@ const AssociateModulesToCourse = () => {
 
     return (
         <div className="form-container">
-            <header>
-                <h1>Associate Modules with Course</h1>
-            </header>
             <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="course-select">Select Course:</label>
+                <h2>Associate Modules with Course</h2>
+
+                <div>
+                    <label>Select Course</label>
                     <select
-                        id="course-select"
+                        name="course"
                         value={selectedCourse}
                         onChange={handleCourseChange}
                         required
@@ -124,27 +129,29 @@ const AssociateModulesToCourse = () => {
                     </select>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="module-select">Select Modules:</label>
-                    <select
-                        id="module-select"
-                        multiple
-                        value={selectedModules}
-                        onChange={handleModuleChange}
-                        required
-                    >
+                <div>
+                    <label>Modules</label>
+                    <div className="checkbox-group">
                         {modules.map((module) => (
-                            <option
-                                key={module.module_id}
-                                value={module.module_id}
-                            >
-                                {module.name}
-                            </option>
+                            <div key={module.module_id}>
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        name="module_ids"
+                                        value={module.module_id}
+                                        checked={selectedModules.includes(
+                                            module.module_id
+                                        )}
+                                        onChange={handleModuleCheckboxChange}
+                                    />
+                                    {module.name}
+                                </label>
+                            </div>
                         ))}
-                    </select>
+                    </div>
                 </div>
 
-                <button type="submit">Associate Modules</button>
+                <button type="submit">Submeter</button>
             </form>
         </div>
     );

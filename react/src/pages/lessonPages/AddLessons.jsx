@@ -53,7 +53,7 @@ const AddLesson = () => {
                 }
             })
             .then((courseData) => {
-                setCourses(courseData.courses);
+                setCourses(courseData.courses.reverse());
             })
             .catch((error) => {
                 console.error("Error:", error);
@@ -92,17 +92,19 @@ const AddLesson = () => {
 
     const handleProfessorCheckboxChange = (e) => {
         const { value, checked } = e.target;
+        const numericValue = parseInt(value, 10);
+
         setFormData((prevState) => {
             if (checked) {
                 return {
                     ...prevState,
-                    professor_ids: [...prevState.professor_ids, value],
+                    professor_ids: [...prevState.professor_ids, numericValue],
                 };
             } else {
                 return {
                     ...prevState,
                     professor_ids: prevState.professor_ids.filter(
-                        (id) => id !== value
+                        (id) => id !== numericValue
                     ),
                 };
             }
@@ -241,7 +243,7 @@ const AddLesson = () => {
             </div>
             <div>
                 <label>Professors</label>
-                <div className="professors-checkbox-group">
+                <div className="checkbox-group">
                     {professors.map((professor) => (
                         <div key={professor.professor_id}>
                             <label>

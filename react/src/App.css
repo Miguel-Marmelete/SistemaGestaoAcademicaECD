@@ -373,8 +373,6 @@ input[type="password"] {
 
 /*--------------GENERAL FORM CSS-----------*/
 /* General form styling */
-form {
-}
 
 /* Input styling */
 form input[type="text"],
@@ -402,7 +400,6 @@ form input[type="date"] {
     border-radius: 4px;
     background-color: #ffffff;
     width: 100%;
-    margin-top: 10px;
 }
 
 /* Button styling */
@@ -563,7 +560,7 @@ textarea {
 button[type="submit"] {
     background-color: #007bff;
     color: white;
-    padding: 10px 20px;
+    padding: 10px 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -575,7 +572,7 @@ button[type="submit"]:hover {
 }
 
 /* Styling for the professors list */
-.professors-checkbox-group {
+.checkbox-group {
     display: flex;
     flex-direction: column; /* Align checkboxes in a column */
     max-height: 17px; /* Set a max height */
@@ -587,7 +584,7 @@ button[type="submit"]:hover {
     color: #333;
 }
 
-.professors-checkbox-group label {
+.checkbox-group label {
     display: flex;
     align-items: center;
     font-size: 14px;
