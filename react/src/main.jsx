@@ -26,7 +26,9 @@ import AddEvaluationMoment from "./pages/evaluationMomentsPages/AddEvaluationMom
 import EvaluationMomentsList from "./pages/evaluationMomentsPages/EvaluationMomentsList.jsx";
 import AddAttendance from "./pages/lessonPages/AddAttendance.jsx";
 import AttendanceList from "./pages/lessonPages/AttendanceList.jsx";
-
+import EvaluateEvaluationMoments from "./pages/evaluationMomentsPages/evaluateEvaluationsMoments.jsx";
+import AssociateProfessorToModule from "./pages/modulesPages/AssociateModuleToProfessor.jsx";
+import ProfessorsInChargeOfModulesList from "./pages/modulesPages/ProfessorsInChargeOfModulesList.jsx";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
         <AuthProvider>
@@ -93,6 +95,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         }
                     />
                     <Route
+                        path="/professorsInChargeOfModules"
+                        element={
+                            <PrivateRoute>
+                                <ProfessorsInChargeOfModulesList />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
                         path="/addSubmodule"
                         element={
                             <PrivateRoute>
@@ -149,6 +159,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         }
                     />
                     <Route
+                        path="/evaluateEvaluationMoments"
+                        element={
+                            <PrivateRoute>
+                                <EvaluateEvaluationMoments />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
                         path="/addAttendance"
                         element={
                             <PrivateRoute>
@@ -164,7 +182,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                             </PrivateRoute>
                         }
                     />
-
+                    <Route
+                        path="/associateProfessorToModule"
+                        element={
+                            <PrivateRoute>
+                                <AssociateProfessorToModule />
+                            </PrivateRoute>
+                        }
+                    />
                     <Route path="/verify-email" element={<VerifyEmail />} />
                 </Route>
             </Routes>

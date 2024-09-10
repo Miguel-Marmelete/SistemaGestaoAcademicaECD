@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Course;
-
+use Illuminate\Support\Facades\Log;
 class CourseController extends Controller
 {
      // Método para listar todos os cursos
@@ -15,6 +15,7 @@ class CourseController extends Controller
             $courses = Course::all();
             return response()->json(['courses' => $courses], 200);
         } catch (\Exception $e) {
+            Log::error('Error fetching courses:', ['message' => $e->getMessage()]);
             return response()->json(['error' => 'Erro ao listar os cursos', 'message' => $e->getMessage()], 500);
         }
      }

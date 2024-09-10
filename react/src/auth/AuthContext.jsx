@@ -15,10 +15,12 @@ export const AuthProvider = ({ children }) => {
         return new Date() > expirationTime;
     };
 
-    // Load authentication state from localStorage on initial render
+    // Load authentication state from sessionStorage on initial render
     useEffect(() => {
-        const tokenData = JSON.parse(localStorage.getItem("tokenData"));
-        const professorData = JSON.parse(localStorage.getItem("professorData"));
+        const tokenData = JSON.parse(sessionStorage.getItem("tokenData"));
+        const professorData = JSON.parse(
+            sessionStorage.getItem("professorData")
+        );
 
         if (tokenData && professorData) {
             const { issued_at, expires_in } = tokenData;
@@ -57,8 +59,8 @@ export const AuthProvider = ({ children }) => {
             expires_in: expiresIn, // Store expiration duration
         });
 
-        // Store token and professor data in localStorage
-        localStorage.setItem(
+        // Store token and professor data in sessionStorage
+        sessionStorage.setItem(
             "tokenData",
             JSON.stringify({
                 ...tokenData,
@@ -66,7 +68,7 @@ export const AuthProvider = ({ children }) => {
                 expires_in: expiresIn, // Store expiration duration
             })
         );
-        localStorage.setItem("professorData", JSON.stringify(professorData));
+        sessionStorage.setItem("professorData", JSON.stringify(professorData));
 
         // Set up the logout timer to log out just before token expires
         const timeUntilExpiration = expirationTime - new Date();
@@ -88,11 +90,11 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error("Logout failed:", error);
         } finally {
-            // Clear local storage and state
+            // Clear session storage and state
             setProfessor(null);
             setAccessTokenData(null);
-            localStorage.removeItem("tokenData");
-            localStorage.removeItem("professorData");
+            sessionStorage.removeItem("tokenData");
+            sessionStorage.removeItem("professorData");
 
             // Redirect to Login page
             navigate("/login");

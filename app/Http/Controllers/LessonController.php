@@ -46,6 +46,40 @@ class LessonController extends Controller
     }
 
     /**
+     * Get lessons of a submodule.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getLessonsOfSubmodule(Request $request)
+    {
+        try {
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'submodule_id' => 'required|exists:submodules,submodule_id',
+                'course_id' => 'required|exists:courses,course_id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $submoduleId = $request->query('submodule_id');
+            $courseId = $request->query('course_id');
+
+            $lessons = Lesson::where('submodule_id', $submoduleId)
+                             ->where('course_id', $courseId)
+                             ->with(['professors', 'course'])
+                             ->get();
+
+            return response()->json(['lessons' => $lessons], 200);
+        } catch (\Exception $e) {
+            Log::info($e->getMessage());
+            return response()->json(['error' => 'An error occurred while retrieving lessons', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Store a new lesson.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -84,6 +118,7 @@ class LessonController extends Controller
     
             return response()->json(['message' => 'Lesson created successfully', 'lesson' => $lesson], 201);
         } catch (\Exception $e) {
+            Log::info($e->getMessage());
             return response()->json(['error' => 'An error occurred while creating the lesson', 'details' => $e->getMessage()], 500);
         }
     }

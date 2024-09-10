@@ -154,6 +154,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getAllLessons', [LessonController::class, 'index']);
     // Get a specific lesson by ID
     Route::get('/getLesson/{id}', [LessonController::class, 'show']);
+    Route::get('/getLessonsOfSubmodule', [LessonController::class, 'getLessonsOfSubmodule']);
     // Create a new lesson
     Route::post('/addLessons', [LessonController::class, 'store']);
     // Update an existing lesson by ID
@@ -190,11 +191,11 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
 
   //------------------PROFESSOR IN CHARGE OF MODULE ROUTES--------------------------------------
     // Get all ProfessorInChargeOfModule
-    Route::get('/getAllProfessorInChargeOfModule', [ProfessorInChargeOfModuleController::class, 'index']);
+    Route::get('/getAllProfessorsInChargeOfModules', [ProfessorInChargeOfModuleController::class, 'index']);
     // Get a specific ProfessorInChargeOfModule by ID
     Route::get('/getProfessorInChargeOfModule/{id}', [ProfessorInChargeOfModuleController::class, 'show']);
     // Create a new ProfessorInChargeOfModule
-    Route::post('/createProfessorInChargeOfModule', [ProfessorInChargeOfModuleController::class, 'store']);
+    Route::post('/associateProfessorToModule', [ProfessorInChargeOfModuleController::class, 'store']);
     // Update an existing ProfessorInChargeOfModule by ID
     Route::put('/editProfessorInChargeOfModule/{id}', [ProfessorInChargeOfModuleController::class, 'update']);
     // Delete a ProfessorInChargeOfModule by ID
@@ -220,6 +221,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getAllStudents', [StudentController::class, 'index']);
     // Get filtered students
     Route::get('/students/search', [StudentController::class, 'search']);
+    Route::get('/getStudentsByCourse', [StudentController::class, 'getStudentsByCourse']);
     // Get a specific student by ID
     Route::get('/getStudent/{id}', [StudentController::class, 'show']);
     // Create a new student
@@ -242,4 +244,5 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
      Route::put('/editSubmodule/{id}', [SubmoduleController::class, 'update']);
      // Delete a Submodule by ID
      Route::delete('/deleteSubmodule/{id}', [SubmoduleController::class, 'destroy']);  
+     Route::get('/getSubmodulesByCourse/{course_id}', [SubmoduleController::class, 'getSubmodulesByCourse']);
   //---------------------------------------------------------------------

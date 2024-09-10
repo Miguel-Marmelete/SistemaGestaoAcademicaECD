@@ -3,6 +3,7 @@ import { useAuth } from "../../auth/AuthContext";
 import endpoints from "../../endpoints";
 
 const AddAttendance = () => {
+    const { accessTokenData } = useAuth();
     const [courses, setCourses] = useState([]);
     const [submodules, setSubmodules] = useState([]);
     const [lessons, setLessons] = useState([]);
@@ -11,10 +12,8 @@ const AddAttendance = () => {
     const [selectedSubmodule, setSelectedSubmodule] = useState("");
     const [selectedLesson, setSelectedLesson] = useState("");
     const [selectedStudents, setSelectedStudents] = useState([]);
-    const { accessTokenData } = useAuth();
 
     useEffect(() => {
-        // Fetch courses
         fetch(endpoints.GET_COURSES, {
             method: "GET",
             headers: {
@@ -22,7 +21,7 @@ const AddAttendance = () => {
             },
         })
             .then((response) => response.json())
-            .then((data) => setCourses(data.courses))
+            .then((data) => setCourses(data.courses.reverse()))
             .catch((error) =>
                 alert("Failed to fetch courses: " + error.message)
             );
@@ -30,8 +29,7 @@ const AddAttendance = () => {
 
     useEffect(() => {
         if (selectedCourse) {
-            // Fetch submodules based on selected course
-            fetch(`${endpoints.GET_SUBMODULES}?course_id=${selectedCourse}`, {
+            fetch(`${endpoints.GET_SUBMODULES_BY_COURSE}/${selectedCourse}`, {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${accessTokenData.access_token}`,
@@ -42,16 +40,32 @@ const AddAttendance = () => {
                 .catch((error) =>
                     alert("Failed to fetch submodules: " + error.message)
                 );
-        } else {
-            setSubmodules([]);
+
+            fetch(
+                `${endpoints.GET_STUDENTS_BY_COURSE}?course_id=${selectedCourse}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                }
+            )
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data);
+
+                    setStudents(data);
+                })
+                .catch((error) =>
+                    alert("Failed to fetch students: " + error.message)
+                );
         }
     }, [selectedCourse, accessTokenData.access_token]);
 
     useEffect(() => {
         if (selectedCourse && selectedSubmodule) {
-            // Fetch lessons based on selected course and submodule
             fetch(
-                `${endpoints.GET_LESSONS}?course_id=${selectedCourse}&submodule_id=${selectedSubmodule}`,
+                `${endpoints.GET_LESSONS_OF_SUBMODULE}?course_id=${selectedCourse}&submodule_id=${selectedSubmodule}`,
                 {
                     method: "GET",
                     headers: {
@@ -68,21 +82,6 @@ const AddAttendance = () => {
             setLessons([]);
         }
     }, [selectedCourse, selectedSubmodule, accessTokenData.access_token]);
-
-    useEffect(() => {
-        // Fetch students
-        fetch(endpoints.GET_STUDENTS, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => setStudents(data.students))
-            .catch((error) =>
-                alert("Failed to fetch students: " + error.message)
-            );
-    }, [accessTokenData.access_token]);
 
     const handleStudentChange = (e) => {
         const value = Array.from(
@@ -116,7 +115,6 @@ const AddAttendance = () => {
                     throw new Error(data.error);
                 }
                 alert("Attendance registered successfully.");
-                // Clear selections
                 setSelectedCourse("");
                 setSelectedSubmodule("");
                 setSelectedLesson("");
@@ -128,96 +126,88 @@ const AddAttendance = () => {
     };
 
     return (
-        <div className="attendance-form-container">
-            <header>
-                <h1>Add Attendance</h1>
-            </header>
-
-            <div className="filters">
-                <label>
-                    Course:
-                    <select
-                        value={selectedCourse}
-                        onChange={(e) => setSelectedCourse(e.target.value)}
-                    >
-                        <option value="">Select a Course</option>
-                        {courses.map((course) => (
-                            <option
-                                key={course.course_id}
-                                value={course.course_id}
-                            >
-                                {course.name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label>
-                    Submodule:
-                    <select
-                        value={selectedSubmodule}
-                        onChange={(e) => setSelectedSubmodule(e.target.value)}
-                        disabled={!selectedCourse}
-                    >
-                        <option value="">Select a Submodule</option>
-                        {submodules.map((submodule) => (
-                            <option
-                                key={submodule.submodule_id}
-                                value={submodule.submodule_id}
-                            >
-                                {submodule.name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label>
-                    Lesson:
-                    <select
-                        value={selectedLesson}
-                        onChange={(e) => setSelectedLesson(e.target.value)}
-                        disabled={!selectedSubmodule}
-                    >
-                        <option value="">Select a Lesson</option>
-                        {lessons.map((lesson) => (
-                            <option
-                                key={lesson.lesson_id}
-                                value={lesson.lesson_id}
-                            >
-                                {lesson.title}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+        <form onSubmit={handleSubmit}>
+            <h2>Add Attendance</h2>
+            <div>
+                <label>Course</label>
+                <select
+                    value={selectedCourse}
+                    onChange={(e) => setSelectedCourse(e.target.value)}
+                    required
+                >
+                    <option value="" disabled>
+                        Select a Course
+                    </option>
+                    {courses.map((course) => (
+                        <option key={course.course_id} value={course.course_id}>
+                            {course.name}
+                        </option>
+                    ))}
+                </select>
             </div>
-
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Students:
-                    <select
-                        multiple
-                        value={selectedStudents}
-                        onChange={handleStudentChange}
-                    >
-                        {students
-                            .filter(
-                                (student) =>
-                                    student.course_id === selectedCourse
-                            )
-                            .map((student) => (
-                                <option
-                                    key={student.student_id}
-                                    value={student.student_id}
-                                >
-                                    {student.name}
-                                </option>
-                            ))}
-                    </select>
-                </label>
-
-                <button type="submit">Register Attendance</button>
-            </form>
-        </div>
+            <div>
+                <label>Submodule</label>
+                <select
+                    value={selectedSubmodule}
+                    onChange={(e) => setSelectedSubmodule(e.target.value)}
+                    disabled={!selectedCourse}
+                    required
+                >
+                    <option value="" disabled>
+                        Select a Submodule
+                    </option>
+                    {submodules.map((submodule) => (
+                        <option
+                            key={submodule.submodule_id}
+                            value={submodule.submodule_id}
+                        >
+                            {submodule.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div>
+                <label>Lesson</label>
+                <select
+                    value={selectedLesson}
+                    onChange={(e) => setSelectedLesson(e.target.value)}
+                    disabled={!selectedSubmodule}
+                    required
+                >
+                    <option value="" disabled>
+                        Select a Lesson
+                    </option>
+                    {lessons.map((lesson) => (
+                        <option key={lesson.lesson_id} value={lesson.lesson_id}>
+                            {lesson.title}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div>
+                <label>Students</label>
+                <select
+                    multiple
+                    value={selectedStudents}
+                    onChange={handleStudentChange}
+                    required
+                >
+                    {students.length > 0 ? (
+                        students.map((student) => (
+                            <option
+                                key={student.student_id}
+                                value={student.student_id}
+                            >
+                                {student.name}
+                            </option>
+                        ))
+                    ) : (
+                        <option disabled>No students available</option>
+                    )}
+                </select>
+            </div>
+            <button type="submit">Register Attendance</button>
+        </form>
     );
 };
 

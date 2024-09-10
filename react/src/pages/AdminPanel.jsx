@@ -41,7 +41,11 @@ function AdminPanel() {
                 { label: "Adicionar Módulos", link: "/addModule" },
                 {
                     label: "Atribuir Módulo a Professor",
-                    link: "/cursos/manage",
+                    link: "/associateProfessorToModule",
+                },
+                {
+                    label: "Prof. Encarregues de Módulos",
+                    link: "/professorsInChargeOfModules",
                 },
 
                 { label: "Listar Submódulos", link: "/subModules" },
@@ -74,7 +78,7 @@ function AdminPanel() {
                 },
                 {
                     label: "Avaliar Momentos de Avaliação",
-                    link: "/cursos/manage",
+                    link: "/evaluateEvaluationMoments",
                 },
             ],
         },

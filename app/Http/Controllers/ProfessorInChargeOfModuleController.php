@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ProfessorInChargeOfModule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Log; 
 class ProfessorInChargeOfModuleController extends Controller
 {
     /**
@@ -46,6 +46,7 @@ class ProfessorInChargeOfModuleController extends Controller
 
             return response()->json(['message' => 'Professor in charge of module created successfully', 'professorInCharge' => $professorInCharge], 201);
         } catch (\Exception $e) {
+            Log::error('Error creating professor in charge of module: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while creating the professor in charge of module record', 'details' => $e->getMessage()], 500);
         }
     }

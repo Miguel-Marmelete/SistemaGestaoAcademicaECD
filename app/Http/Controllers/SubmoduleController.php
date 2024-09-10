@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use App\Models\Submodule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Course;
+use App\Models\CourseModule;
 
 class SubmoduleController extends Controller
 {
@@ -109,7 +111,6 @@ class SubmoduleController extends Controller
     }
 }
 
-
     /**
      * Remove the specified submodule.
      *
@@ -128,6 +129,33 @@ class SubmoduleController extends Controller
             return response()->json(['error' => 'Submodule not found'], 404);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while deleting the submodule', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Get submodules by course.
+     *
+     * @param  int  $course_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSubmodulesByCourse($course_id)
+    {
+        // Validate the course_id
+        $course = Course::find($course_id);
+        if (!$course) {
+            return response()->json(['error' => 'Course not found'], 404);
+        }
+
+        try {
+            // Fetch the modules associated with the course
+            $moduleIds = CourseModule::where('course_id', $course_id)->pluck('module_id');
+
+            // Fetch the submodules associated with the modules
+            $submodules = Submodule::whereIn('module_id', $moduleIds)->get();
+
+            return response()->json(['submodules' => $submodules], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while retrieving submodules', 'details' => $e->getMessage()], 500);
         }
     }
 }

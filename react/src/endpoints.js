@@ -17,6 +17,10 @@ const endpoints = {
     GET_SUBMODULES: `${API_BASE_URL}/getAllSubModules`,
     GET_LESSONS: `${API_BASE_URL}/getAllLessons`,
     GET_EVALUATION_MOMENTS: `${API_BASE_URL}/getAllEvaluationMoments`,
+    GET_PROFESSORS_IN_CHARGE_OF_MODULES: `${API_BASE_URL}/getAllProfessorsInChargeOfModules`,
+    GET_SUBMODULES_BY_COURSE: `${API_BASE_URL}/getSubmodulesByCourse`,
+    GET_LESSONS_OF_SUBMODULE: `${API_BASE_URL}/getLessonsOfSubmodule`,
+    GET_STUDENTS_BY_COURSE: `${API_BASE_URL}/getStudentsByCourse`,
     // Posts
     ADD_STUDENTS: `${API_BASE_URL}/addStudents`,
     ENROLL_STUDENTS: `${API_BASE_URL}/enrollStudents`,
@@ -26,7 +30,7 @@ const endpoints = {
     ADD_LESSONS: `${API_BASE_URL}/addLessons`,
     ASSOCIATE_MODULES_TO_COURSE: `${API_BASE_URL}/associateModulesToCourse`,
     ADD_EVALUATION_MOMENT: `${API_BASE_URL}/addEvaluationMoment`,
-
+    ASSOCIATE_PROFESSOR_TO_MODULE: `${API_BASE_URL}/associateProfessorToModule`,
     // Comments
     GET_COMMENTS: `${API_BASE_URL}/comments`,
     CREATE_COMMENT: `${API_BASE_URL}/comments`,

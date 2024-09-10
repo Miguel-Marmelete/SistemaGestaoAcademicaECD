@@ -160,7 +160,7 @@ class StudentController extends Controller
     }
 
 
-    public function search(Request $request)
+    public function getStudentsByCourse(Request $request)
     {
         // Validate course_id if it's present
         $request->validate([
@@ -180,8 +180,8 @@ class StudentController extends Controller
                 // Retrieve students based on the obtained student IDs
                 $students = Student::whereIn('student_id', $studentIds)->get();
             } else {
-                // If no course_id is provided, return all students
-                $students = Student::all();
+            // If no course_id is provided, return a message
+            return response()->json(['message' => 'No students are enrolled in the provided course'], 200);
             }
     
             // Return students as a JSON response
