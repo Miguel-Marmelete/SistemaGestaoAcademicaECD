@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
+
 const AddStudents = () => {
     const { accessTokenData } = useAuth();
+    const [students, setStudents] = useState([]); // State for fetched students
 
     const [formData, setFormData] = useState({
         name: "",
@@ -17,6 +19,28 @@ const AddStudents = () => {
         personal_email: "",
         nim: "",
     });
+
+    useEffect(() => {
+        fetch(endpoints.GET_STUDENTS, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${accessTokenData.access_token}`,
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch students");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setStudents(data.students.reverse());
+            })
+            .catch((error) => {
+                console.error("Error fetching students:", error);
+                alert(error.message);
+            });
+    }, [accessTokenData.access_token]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -118,6 +142,14 @@ const AddStudents = () => {
                     personal_email: "",
                     nim: "",
                 });
+                // Fetch updated students list
+                const updatedStudents = await fetch(endpoints.GET_STUDENTS, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                }).then((res) => res.json());
+                setStudents(updatedStudents.students.reverse());
             } else {
                 alert("Failed to add student");
             }
@@ -128,129 +160,144 @@ const AddStudents = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>Adicionar Alunos</h2>
-            <div>
-                <label>Nome</label>
-                <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    maxLength={255}
-                />
+        <div className="container">
+            <form className="submitForm" onSubmit={handleSubmit}>
+                <h2>Adicionar Alunos</h2>
+                <div>
+                    <label>Nome</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        maxLength={255}
+                    />
+                </div>
+                <div className="date_input_container">
+                    <label className="date_input_label">
+                        Data de Nascimento
+                    </label>
+                    <input
+                        type="date"
+                        name="birthday"
+                        value={formData.birthday}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Telemóvel</label>
+                    <input
+                        type="text"
+                        name="mobile"
+                        value={formData.mobile}
+                        onChange={handleChange}
+                        required
+                        pattern="\d+"
+                    />
+                </div>
+                <div>
+                    <label>Classe</label>
+                    <input
+                        type="text"
+                        name="classe"
+                        value={formData.classe}
+                        onChange={handleChange}
+                        required
+                        maxLength={255}
+                    />
+                </div>
+                <div>
+                    <label>Email IPBEJA</label>
+                    <input
+                        type="email"
+                        name="ipbeja_email"
+                        value={formData.ipbeja_email}
+                        onChange={handleChange}
+                        required
+                        maxLength={255}
+                    />
+                </div>
+                <div>
+                    <label>Morada</label>
+                    <input
+                        type="text"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        required
+                        maxLength={255}
+                    />
+                </div>
+                <div>
+                    <label>Posto</label>
+                    <input
+                        type="text"
+                        name="posto"
+                        value={formData.posto}
+                        onChange={handleChange}
+                        required
+                        maxLength={255}
+                    />
+                </div>
+                <div>
+                    <label>Número</label>
+                    <input
+                        type="text"
+                        name="number"
+                        value={formData.number}
+                        onChange={handleChange}
+                        required
+                        pattern="\d+"
+                    />
+                </div>
+                <div>
+                    <label>Cidade</label>
+                    <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        required
+                        maxLength={255}
+                    />
+                </div>
+                <div>
+                    <label>NIM</label>
+                    <input
+                        type="text"
+                        name="nim"
+                        value={formData.nim}
+                        onChange={handleChange}
+                        pattern="\d+"
+                    />
+                </div>
+                <div>
+                    <label>Email Pessoal</label>
+                    <input
+                        type="email"
+                        name="personal_email"
+                        value={formData.personal_email}
+                        onChange={handleChange}
+                        required
+                        maxLength={255}
+                    />
+                </div>
+                <button type="submit">Submeter</button>
+            </form>
+
+            <div className="list">
+                <h2>Existing Students</h2>
+                <ul>
+                    {students.map((student) => (
+                        <li key={student.student_id}>
+                            {student.name} - {student.ipbeja_email}
+                        </li>
+                    ))}
+                </ul>
             </div>
-            <div className="date_input_container">
-                <label className="date_input_label">Data de Nascimento</label>
-                <input
-                    type="date"
-                    name="birthday"
-                    value={formData.birthday}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-            <div>
-                <label>Telemóvel</label>
-                <input
-                    type="text"
-                    name="mobile"
-                    value={formData.mobile}
-                    onChange={handleChange}
-                    required
-                    pattern="\d+"
-                />
-            </div>
-            <div>
-                <label>Classe</label>
-                <input
-                    type="text"
-                    name="classe"
-                    value={formData.classe}
-                    onChange={handleChange}
-                    required
-                    maxLength={255}
-                />
-            </div>
-            <div>
-                <label>Email IPBEJA</label>
-                <input
-                    type="email"
-                    name="ipbeja_email"
-                    value={formData.ipbeja_email}
-                    onChange={handleChange}
-                    required
-                    maxLength={255}
-                />
-            </div>
-            <div>
-                <label>Morada</label>
-                <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    required
-                    maxLength={255}
-                />
-            </div>
-            <div>
-                <label>Posto</label>
-                <input
-                    type="text"
-                    name="posto"
-                    value={formData.posto}
-                    onChange={handleChange}
-                    required
-                    maxLength={255}
-                />
-            </div>
-            <div>
-                <label>Número</label>
-                <input
-                    type="text"
-                    name="number"
-                    value={formData.number}
-                    onChange={handleChange}
-                    required
-                    pattern="\d+"
-                />
-            </div>
-            <div>
-                <label>Cidade</label>
-                <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    required
-                    maxLength={255}
-                />
-            </div>
-            <div>
-                <label>NIM</label>
-                <input
-                    type="text"
-                    name="nim"
-                    value={formData.nim}
-                    onChange={handleChange}
-                    pattern="\d+"
-                />
-            </div>
-            <div>
-                <label>Email Pessoal</label>
-                <input
-                    type="email"
-                    name="personal_email"
-                    value={formData.personal_email}
-                    onChange={handleChange}
-                    required
-                    maxLength={255}
-                />
-            </div>
-            <button type="submit">Submeter</button>
-        </form>
+        </div>
     );
 };
 

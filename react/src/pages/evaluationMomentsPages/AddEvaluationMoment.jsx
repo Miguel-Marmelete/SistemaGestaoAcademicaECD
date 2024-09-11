@@ -7,6 +7,7 @@ const AddEvaluationMoment = () => {
     const [courses, setCourses] = useState([]);
     const [modules, setModules] = useState([]);
     const [submodules, setSubmodules] = useState([]);
+    const [loading, setLoading] = useState(false); // Add loading state
     const [formData, setFormData] = useState({
         type: "",
         course_id: "",
@@ -120,7 +121,10 @@ const AddEvaluationMoment = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (loading) return; // Prevent multiple submissions
         if (!validateForm()) return;
+
+        setLoading(true); // Set loading to true
 
         fetch(endpoints.ADD_EVALUATION_MOMENT, {
             method: "POST",
@@ -155,6 +159,9 @@ const AddEvaluationMoment = () => {
             .catch((error) => {
                 console.error("Error:", error);
                 alert(error.message);
+            })
+            .finally(() => {
+                setLoading(false); // Set loading to false
             });
     };
 
@@ -246,7 +253,9 @@ const AddEvaluationMoment = () => {
                     required
                 />
             </div>
-            <button type="submit">Submit</button>
+            <button type="submit" disabled={loading}>
+                {loading ? "Submitting..." : "Submit"}
+            </button>
         </form>
     );
 };

@@ -65,7 +65,9 @@ const AssociateProfessorToModule = () => {
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error("Failed to associate professor to module");
+                    return response.json().then((error) => {
+                        throw new Error(error.message || "Unknown error");
+                    });
                 }
                 return response.json();
             })
@@ -79,8 +81,8 @@ const AssociateProfessorToModule = () => {
     };
 
     return (
-        <div className="form-container">
-            <form onSubmit={handleSubmit}>
+        <div className="container">
+            <form className="submitForm" onSubmit={handleSubmit}>
                 <h2>Associate Professor to Module</h2>
                 <div>
                     <label>Professor</label>
@@ -147,6 +149,19 @@ const AssociateProfessorToModule = () => {
                 </div>
                 <button type="submit">Submit</button>
             </form>
+            <div className="list">
+                <h2>Existing Modules and Professors in Charge</h2>
+                <ul>
+                    {modules.map((module) => (
+                        <li key={module.module_id}>
+                            {module.name} -{" "}
+                            {module.professor
+                                ? module.professor.name
+                                : "No professor assigned"}
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
 };

@@ -279,6 +279,8 @@ input[type="password"] {
 /* General layout and typography for StudentsList component */
 /* Container for the Students List component */
 .table-list-container {
+    max-height: 500px; /* Set a maximum height for the container */
+    overflow-y: auto; /* Enable vertical scrolling */
     margin-left: 10px;
     padding: 10px;
     background-color: #ffffff;
@@ -440,6 +442,7 @@ form small {
     background-color: #343a40; /* Same dark grey background */
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 50%;
 }
 
 .login_form h1,
@@ -512,66 +515,68 @@ form small {
     background-color: #0056b3;
 }
 
-/*---------------------*/
-form {
-    background-color: #343a40; /* Adjust background color */
+/*---------STORE PAGES STRUCTURE------------*/
+.container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.submitForm {
+    background-color: #343a40;
     padding: 20px;
     border-radius: 8px;
-    color: #fff; /* White text color */
+    color: #fff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    max-width: 80%; /* Increased width for the form to reduce scrolling */
-    margin: 20px auto; /* Centering the form */
-    color: white;
-    display: grid; /* Use CSS Grid for layout */
-    grid-template-columns: repeat(2, 1fr); /* Two columns for inputs */
-    gap: 20px; /* Space between rows and inputs */
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 0 auto;
 }
 
-form div {
-    margin-bottom: 15px;
+.list {
+    background-color: #343a40;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 35%;
+    color: #fff;
+    overflow-y: auto; /* Enable scrolling */
+    max-height: 500px; /* Initially give the list a static height */
 }
-form h2 {
-    grid-column: span 2; /* Make title span across both columns */
-    margin-bottom: 20px;
+
+/* Make sure list content allows for scrolling */
+.list-content {
+    overflow-y: auto;
+}
+
+/* List title */
+.list h2 {
     font-size: 1.5rem;
-}
-form label {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
 }
 
-input[type="text"],
-input[type="datetime-local"],
-textarea,
-select {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+/* Styling the course list */
+.list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0; /* Remove default margin */
 }
 
-textarea {
-    resize: vertical;
+.list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+    color: #fff; /* White text for list items */
 }
 
-button[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
+.list li:last-child {
+    border-bottom: none;
 }
 
-button[type="submit"]:hover {
-    background-color: #0056b3;
-}
-
-/* Styling for the professors list */
+/* Styling for checkboxes */
 .checkbox-group {
     display: flex;
     flex-direction: column; /* Align checkboxes in a column */
@@ -589,19 +594,80 @@ button[type="submit"]:hover {
     align-items: center;
     font-size: 14px;
 }
-/*----------------------filters css*/
+
+/* Filters section */
 .filters {
     display: flex;
     gap: 20px; /* Space between filters */
     margin-bottom: 20px; /* Space below filters */
+    align-items: flex-start; /* Align filters to the top */
 }
 
 .filters label {
     display: flex;
     flex-direction: column;
+    font-weight: bold; /* Make labels bold */
+    font-size: 14px;
+    color: #333;
 }
-/*
+
 .filters select {
-    margin-top: 5px; 
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    width: fit-content; /* Set a consistent width for the selects */
+    transition: border-color 0.3s;
 }
-*/ /* Space between label and select box */
+
+.filters select:focus {
+    border-color: #007bff; /* Add focus highlight */
+    outline: none;
+}
+
+/*----------------------filters css*/
+
+/* Add this to your CSS file */
+
+.container form input,
+.container form select,
+.container form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.container form select {
+    appearance: none; /* Remove default styles */
+    background: #fff;
+    border: 1px solid #ddd;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: row;
+    max-height: 40px; /* Adjust height as needed */
+    overflow-y: auto; /* Add scroll if there are too many checkboxes */
+    border: 1px solid #ccc; /* Border to make it stand out */
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.checkbox-group div {
+    margin-right: 15px;
+    margin-bottom: 10px;
+}
+
+.container form button:hover {
+    background-color: #0056b3;
+}
+
+.container .list ul li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}

@@ -41,7 +41,7 @@ const ProfessorsInChargeOfModulesList = () => {
 
     useEffect(() => {
         if (selectedCourse) {
-            const courseId = Number(selectedCourse); // Convert selectedCourse to number
+            const courseId = Number(selectedCourse);
             setFilteredProfessorsInCharge(
                 professorsInCharge.filter(
                     (professorInCharge) =>

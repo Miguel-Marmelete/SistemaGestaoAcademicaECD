@@ -25,8 +25,8 @@ const StudentsList = () => {
     // Fetch students when the selected course changes or when no course is selected
     useEffect(() => {
         const fetchStudentsUrl = selectedCourse
-            ? `${endpoints.GET_FILTERED_STUDENTS}?course_id=${selectedCourse}`
-            : endpoints.GET_FILTERED_STUDENTS; // No course_id for fetching all students
+            ? `${endpoints.GET_STUDENTS_BY_COURSE}?course_id=${selectedCourse}`
+            : endpoints.GET_STUDENTS;
 
         fetch(fetchStudentsUrl)
             .then((response) => {
@@ -37,7 +37,7 @@ const StudentsList = () => {
             })
             .then((data) => {
                 console.log("students data:", data);
-                setStudents(data);
+                setStudents(data.students);
             })
             .catch((error) => {
                 console.error("Error fetching students:", error);
