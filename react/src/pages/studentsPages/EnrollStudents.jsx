@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import { fetchCourses } from "../../../scripts/getCourses";
+import ButtonMenu from "../../components/ButtonMenu";
+import { studentsMenuButtons } from "../../../scripts/buttonsData";
 const EnrollStudents = () => {
     const { accessTokenData } = useAuth();
     const [courses, setCourses] = useState([]); // State for fetched courses
@@ -94,51 +96,57 @@ const EnrollStudents = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>Inscrições</h2>
-            <div>
-                <label>Curso</label>
-                <select
-                    name="course_id"
-                    value={selectedCourse}
-                    onChange={handleCourseChange}
-                    required
-                >
-                    <option value="" disabled>
-                        Selecione um Curso
-                    </option>
-                    {courses.map((course) => (
-                        <option key={course.course_id} value={course.course_id}>
-                            {course.name}
+        <div>
+            <ButtonMenu buttons={studentsMenuButtons} />
+            <form onSubmit={handleSubmit}>
+                <h2>Inscrições</h2>
+                <div>
+                    <label>Curso</label>
+                    <select
+                        name="course_id"
+                        value={selectedCourse}
+                        onChange={handleCourseChange}
+                        required
+                    >
+                        <option value="" disabled>
+                            Selecione um Curso
                         </option>
-                    ))}
-                </select>
-            </div>
-            <div>
-                <label>Students</label>
-                <select
-                    name="student_ids"
-                    value={selectedStudents}
-                    onChange={handleStudentChange}
-                    multiple
-                    required
-                >
-                    {students.length > 0 ? (
-                        students.map((student) => (
+                        {courses.map((course) => (
                             <option
-                                key={student.student_id}
-                                value={student.student_id}
+                                key={course.course_id}
+                                value={course.course_id}
                             >
-                                {student.name}
+                                {course.name}
                             </option>
-                        ))
-                    ) : (
-                        <option disabled>No students available</option>
-                    )}
-                </select>
-            </div>
-            <button type="submit">Inscrever</button>
-        </form>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label>Students</label>
+                    <select
+                        name="student_ids"
+                        value={selectedStudents}
+                        onChange={handleStudentChange}
+                        multiple
+                        required
+                    >
+                        {students.length > 0 ? (
+                            students.map((student) => (
+                                <option
+                                    key={student.student_id}
+                                    value={student.student_id}
+                                >
+                                    {student.name}
+                                </option>
+                            ))
+                        ) : (
+                            <option disabled>No students available</option>
+                        )}
+                    </select>
+                </div>
+                <button type="submit">Inscrever</button>
+            </form>
+        </div>
     );
 };
 

@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
+import ButtonMenu from "../../components/ButtonMenu";
+import { coursesMenuButtons } from "../../../scripts/buttonsData";
 
 const AddCourse = () => {
     const { accessTokenData } = useAuth();
     const [loading, setLoading] = useState(false);
-    const [courses, setCourses] = useState([]); // State for fetched courses
-    const [courseAdded, setCourseAdded] = useState(false); // State to track if a course was added
-
+    const [courses, setCourses] = useState([]);
+    const [courseAdded, setCourseAdded] = useState(false);
     const [formData, setFormData] = useState({
         abbreviation: "",
         name: "",
         date: "",
         schedule: "",
     });
+    const [editedCourse, setEditedCourse] = useState({});
 
     useEffect(() => {
         fetch(endpoints.GET_COURSES, {
@@ -24,7 +26,9 @@ const AddCourse = () => {
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error("Failed to fetch courses");
+                    return response.json().then((errorData) => {
+                        throw new Error(errorData.details);
+                    });
                 }
                 return response.json();
             })
@@ -32,15 +36,23 @@ const AddCourse = () => {
                 setCourses(data.courses.reverse());
             })
             .catch((error) => {
-                console.error("Error fetching courses:", error);
-                alert(error.message);
+                console.error(error);
+                alert(error);
             });
-    }, [courseAdded]); // Trigger fetch when a course is added
+    }, [courseAdded]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
             ...formData,
+            [name]: value,
+        });
+    };
+
+    const handleEditChange = (e) => {
+        const { name, value } = e.target;
+        setEditedCourse({
+            ...editedCourse,
             [name]: value,
         });
     };
@@ -85,23 +97,24 @@ const AddCourse = () => {
             },
             body: JSON.stringify(formData),
         })
-            .then(async (response) => {
+            .then((response) => {
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "Failed to add course");
+                    return response.json().then((errorData) => {
+                        console.log(errorData);
+                        throw new Error(errorData.details);
+                    });
                 }
                 return response.json();
             })
             .then(() => {
                 alert("Course added successfully!");
-                // Reset form
                 setFormData({
                     abbreviation: "",
                     name: "",
                     date: "",
                     schedule: "",
                 });
-                setCourseAdded((prev) => !prev); // Toggle the state to trigger re-fetch
+                setCourseAdded((prev) => !prev);
             })
             .catch((error) => {
                 console.error("Error:", error.message);
@@ -113,70 +126,80 @@ const AddCourse = () => {
     };
 
     return (
-        <div className="container">
-            <form className="submitForm" onSubmit={handleSubmit}>
-                <h2>Add Course</h2>
-                <div>
-                    <label>Course Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        maxLength={255}
-                    />
-                </div>
-                <div>
-                    <label>Abbreviation</label>
-                    <input
-                        type="text"
-                        name="abbreviation"
-                        value={formData.abbreviation}
-                        onChange={handleChange}
-                        required
-                        maxLength={255}
-                    />
-                </div>
-                <div>
-                    <label>Start Date</label>
-                    <input
-                        type="date"
-                        name="date"
-                        value={formData.date}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>
-                        Schedule
-                        <small
-                            style={{ fontSize: "0.6rem", paddingLeft: "5px" }}
-                        >
-                            (Optional)
-                        </small>
-                    </label>
-                    <input
-                        type="text"
-                        name="schedule"
-                        value={formData.schedule}
-                        onChange={handleChange}
-                        maxLength={255}
-                    />
-                </div>
-                <button type="submit" disabled={loading}>
-                    {loading ? "Submitting..." : "Submit"}
-                </button>
-            </form>
+        <div>
+            <ButtonMenu buttons={coursesMenuButtons} />
+            <div className="container">
+                <form className="submitForm" onSubmit={handleSubmit}>
+                    <h2>Add Course</h2>
+                    <div>
+                        <label>Course Name</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            maxLength={255}
+                        />
+                    </div>
+                    <div>
+                        <label>Abbreviation</label>
+                        <input
+                            type="text"
+                            name="abbreviation"
+                            value={formData.abbreviation}
+                            onChange={handleChange}
+                            required
+                            maxLength={255}
+                        />
+                    </div>
+                    <div>
+                        <label>Start Date</label>
+                        <input
+                            type="date"
+                            name="date"
+                            value={formData.date}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>
+                            Schedule
+                            <small
+                                style={{
+                                    fontSize: "0.6rem",
+                                    paddingLeft: "5px",
+                                }}
+                            >
+                                (Optional)
+                            </small>
+                        </label>
+                        <input
+                            type="text"
+                            name="schedule"
+                            value={formData.schedule}
+                            onChange={handleChange}
+                            maxLength={255}
+                        />
+                    </div>
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Submitting..." : "Submit"}
+                    </button>
+                </form>
 
-            <div className="list">
-                <h2>Existing Courses</h2>
-                <ul>
-                    {courses.map((course) => (
-                        <li key={course.id}>{course.name}</li>
-                    ))}
-                </ul>
+                <div className="list">
+                    <h2>Existing Courses</h2>
+                    <ul>
+                        {courses.map((course) => (
+                            <li key={course.course_id}>
+                                <>
+                                    {course.name} - {course.abbreviation}
+                                </>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );

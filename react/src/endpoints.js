@@ -31,10 +31,25 @@ const endpoints = {
     ASSOCIATE_MODULES_TO_COURSE: `${API_BASE_URL}/associateModulesToCourse`,
     ADD_EVALUATION_MOMENT: `${API_BASE_URL}/addEvaluationMoment`,
     ASSOCIATE_PROFESSOR_TO_MODULE: `${API_BASE_URL}/associateProfessorToModule`,
-    // Comments
-    GET_COMMENTS: `${API_BASE_URL}/comments`,
-    CREATE_COMMENT: `${API_BASE_URL}/comments`,
-    DELETE_COMMENT: `${API_BASE_URL}/comments/{id}`,
+    CREATE_AND_ENROLL: `${API_BASE_URL}/createAndEnroll`,
+
+    //DELETE
+    DELETE_COURSE: `${API_BASE_URL}/deleteCourse`,
+    DELETE_MODULE: `${API_BASE_URL}/deleteModule`,
+    DELETE_SUBMODULE: `${API_BASE_URL}/deleteSubmodule`,
+    DELETE_LESSON: `${API_BASE_URL}/deleteLesson`,
+    DELETE_EVALUATION_MOMENT: `${API_BASE_URL}/deleteEvaluationMoment`,
+    DELETE_PROFESSOR: `${API_BASE_URL}/deleteProfessor`,
+    DELETE_STUDENT: `${API_BASE_URL}/deleteStudent`,
+
+    //UPDATE
+    UPDATE_COURSE: `${API_BASE_URL}/updateCourse`,
+    UPDATE_MODULE: `${API_BASE_URL}/updateModule`,
+    UPDATE_SUBMODULE: `${API_BASE_URL}/updateSubmodule`,
+    UPDATE_LESSON: `${API_BASE_URL}/updateLesson`,
+    UPDATE_EVALUATION_MOMENT: `${API_BASE_URL}/updateEvaluationMoment`,
+    UPDATE_PROFESSOR: `${API_BASE_URL}/updateProfessor`,
+    UPDATE_STUDENT: `${API_BASE_URL}/updateStudent`,
 };
 
 export default endpoints;

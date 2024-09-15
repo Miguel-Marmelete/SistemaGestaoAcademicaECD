@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import ButtonMenu from "../components/ButtonMenu";
+import {
+    studentsMenuButtons,
+    coursesMenuButtons,
+    lessonsMenuButtons,
+    modulesMenuButtons,
+    evaluationMomentsMenuButtons,
+    gradesMenuButtons,
+} from "../../scripts/buttonsData";
 
 function AdminPanel() {
     const [currentPanel, setCurrentPanel] = useState(null);
@@ -8,104 +16,27 @@ function AdminPanel() {
     const panelButtons = [
         {
             label: "Cursos",
-            subButtons: [
-                { label: "Listar Cursos", link: "/courses" },
-                { label: "Adicionar Curso", link: "/addCourse" },
-                { label: "Editar Curso", link: "/cursos/manage" },
-                { label: "Apagar Curso", link: "/cursos/manage" },
-            ],
+            subButtons: coursesMenuButtons,
         },
         {
             label: "Alunos",
-            subButtons: [
-                { label: "Listar Alunos", link: "/students" },
-                { label: "Adicionar Alunos", link: "/addStudents" },
-                { label: "Inscrições", link: "/enrollStudents" },
-                { label: "Editar Alunos", link: "/cursos/manage" },
-                { label: "Apagar Alunos", link: "/cursos/manage" },
-            ],
+            subButtons: studentsMenuButtons,
         },
         {
             label: "Aulas",
-            subButtons: [
-                { label: "Listar Aulas", link: "/lessons" },
-                { label: "Adicionar Aulas", link: "/addLesson" },
-                { label: "Marcar Presenças", link: "/addAttendance" },
-                { label: "Ver Presenças", link: "/attendance" },
-            ],
+            subButtons: lessonsMenuButtons,
         },
         {
             label: "Módulos",
-            subButtons: [
-                { label: "Listar Módulos", link: "/modules" },
-                { label: "Adicionar Módulos", link: "/addModule" },
-                {
-                    label: "Atribuir Módulo a Professor",
-                    link: "/associateProfessorToModule",
-                },
-                {
-                    label: "Prof. Encarregues de Módulos",
-                    link: "/professorsInChargeOfModules",
-                },
-
-                { label: "Listar Submódulos", link: "/subModules" },
-                { label: "Adicionar Submódulos", link: "/addSubmodule" },
-                {
-                    label: "Associar Módulos a Curso",
-                    link: "/associateModulesToCourse",
-                },
-            ],
+            subButtons: modulesMenuButtons,
         },
-
         {
             label: "Momentos de Avaliação",
-            subButtons: [
-                {
-                    label: "Listar Momentos de Avaliação",
-                    link: "/evaluationMoments",
-                },
-                {
-                    label: "Adicionar Momentos de Avaliação",
-                    link: "/addEvaluationMoment",
-                },
-                {
-                    label: "Editar Momentos de Avaliação",
-                    link: "/cursos/manage",
-                },
-                {
-                    label: "Apagar Momentos de Avaliação",
-                    link: "/cursos/manage",
-                },
-                {
-                    label: "Avaliar Momentos de Avaliação",
-                    link: "/evaluateEvaluationMoments",
-                },
-            ],
+            subButtons: evaluationMomentsMenuButtons,
         },
         {
             label: "Notas",
-            subButtons: [
-                {
-                    label: "Atribuir Notas",
-                    link: "/cursos/create",
-                },
-                {
-                    label: "Editar Notas",
-                    link: "/cursos/manage",
-                },
-                {
-                    label: "Apagar Notas",
-                    link: "/cursos/manage",
-                },
-                {
-                    label: "Calcular Notas",
-                    link: "/cursos/manage",
-                },
-                {
-                    label: "Pauta",
-                    link: "/cursos/manage",
-                },
-            ],
+            subButtons: gradesMenuButtons,
         },
     ];
 
@@ -124,15 +55,7 @@ function AdminPanel() {
             {currentPanel ? (
                 <>
                     <h2>Painel de Administrador - {currentPanel}</h2>
-                    <div className="button-container">
-                        {subButtons.map((subButton, index) => (
-                            <Link key={index} to={subButton.link}>
-                                <button className="panel-button">
-                                    {subButton.label}
-                                </button>
-                            </Link>
-                        ))}
-                    </div>
+                    <ButtonMenu buttons={subButtons} />
                     <button className="back-button" onClick={handleBackClick}>
                         Voltar
                     </button>

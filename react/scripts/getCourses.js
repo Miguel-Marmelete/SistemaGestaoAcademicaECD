@@ -10,7 +10,9 @@ export const fetchCourses = (accessToken) => {
     })
         .then((response) => {
             if (!response.ok) {
-                throw new Error("Failed to fetch courses");
+                return response.json().then((errorData) => {
+                    throw new Error(errorData.details);
+                });
             }
             return response.json();
         })
