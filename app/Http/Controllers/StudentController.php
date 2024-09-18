@@ -56,40 +56,28 @@ class StudentController extends Controller
                 'name' => 'required|string|max:255',
                 'ipbeja_email' => 'required|string|email|max:255|unique:students',
                 'number' => 'required|integer|unique:students',
-                'birthday' => 'nullable|date',
-                'address' => 'nullable|string|max:255',
-                'city' => 'nullable|string|max:255',
-                'mobile' => 'nullable|integer',
-                'posto' => 'nullable|string|max:255',
-                'nim' => 'nullable|integer',
-                'classe' => 'nullable|string|max:255',
+                'birthday' => 'required|date',
+                'address' => 'required|string|max:255',
+                'city' => 'required|string|max:255',
+                'mobile' => 'required|integer',
+                'posto' => 'required|string|max:255',
+                'nim' => 'required|integer',
+                'classe' => 'required|string|max:255',
                 'personal_email' => 'required|string|email|max:255|unique:students',
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 400);
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['details' => $validator->errors()], 400);
             }
 
             $student = Student::create($validator->validated());
-            /*
-            // Create the student
-            $student = Student::create([
-                'name' => $request->name,
-                'ipbeja_email' => $request->ipbeja_email,
-                'number' => $request->number,
-                'birthday' => $request->birthday,
-                'address' => $request->address,
-                'city' => $request->city,
-                'mobile' => $request->mobile,
-                'posto' => $request->posto,
-                'nim' => $request->nii,
-                'classe' => $request->classe,
-                'personal_email' => $request->personal_email,
-            ]);*/
+            
 
             return response()->json(['message' => 'Student created successfully', 'student' => $student], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while creating the student', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while creating the student: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while creating the student', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -122,7 +110,8 @@ class StudentController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 400);
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['details' => $validator->errors()], 400);
             }
 
             // Update the student with the provided data
@@ -185,7 +174,7 @@ class StudentController extends Controller
             }
     
             // Return students as a JSON response
-            return response()->json($students, 200);
+            return response()->json(['students' => $students], 200);
     
         } catch (\Exception $e) {
             // Log the error for debugging purposes
@@ -194,11 +183,50 @@ class StudentController extends Controller
             // Return a JSON response with the error message
             return response()->json([
                 'error' => 'An unexpected error occurred.',
-                'message' => $e->getMessage()
+                'details' => $e->getMessage()
             ], 500);
         }
     }
     
+    public function createAndEnroll(Request $request)
+    {
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'ipbeja_email' => 'required|string|email|max:255|unique:students',
+                'number' => 'required|integer|unique:students',
+                'birthday' => 'required|date',
+                'address' => 'required|string|max:255',
+                'city' => 'required|string|max:255',
+                'mobile' => 'required|integer',
+                'posto' => 'required|string|max:255',
+                'nim' => 'required|integer',
+                'classe' => 'required|string|max:255',
+                'personal_email' => 'required|string|email|max:255|unique:students',
+                'course_id' => 'required|integer|exists:courses,course_id',
+            ]);
+
+            if ($validator->fails()) {
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['details' => $validator->errors()], 400);
+            }
+
+            // Create the student
+            $student = Student::create($validator->validated());
+
+            // Enroll the student in the course
+            Enrollment::create([
+                'student_id' => $student->student_id,
+                'course_id' => $request->input('course_id'),
+            ]);
+
+            return response()->json(['message' => 'Student created and enrolled successfully', 'student' => $student], 201);
+        } catch (\Exception $e) {
+            Log::error('An error occurred while creating and enrolling the student: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while creating and enrolling the student', 'details' => $e->getMessage()], 500);
+        }
+    }
 }
 
  

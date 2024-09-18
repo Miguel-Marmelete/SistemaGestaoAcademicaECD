@@ -10,7 +10,6 @@ class CourseModule extends Model
 
     protected $table = 'course_module';
     public $incrementing = false;
-    public $timestamps = false;
 
     protected $fillable = [
         'module_id',

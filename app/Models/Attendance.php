@@ -11,7 +11,6 @@ class Attendance extends Model
 
     protected $table = 'attendance';
     public $incrementing = false;
-    public $timestamps = false;
 
     protected $fillable = [
         'lesson_id',

@@ -45,7 +45,7 @@ const StudentsList = () => {
                 return response.json();
             })
             .then((data) => {
-                setStudents(data.students);
+                setStudents(data.students.reverse());
             })
             .catch((error) => {
                 console.error("Error fetching students:", error);

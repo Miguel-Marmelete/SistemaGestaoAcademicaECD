@@ -39,19 +39,28 @@ class EnrollmentController extends Controller
     ]);
 
     if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
+        Log::error('Validation failed: ' . $validator->errors());
+        return response()->json(['error' => $validator->errors()], 422);
     }
 
-    $enrollments = [];
-
     try {
-        foreach ($request->input('student_ids') as $studentId) {
-            $enrollmentData = [
-                'student_id' => $studentId,
-                'course_id' => $request->input('course_id'),
-            ];
+        $enrollments = []; // Initialize the enrollments array
 
-            $enrollments[] = Enrollment::create($enrollmentData);
+        foreach ($request->input('student_ids') as $studentId) {
+            // Check if the enrollment already exists for this student and course
+            $existingEnrollment = Enrollment::where('student_id', $studentId)
+                                            ->where('course_id', $request->input('course_id'))
+                                            ->first();
+
+            if (!$existingEnrollment) {
+                $enrollmentData = [
+                    'student_id' => $studentId,
+                    'course_id' => $request->input('course_id'),
+                ];
+
+                // Create the new enrollment
+                $enrollments[] = Enrollment::create($enrollmentData);
+            }
         }
 
         return response()->json([
@@ -59,13 +68,15 @@ class EnrollmentController extends Controller
             'enrollments' => $enrollments
         ], 201);
     } catch (\Exception $e) {
-        Log::info('erro: ',$e);
+        Log::error('Error creating enrollments: ', ['error' => $e->getMessage()]);
+
         return response()->json([
-            'error' => 'An error occurred while creating the enrollments',
-            'details' => $e->getMessage()
+            'message' => 'An error occurred while creating the enrollments',
+            'error' => $e->getMessage()
         ], 500);
     }
 }
+
 
 
     /**

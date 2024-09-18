@@ -7,6 +7,7 @@ use App\Models\Lesson;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ProfessorInChargeOfLesson;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class LessonController extends Controller
 {
@@ -19,7 +20,6 @@ class LessonController extends Controller
     {
         try {
             $lessons = Lesson::with([ 'submodule', 'course','professors'])->get();
-            Log::info('Lessons Data: ' . $lessons->toJson());
             return response()->json(['lessons' => $lessons], 200);
         } catch (\Exception $e) {
             Log::info($e->getMessage());
@@ -51,33 +51,63 @@ class LessonController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getLessonsOfSubmodule(Request $request)
+    public function getFilteredLessons(Request $request)
     {
         try {
-            // Validation
+            // Validate the request
             $validator = Validator::make($request->all(), [
-                'submodule_id' => 'required|exists:submodules,submodule_id',
-                'course_id' => 'required|exists:courses,course_id',
+                'submodule_id' => 'sometimes|exists:submodules,submodule_id',
+                'course_id' => 'sometimes|exists:courses,course_id',
             ]);
-
+    
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
-
-            $submoduleId = $request->query('submodule_id');
-            $courseId = $request->query('course_id');
-
-            $lessons = Lesson::where('submodule_id', $submoduleId)
-                             ->where('course_id', $courseId)
-                             ->with(['professors', 'course'])
-                             ->get();
-
+    
+            // Retrieve the authenticated professor
+            $professor = JWTAuth::user();
+            if (!$professor) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+    
+            Log::info($professor);
+    
+            // Initialize the query
+            $query = Lesson::query();
+    
+            // If the professor is not a coordinator, filter by their assigned lessons
+            if ($professor->is_coordinator == 0) {
+                $query->whereHas('professors', function ($q) use ($professor) {
+                    $q->where('professor_in_charge_of_lesson.professor_id', $professor->professor_id);
+                });
+            }
+    
+            // Apply additional filters if present
+            if ($request->has('submodule_id')) {
+                $query->where('submodule_id', $request->query('submodule_id'));
+            }
+    
+            if ($request->has('course_id')) {
+                $query->where('course_id', $request->query('course_id'));
+            }
+    
+            // Eager load relationships
+            $lessons = $query->with(['submodule', 'course', 'professors'])->get();
+    
             return response()->json(['lessons' => $lessons], 200);
         } catch (\Exception $e) {
-            Log::info($e->getMessage());
-            return response()->json(['error' => 'An error occurred while retrieving lessons', 'details' => $e->getMessage()], 500);
+            Log::error('Error retrieving lessons: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'An error occurred while retrieving lessons',
+                'details' => $e->getMessage()
+            ], 500);
         }
     }
+    
+    
+
+    
+
 
     /**
      * Store a new lesson.

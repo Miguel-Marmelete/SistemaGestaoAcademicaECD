@@ -6,6 +6,10 @@ use App\Models\ProfessorInChargeOfModule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log; 
+use App\Models\Submodule;
+use App\Models\CourseModule;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+
 class ProfessorInChargeOfModuleController extends Controller
 {
     /**
@@ -39,6 +43,16 @@ class ProfessorInChargeOfModuleController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Check if the entry already exists
+        $exists = ProfessorInChargeOfModule::where('professor_id', $request->professor_id)
+            ->where('module_id', $request->module_id)
+            ->where('course_id', $request->course_id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['message' => 'Professor already in charge of module'], 409);
         }
 
         try {
@@ -142,4 +156,52 @@ class ProfessorInChargeOfModuleController extends Controller
             return response()->json(['error' => 'An error occurred while deleting the professor in charge of module record', 'details' => $e->getMessage()], 500);
         }
     }
+    public function getSubmodulesOfProfessor(Request $request)
+    {
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'course_id' => 'sometimes|exists:courses,course_id',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+    
+            // Retrieve the authenticated professor
+            $professor = JWTAuth::user();
+            if (!$professor) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+    
+            // Initialize the query for submodules
+            $query = Submodule::query();
+    
+            // If the professor is not a coordinator, filter by their assigned modules
+            if ($professor->is_coordinator == 0) {
+                $moduleIds = ProfessorInChargeOfModule::where('professor_id', $professor->professor_id)
+                    ->pluck('module_id');
+                $query->whereIn('module_id', $moduleIds);
+            }
+    
+            // If the professor is a coordinator or if a course_id is provided, filter by course modules
+            if ($request->has('course_id')) {
+                $courseModuleIds = CourseModule::where('course_id', $request->query('course_id'))
+                    ->pluck('module_id');
+                $query->whereIn('module_id', $courseModuleIds);
+            }
+    
+            // Eager load relationships
+            $submodules = $query->with(['module'])->get();
+    
+            return response()->json(['submodules' => $submodules], 200);
+        } catch (\Exception $e) {
+            Log::error('Error retrieving submodules: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'An error occurred while retrieving submodules',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
 }

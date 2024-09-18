@@ -21,6 +21,8 @@ const endpoints = {
     GET_SUBMODULES_BY_COURSE: `${API_BASE_URL}/getSubmodulesByCourse`,
     GET_LESSONS_OF_SUBMODULE: `${API_BASE_URL}/getLessonsOfSubmodule`,
     GET_STUDENTS_BY_COURSE: `${API_BASE_URL}/getStudentsByCourse`,
+    GET_FILTERED_LESSONS: `${API_BASE_URL}/getFilteredLessons`,
+    GET_SUBMODULES_OF_PROFESSOR: `${API_BASE_URL}/getSubmodulesOfProfessor`,
     // Posts
     ADD_STUDENTS: `${API_BASE_URL}/addStudents`,
     ENROLL_STUDENTS: `${API_BASE_URL}/enrollStudents`,

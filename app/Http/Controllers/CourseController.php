@@ -16,13 +16,15 @@ class CourseController extends Controller
             return response()->json(['courses' => $courses], 200);
         } catch (\Exception $e) {
             Log::error('Error fetching courses:', ['message' => $e->getMessage()]);
-            return response()->json(['error' => 'Erro ao listar os cursos', 'message' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Erro ao listar os cursos', 'details' => $e->getMessage()], 500);
         }
      }
  
      // Método para salvar um novo curso
      public function store(Request $request)
      {
+        //return response()->json(['message' => 'Erro ao criar o curso', 'details' => 'errot aqui'], 500);
+
         try {
             $validator = Validator::make($request->all(), [
                 'abbreviation' => 'required|string|max:255',
@@ -39,7 +41,7 @@ class CourseController extends Controller
              $course = Course::create($request->all());
              return response()->json(['message' => 'Curso criado com sucesso', 'course' => $course], 201);
          } catch (\Exception $e) {
-             return response()->json(['error' => 'Erro ao criar o curso', 'message' => $e->getMessage()], 500);
+             return response()->json(['message' => 'Erro ao criar o curso', 'details' => $e->getMessage()], 500);
          }
      }
  
@@ -50,49 +52,44 @@ class CourseController extends Controller
              $course = Course::findOrFail($id);
              return response()->json(['course' => $course], 200);
          } catch (\Exception $e) {
-             return response()->json(['error' => 'Erro ao encontrar o curso', 'message' => $e->getMessage()], 404);
+             return response()->json(['message' => 'Erro ao encontrar o curso', 'details' => $e->getMessage()], 404);
          }
      }
  
      public function update(Request $request, $id)
-{
-    try {
-        // Verifica se o curso existe
-        $course = Course::findOrFail($id);
-        
-        // Valida apenas os campos que estão presentes na requisição
-        $validator = Validator::make($request->all(), [
-            'abbreviation' => 'sometimes|required|string|max:255',
-            'name' => 'sometimes|string|max:255',
-            'date' => 'sometimes|date_format:m/d/Y',
-            'schedule' => 'sometimes|nullable|string|max:255',
-        ]);
-
-        // Se a validação falhar, retorna erros de validação
-        if ($validator->fails()) {
-            return response()->json(['error' => 'Erro de validação', 'messages' => $validator->errors()], 400);
-        }
-
-        // Converte a data se o campo "date" estiver presente na requisição
-        if ($request->has('date')) {
-            $request->merge([
-                'date' => \Carbon\Carbon::createFromFormat('m/d/Y', $request->input('date'))->format('Y-m-d')
-            ]);
-        }
-
-        // Atualiza apenas os campos que foram passados na requisição
-        $course->update($request->only(['abbreviation', 'name', 'date', 'schedule']));
-
-        return response()->json(['message' => 'Curso atualizado com sucesso', 'course' => $course], 200);
-
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        // Tratamento específico para quando o curso não é encontrado
-        return response()->json(['error' => 'Curso não encontrado'], 404);
-    } catch (\Exception $e) {
-        // Tratamento para outros tipos de exceções
-        return response()->json(['error' => 'Erro ao atualizar o curso', 'message' => $e->getMessage()], 500);
-    }
-}
+     {
+         try {
+             // Verifica se o curso existe
+             $course = Course::findOrFail($id);
+             
+             // Valida os campos
+             $validator = Validator::make($request->all(), [
+                 'abbreviation' => 'sometimes|required|string|max:255',
+                 'name' => 'sometimes|string|max:255',
+                 'date' => 'sometimes|date_format:Y-m-d', // Validate the incoming Y-m-d format
+                 'schedule' => 'sometimes|nullable|string|max:255',
+             ]);
+     
+             // Se a validação falhar, retorna erros de validação
+             if ($validator->fails()) {
+                 Log::error('Erro de validação:', ['message' => $validator->errors()]);
+                 return response()->json(['error' => 'Erro de validação', 'messages' => $validator->errors()], 400);
+             }
+     
+             // Não há necessidade de conversão se o formato já é Y-m-d
+             $course->update($request->only(['abbreviation', 'name', 'date', 'schedule']));
+     
+             return response()->json(['message' => 'Curso atualizado com sucesso', 'course' => $course->fresh()], 200);
+     
+         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+             // Tratamento específico para quando o curso não é encontrado
+             return response()->json(['error' => 'Curso não encontrado'], 404);
+         } catch (\Exception $e) {
+             // Tratamento para outros tipos de exceções
+             return response()->json(['error' => 'Erro ao atualizar o curso', 'message' => $e->getMessage()], 500);
+         }
+     }
+     
 
 
      

@@ -11,7 +11,6 @@ class Enrollment extends Model
 
     protected $table = 'enrollments';
     public $incrementing = false;
-    public $timestamps = false;
 
     protected $fillable = [
         'student_id',

@@ -18,8 +18,7 @@ class ProfessorInChargeOfLesson extends Model
  
     protected $fillable = ['professor_id', 'lesson_id'];
 
-    // Disable timestamps if not needed
-    public $timestamps = true;
+    
 
     public function professor(): BelongsTo
     {
