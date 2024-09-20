@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.jsx";
 
 function MenuBar() {
@@ -14,18 +15,39 @@ function MenuBar() {
     };
 
     const menuItems = [
-        { name: "Alunos", subItems: ["Lista de Alunos"] },
-        { name: "Cursos", subItems: ["Lista de Cursos", "Lista de Módulos"] },
-        { name: "Aulas", subItems: ["Lista de Aulas", "Adicionar Aulas"] },
+        {
+            name: "Alunos",
+            subItems: [{ name: "Lista de Alunos", path: "/students" }],
+        },
+        {
+            name: "Cursos",
+            subItems: [
+                { name: "Lista de Cursos", path: "/courses" },
+                { name: "Lista de Módulos", path: "/modules" },
+            ],
+        },
+        {
+            name: "Aulas",
+            subItems: [
+                { name: "Lista de Aulas", path: "/lessons" },
+                { name: "Adicionar Aulas", path: "/addLesson" },
+            ],
+        },
         {
             name: "Avaliações",
             subItems: [
-                "Momentos de Avaliação",
-                "Avaliar Momentos de Avaliação",
-                "Pauta",
+                { name: "Momentos de Avaliação", path: "/evaluationMoments" },
+                {
+                    name: "Avaliar Momentos de Avaliação",
+                    path: "/avaliacoes/avaliar",
+                },
+                { name: "Pauta", path: "/avaliacoes/pauta" },
             ],
         },
-        { name: "Diplomas", subItems: ["Criar Diploma"] },
+        {
+            name: "Diplomas",
+            subItems: [{ name: "Criar Diploma", path: "/diplomas/criar" }],
+        },
     ];
 
     return professor ? (
@@ -41,9 +63,13 @@ function MenuBar() {
                     {hovered === index && item.subItems.length > 0 && (
                         <div className="dropdown">
                             {item.subItems.map((subItem, subIndex) => (
-                                <div key={subIndex} className="dropdown-item">
-                                    {subItem}
-                                </div>
+                                <Link
+                                    key={subIndex}
+                                    to={subItem.path}
+                                    className="dropdown-item"
+                                >
+                                    {subItem.name}
+                                </Link>
                             ))}
                         </div>
                     )}

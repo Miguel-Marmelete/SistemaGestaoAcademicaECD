@@ -40,7 +40,7 @@ const EnrollStudents = () => {
                 return response.json();
             })
             .then((data) => {
-                setStudents(data.students);
+                setStudents(data.students.reverse());
             })
             .catch((error) => {
                 console.error("Error fetching students:", error);
@@ -81,15 +81,12 @@ const EnrollStudents = () => {
         setSelectedStudents([]); // Reset selected students when course changes
     };
 
-    const handleStudentChange = (e) => {
-        const options = e.target.options;
-        const selectedOptions = [];
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].selected) {
-                selectedOptions.push(options[i].value);
-            }
-        }
-        setSelectedStudents(selectedOptions);
+    const handleStudentChange = (studentId) => {
+        setSelectedStudents((prevSelected) =>
+            prevSelected.includes(studentId)
+                ? prevSelected.filter((id) => id !== studentId)
+                : [...prevSelected, studentId]
+        );
     };
 
     const handleSubmit = (e) => {
@@ -157,26 +154,32 @@ const EnrollStudents = () => {
                     </div>
                     <div>
                         <label>Students</label>
-                        <select
-                            name="student_ids"
-                            value={selectedStudents}
-                            onChange={handleStudentChange}
-                            multiple
-                            required
-                        >
+                        <div className="checkbox-group">
                             {students.length > 0 ? (
                                 students.map((student) => (
-                                    <option
-                                        key={student.student_id}
-                                        value={student.student_id}
-                                    >
-                                        {student.name}
-                                    </option>
+                                    <div key={student.student_id}>
+                                        <input
+                                            type="checkbox"
+                                            id={student.student_id}
+                                            value={student.student_id}
+                                            onChange={() =>
+                                                handleStudentChange(
+                                                    student.student_id
+                                                )
+                                            }
+                                            checked={selectedStudents.includes(
+                                                student.student_id
+                                            )}
+                                        />
+                                        <label htmlFor={student.student_id}>
+                                            {student.name}
+                                        </label>
+                                    </div>
                                 ))
                             ) : (
-                                <option disabled>No students available</option>
+                                <p>No students available</p>
                             )}
-                        </select>
+                        </div>
                     </div>
                     <button type="submit">Inscrever</button>
                 </form>

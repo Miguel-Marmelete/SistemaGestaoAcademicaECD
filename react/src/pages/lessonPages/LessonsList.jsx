@@ -10,6 +10,7 @@ const LessonsList = () => {
     const [selectedSubmodule, setSelectedSubmodule] = useState("");
     const { accessTokenData, professor } = useAuth();
     const [expandedLessonId, setExpandedLessonId] = useState(null);
+    const [editedLesson, setEditedLesson] = useState({});
 
     // Fetch courses on mount
     useEffect(() => {
@@ -27,22 +28,34 @@ const LessonsList = () => {
     }, [accessTokenData.access_token]);
 
     // Fetch submodules on mount
+    // Fetch submodules when course changes
     useEffect(() => {
-        fetch(endpoints.GET_SUBMODULES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("Fetched submodules data:", data); // Debugging line
-                setSubmodules(data.submodules);
+        if (!selectedCourse) {
+            setSubmodules([]); // Clear submodules if no course is selected
+            return;
+        }
+
+        const fetchSubmodules = () => {
+            const url = `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`;
+
+            fetch(url, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${accessTokenData.access_token}`,
+                },
             })
-            .catch((error) =>
-                alert("Failed to fetch submodules: " + error.message)
-            );
-    }, [accessTokenData.access_token]);
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log("Fetched submodules data:", data); // Debugging line
+                    setSubmodules(data.submodules);
+                })
+                .catch((error) =>
+                    alert("Failed to fetch submodules: " + error.message)
+                );
+        };
+
+        fetchSubmodules();
+    }, [selectedCourse, accessTokenData.access_token]);
 
     // Fetch lessons when course or submodule is selected
     useEffect(() => {
@@ -89,6 +102,81 @@ const LessonsList = () => {
 
     const toggleSummary = (lessonId) => {
         setExpandedLessonId(expandedLessonId === lessonId ? null : lessonId);
+    };
+
+    const handleEditClick = (lesson) => {
+        setEditedLesson({ ...lesson });
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setEditedLesson({ ...editedLesson, [name]: value });
+    };
+
+    const handleSave = (lessonId) => {
+        if (!window.confirm("Are you sure you want to save the changes?")) {
+            return;
+        }
+
+        fetch(`${endpoints.UPDATE_LESSON}/${lessonId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessTokenData.access_token}`,
+            },
+            body: JSON.stringify(editedLesson),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    return response.json().then((errorData) => {
+                        throw new Error(errorData.details);
+                    });
+                }
+                return response.json();
+            })
+            .then(() => {
+                setFilteredLessons((prevLessons) =>
+                    prevLessons.map((lesson) =>
+                        lesson.lesson_id === lessonId
+                            ? { ...lesson, ...editedLesson }
+                            : lesson
+                    )
+                );
+                setEditedLesson({});
+                alert("Lesson updated successfully");
+            })
+            .catch((error) => {
+                alert("Error updating lesson: " + error.message);
+            });
+    };
+
+    const handleDelete = (lessonId) => {
+        if (!window.confirm("Are you sure you want to delete this lesson?")) {
+            return;
+        }
+
+        fetch(`${endpoints.DELETE_LESSON}/${lessonId}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${accessTokenData.access_token}`,
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    return response.json().then((errorData) => {
+                        throw new Error(errorData.details);
+                    });
+                }
+                setFilteredLessons((prevLessons) =>
+                    prevLessons.filter(
+                        (lesson) => lesson.lesson_id !== lessonId
+                    )
+                );
+                alert("Lesson deleted successfully");
+            })
+            .catch((error) => {
+                alert("Error deleting lesson: " + error.message);
+            });
     };
 
     return (
@@ -149,57 +237,141 @@ const LessonsList = () => {
                             <th>Course</th>
                             <th>Date</th>
                             <th>Professors</th>
+                            {professor.is_coordinator === 1 && <th>Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
                         {filteredLessons.map((lesson) => (
                             <tr key={lesson.lesson_id}>
-                                <td>{lesson.title}</td>
-                                <td>{lesson.type}</td>
-                                <td>
-                                    {expandedLessonId === lesson.lesson_id ? (
-                                        <>
-                                            {lesson.summary}
-                                            <button
-                                                onClick={() =>
-                                                    toggleSummary(
-                                                        lesson.lesson_id
-                                                    )
+                                {editedLesson.lesson_id === lesson.lesson_id ? (
+                                    <>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="title"
+                                                value={editedLesson.title || ""}
+                                                onChange={handleChange}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="type"
+                                                value={editedLesson.type || ""}
+                                                onChange={handleChange}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="summary"
+                                                value={
+                                                    editedLesson.summary || ""
                                                 }
-                                            >
-                                                Esconder
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            {lesson.summary.length > 100
-                                                ? `${lesson.summary.substring(
-                                                      0,
-                                                      100
-                                                  )}...`
-                                                : lesson.summary}
-                                            {lesson.summary.length > 100 && (
+                                                onChange={handleChange}
+                                            />
+                                        </td>
+                                        <td>{lesson.submodule.name}</td>
+                                        <td>{lesson.course.name}</td>
+                                        <td>
+                                            <input
+                                                type="date"
+                                                name="date"
+                                                value={editedLesson.date || ""}
+                                                onChange={handleChange}
+                                            />
+                                        </td>
+                                        <td>
+                                            {lesson.professors
+                                                .map((prof) => prof.name)
+                                                .join(", ")}
+                                        </td>
+                                        {professor.is_coordinator === 1 && (
+                                            <td>
                                                 <button
                                                     onClick={() =>
-                                                        toggleSummary(
+                                                        handleSave(
                                                             lesson.lesson_id
                                                         )
                                                     }
                                                 >
-                                                    Mais
+                                                    Save
                                                 </button>
+                                            </td>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <td>{lesson.title}</td>
+                                        <td>{lesson.type}</td>
+                                        <td>
+                                            {expandedLessonId ===
+                                            lesson.lesson_id ? (
+                                                <>
+                                                    {lesson.summary}
+                                                    <button
+                                                        onClick={() =>
+                                                            toggleSummary(
+                                                                lesson.lesson_id
+                                                            )
+                                                        }
+                                                    >
+                                                        Esconder
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {lesson.summary.length > 100
+                                                        ? `${lesson.summary.substring(
+                                                              0,
+                                                              100
+                                                          )}...`
+                                                        : lesson.summary}
+                                                    {lesson.summary.length >
+                                                        100 && (
+                                                        <button
+                                                            onClick={() =>
+                                                                toggleSummary(
+                                                                    lesson.lesson_id
+                                                                )
+                                                            }
+                                                        >
+                                                            Mais
+                                                        </button>
+                                                    )}
+                                                </>
                                             )}
-                                        </>
-                                    )}
-                                </td>
-                                <td>{lesson.submodule.name}</td>
-                                <td>{lesson.course.name}</td>
-                                <td>{lesson.date}</td>
-                                <td>
-                                    {lesson.professors
-                                        .map((prof) => prof.name)
-                                        .join(", ")}
-                                </td>
+                                        </td>
+                                        <td>{lesson.submodule.name}</td>
+                                        <td>{lesson.course.name}</td>
+                                        <td>{lesson.date}</td>
+                                        <td>
+                                            {lesson.professors
+                                                .map((prof) => prof.name)
+                                                .join(", ")}
+                                        </td>
+                                        {professor.is_coordinator === 1 && (
+                                            <td>
+                                                <button
+                                                    onClick={() =>
+                                                        handleEditClick(lesson)
+                                                    }
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            lesson.lesson_id
+                                                        )
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        )}
+                                    </>
+                                )}
                             </tr>
                         ))}
                     </tbody>

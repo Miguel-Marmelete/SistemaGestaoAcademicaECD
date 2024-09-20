@@ -161,26 +161,20 @@ const StudentsList = () => {
                     </select>
                 </label>
             </div>
-            <table className="table-list" border="1" cellPadding="10">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Número</th>
-                        <th>Email</th>
-                        {professor.is_coordinator === 1 && <th>Ações</th>}
-                    </tr>
-                </thead>
-                <tbody>
-                    {students.length === 0 ? (
+            {students.length === 0 ? (
+                <p>No students enrolled in selected course</p>
+            ) : (
+                <table className="table-list" border="1" cellPadding="10">
+                    <thead>
                         <tr>
-                            <td
-                                colSpan={professor.is_coordinator === 1 ? 4 : 3}
-                            >
-                                No students enrolled in selected course
-                            </td>
+                            <th>Nome</th>
+                            <th>Número</th>
+                            <th>Email</th>
+                            {professor.is_coordinator === 1 && <th>Ações</th>}
                         </tr>
-                    ) : (
-                        students.map((student) => (
+                    </thead>
+                    <tbody>
+                        {students.map((student) => (
                             <tr key={student.student_id}>
                                 {editedStudent.student_id ===
                                 student.student_id ? (
@@ -256,10 +250,10 @@ const StudentsList = () => {
                                     </>
                                 )}
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
+                        ))}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
 };

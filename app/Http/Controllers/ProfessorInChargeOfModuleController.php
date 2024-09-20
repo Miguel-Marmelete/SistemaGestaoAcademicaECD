@@ -178,18 +178,22 @@ class ProfessorInChargeOfModuleController extends Controller
             $query = Submodule::query();
     
             // If the professor is not a coordinator, filter by their assigned modules
-            if ($professor->is_coordinator == 0) {
+            if ($professor->is_coordinator == 1) {
                 $moduleIds = ProfessorInChargeOfModule::where('professor_id', $professor->professor_id)
                     ->pluck('module_id');
-                $query->whereIn('module_id', $moduleIds);
+    
+                // Filter by both module_id (from professor) and course_id (if provided)
+                if ($request->has('course_id')) {
+                    $courseModuleIds = CourseModule::where('course_id', $request->query('course_id'))
+                        ->whereIn('module_id', $moduleIds) // Ensure both conditions are met
+                        ->pluck('module_id');
+                    $query->whereIn('module_id', $courseModuleIds);
+                } else {
+                    $query->whereIn('module_id', $moduleIds);
+                }
             }
     
-            // If the professor is a coordinator or if a course_id is provided, filter by course modules
-            if ($request->has('course_id')) {
-                $courseModuleIds = CourseModule::where('course_id', $request->query('course_id'))
-                    ->pluck('module_id');
-                $query->whereIn('module_id', $courseModuleIds);
-            }
+        
     
             // Eager load relationships
             $submodules = $query->with(['module'])->get();
@@ -203,5 +207,8 @@ class ProfessorInChargeOfModuleController extends Controller
             ], 500);
         }
     }
+    
+    
+
     
 }

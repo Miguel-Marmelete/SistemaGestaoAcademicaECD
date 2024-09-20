@@ -23,27 +23,6 @@ const AddLesson = () => {
     });
 
     useEffect(() => {
-        fetch(endpoints.GET_SUBMODULES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((submoduleResponse) => {
-                if (submoduleResponse.ok) {
-                    return submoduleResponse.json();
-                } else {
-                    throw new Error("Failed to fetch submodules");
-                }
-            })
-            .then((submoduleData) => {
-                setSubmodules(submoduleData.submodules);
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                alert(error.message);
-            });
-
         fetch(endpoints.GET_COURSES, {
             method: "GET",
             headers: {
@@ -88,12 +67,15 @@ const AddLesson = () => {
     }, [accessTokenData]);
 
     useEffect(() => {
-        fetch(endpoints.GET_LESSONS, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
+        fetch(
+            `${endpoints.GET_LESSONS}?professor_id=${accessTokenData.professor_id}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${accessTokenData.access_token}`,
+                },
+            }
+        )
             .then((lessonResponse) => {
                 if (lessonResponse.ok) {
                     return lessonResponse.json();
@@ -109,6 +91,36 @@ const AddLesson = () => {
                 alert(error.message);
             });
     }, [lessonAdded, accessTokenData]);
+
+    useEffect(() => {
+        if (formData.course_id) {
+            fetch(
+                `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${formData.course_id}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                }
+            )
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error("Failed to fetch submodules");
+                    }
+                })
+                .then((data) => {
+                    setSubmodules(data.submodules);
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert(error.message);
+                });
+        } else {
+            setSubmodules([]);
+        }
+    }, [formData.course_id, accessTokenData]);
 
     useEffect(() => {
         if (formData.course_id) {
@@ -289,27 +301,6 @@ const AddLesson = () => {
                     ></textarea>
                 </div>
                 <div>
-                    <label>Submodule</label>
-                    <select
-                        name="submodule_id"
-                        value={formData.submodule_id}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="" disabled>
-                            Select a submodule
-                        </option>
-                        {submodules.map((submodule) => (
-                            <option
-                                key={submodule.submodule_id}
-                                value={submodule.submodule_id}
-                            >
-                                {submodule.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div>
                     <label>Course</label>
                     <select
                         name="course_id"
@@ -326,6 +317,28 @@ const AddLesson = () => {
                                 value={course.course_id}
                             >
                                 {course.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label>Submodule</label>
+                    <select
+                        name="submodule_id"
+                        value={formData.submodule_id}
+                        onChange={handleChange}
+                        required
+                        disabled={!formData.course_id} // Disable until a course is selected
+                    >
+                        <option value="" disabled>
+                            Select a submodule
+                        </option>
+                        {submodules.map((submodule) => (
+                            <option
+                                key={submodule.submodule_id}
+                                value={submodule.submodule_id}
+                            >
+                                {submodule.name}
                             </option>
                         ))}
                     </select>

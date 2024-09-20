@@ -181,6 +181,8 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::put('/updateProfessorInChargeOfModule/{id}', [ProfessorInChargeOfModuleController::class, 'update']);
     // Delete a ProfessorInChargeOfModule by ID
     Route::delete('/deleteProfessorInChargeOfModule/{id}', [ProfessorInChargeOfModuleController::class, 'destroy']);
+    // Get submodules of professor
+    Route::get('/getSubmodulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getSubmodulesOfProfessor']);
   //-----------------------------------------------------------------------
 
 
