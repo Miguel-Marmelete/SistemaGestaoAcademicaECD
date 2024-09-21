@@ -178,7 +178,7 @@ class ProfessorInChargeOfModuleController extends Controller
             $query = Submodule::query();
     
             // If the professor is not a coordinator, filter by their assigned modules
-            if ($professor->is_coordinator == 1) {
+            if ($professor->is_coordinator == 0) {
                 $moduleIds = ProfessorInChargeOfModule::where('professor_id', $professor->professor_id)
                     ->pluck('module_id');
     

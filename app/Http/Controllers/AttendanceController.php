@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Attendance;
+use Illuminate\Support\Facades\Log;
+
 class AttendanceController extends Controller
 {
     /**
@@ -33,19 +35,30 @@ class AttendanceController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'lesson_id' => 'required|exists:lessons,lesson_id',
-                'student_id' => 'required|exists:students,student_id',
+                'student_ids' => 'required|array',
+                'student_ids.*' => 'required|exists:students,student_id',
             ]);
 
             if ($validator->fails()) {
+                Log::error('Validation failed: ' . $validator->errors());
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-        
-            $attendance = Attendance::create($validator->validated());
+            $lesson_id = $request->input('lesson_id');
+            $student_ids = $request->input('student_ids');
 
-            return response()->json(['message' => 'Attendance record created successfully', 'attendance' => $attendance], 201);
+            $attendances = [];
+            foreach ($student_ids as $student_id) {
+                $attendance = Attendance::create([
+                    'lesson_id' => $lesson_id,
+                    'student_id' => $student_id,
+                ]);
+                $attendances[] = $attendance;
+            }
+
+            return response()->json(['message' => 'Attendance records created successfully', 'attendances' => $attendances], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while creating the attendance record', 'details' => $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred while creating the attendance records', 'details' => $e->getMessage()], 500);
         }
     }
 

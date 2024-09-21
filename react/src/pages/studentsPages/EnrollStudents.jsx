@@ -196,7 +196,9 @@ const EnrollStudents = () => {
                     </h2>
                     <ul>
                         {enrolledStudents.map((student) => (
-                            <li key={student.student_id}>{student.name}</li>
+                            <li key={student.student_id}>
+                                {student.name} - {student.number}
+                            </li>
                         ))}
                     </ul>
                 </div>

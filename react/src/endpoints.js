@@ -34,6 +34,7 @@ const endpoints = {
     ADD_EVALUATION_MOMENT: `${API_BASE_URL}/addEvaluationMoment`,
     ASSOCIATE_PROFESSOR_TO_MODULE: `${API_BASE_URL}/associateProfessorToModule`,
     CREATE_AND_ENROLL: `${API_BASE_URL}/createAndEnroll`,
+    REGIST_ATTENDANCE: `${API_BASE_URL}/createAttendance`,
 
     //DELETE
     DELETE_COURSE: `${API_BASE_URL}/deleteCourse`,
