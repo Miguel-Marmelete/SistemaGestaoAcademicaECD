@@ -71,9 +71,9 @@ const AddLesson = () => {
     }, [accessTokenData]);
 
     useEffect(() => {
-        if (formData.course_id) {
+        if (selectedCourse) {
             fetch(
-                `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${formData.course_id}`,
+                `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`,
                 {
                     method: "GET",
                     headers: {
@@ -98,13 +98,13 @@ const AddLesson = () => {
         } else {
             setSubmodules([]);
         }
-    }, [formData.course_id, accessTokenData]);
+    }, [selectedCourse, accessTokenData]);
 
     useEffect(() => {
-        if (formData.course_id) {
-            let url = `${endpoints.GET_FILTERED_LESSONS}?course_id=${formData.course_id}`;
-            if (formData.submodule_id) {
-                url += `&submodule_id=${formData.submodule_id}`;
+        if (selectedCourse) {
+            let url = `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}`;
+            if (selectedSubmodule) {
+                url += `&submodule_id=${selectedSubmodule}`;
             }
 
             fetch(url, {
@@ -126,12 +126,7 @@ const AddLesson = () => {
                     alert(error.message);
                 });
         }
-    }, [
-        formData.course_id,
-        formData.submodule_id,
-        lessonAdded,
-        accessTokenData,
-    ]);
+    }, [selectedCourse, selectedSubmodule, lessonAdded, accessTokenData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -139,6 +134,12 @@ const AddLesson = () => {
             ...formData,
             [name]: value,
         });
+
+        if (name === "course_id") {
+            setSelectedCourse(value);
+        } else if (name === "submodule_id") {
+            setSelectedSubmodule(value);
+        }
     };
 
     const handleProfessorCheckboxChange = (e) => {
@@ -387,7 +388,7 @@ const AddLesson = () => {
                             ))}
                         </div>
                     </div>
-                    {formData.course_id && (
+                    {selectedCourse && (
                         <div>
                             <label>Students</label>
                             <div className="checkbox-group">
