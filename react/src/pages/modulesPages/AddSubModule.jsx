@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../auth/AuthContext";
 import endpoints from "../../endpoints";
-
+import ButtonMenu from "../../components/ButtonMenu";
+import { modulesMenuButtons } from "../../../scripts/buttonsData";
 const AddSubModule = () => {
     const { accessTokenData } = useAuth();
     const [modules, setModules] = useState([]); // State for fetched modules
@@ -113,78 +114,81 @@ const AddSubModule = () => {
     };
 
     return (
-        <div className="container">
-            <form className="submitForm" onSubmit={handleSubmit}>
-                <h2>Adicionar Submódulo</h2>
-                <div>
-                    <label>Nome</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        maxLength={255}
-                    />
-                </div>
-                <div>
-                    <label>Horas de Contacto</label>
-                    <input
-                        type="text"
-                        name="contact_hours"
-                        value={formData.contact_hours}
-                        onChange={handleChange}
-                        required
-                        pattern="\d+"
-                    />
-                </div>
-                <div>
-                    <label>Abreviatura</label>
-                    <input
-                        type="text"
-                        name="abbreviation"
-                        value={formData.abbreviation}
-                        onChange={handleChange}
-                        required
-                        maxLength={255}
-                    />
-                </div>
-                <div>
-                    <label>Módulo</label>
-                    <select
-                        name="module_id"
-                        value={formData.module_id}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="" disabled>
-                            Select a module
-                        </option>
-                        {modules.map((module) => (
-                            <option
-                                key={module.module_id}
-                                value={module.module_id}
-                            >
-                                {module.name}
+        <div>
+            <ButtonMenu buttons={modulesMenuButtons} />
+            <div className="container">
+                <form className="submitForm" onSubmit={handleSubmit}>
+                    <h2>Adicionar Submódulo</h2>
+                    <div>
+                        <label>Nome</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            maxLength={255}
+                        />
+                    </div>
+                    <div>
+                        <label>Horas de Contacto</label>
+                        <input
+                            type="text"
+                            name="contact_hours"
+                            value={formData.contact_hours}
+                            onChange={handleChange}
+                            required
+                            pattern="\d+"
+                        />
+                    </div>
+                    <div>
+                        <label>Abreviatura</label>
+                        <input
+                            type="text"
+                            name="abbreviation"
+                            value={formData.abbreviation}
+                            onChange={handleChange}
+                            required
+                            maxLength={255}
+                        />
+                    </div>
+                    <div>
+                        <label>Módulo</label>
+                        <select
+                            name="module_id"
+                            value={formData.module_id}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="" disabled>
+                                Select a module
                             </option>
+                            {modules.map((module) => (
+                                <option
+                                    key={module.module_id}
+                                    value={module.module_id}
+                                >
+                                    {module.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Submitting..." : "Submeter"}
+                    </button>
+                </form>
+
+                <div className="list">
+                    <h2>Existing Submodules</h2>
+                    <ul>
+                        {subModules.map((subModule) => (
+                            <li key={subModule.submodule_id}>
+                                {subModule.name} - {subModule.abbreviation}
+                            </li>
                         ))}
-                    </select>
+                    </ul>
                 </div>
-
-                <button type="submit" disabled={loading}>
-                    {loading ? "Submitting..." : "Submeter"}
-                </button>
-            </form>
-
-            <div className="list">
-                <h2>Existing Submodules</h2>
-                <ul>
-                    {subModules.map((subModule) => (
-                        <li key={subModule.submodule_id}>
-                            {subModule.name} - {subModule.abbreviation}
-                        </li>
-                    ))}
-                </ul>
             </div>
         </div>
     );

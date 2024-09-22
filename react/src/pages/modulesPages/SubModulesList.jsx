@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
-
+import ButtonMenu from "../../components/ButtonMenu";
+import { modulesMenuButtons } from "../../../scripts/buttonsData";
 const SubModulesList = () => {
     const [subModules, setSubModules] = useState([]);
     const { accessTokenData } = useAuth();
@@ -32,30 +33,33 @@ const SubModulesList = () => {
     }, [accessTokenData.access_token]);
 
     return (
-        <div className="table-list-container">
-            <header>
-                <h1>SubMódulos Disponíveis</h1>
-            </header>
-            <table className="table-list" border="1" cellPadding="10">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Abreviatura</th>
-                        <th>Horas de Contacto</th>
-                        <th>Módulo Principal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {subModules.map((subModule) => (
-                        <tr key={subModule.submodule_id}>
-                            <td>{subModule.name}</td>
-                            <td>{subModule.abbreviation}</td>
-                            <td>{subModule.contact_hours}</td>
-                            <td>{subModule.module.name}</td>
+        <div>
+            <ButtonMenu buttons={modulesMenuButtons} />
+            <div className="table-list-container">
+                <header>
+                    <h1>SubMódulos Disponíveis</h1>
+                </header>
+                <table className="table-list" border="1" cellPadding="10">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Abreviatura</th>
+                            <th>Horas de Contacto</th>
+                            <th>Módulo Principal</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {subModules.map((subModule) => (
+                            <tr key={subModule.submodule_id}>
+                                <td>{subModule.name}</td>
+                                <td>{subModule.abbreviation}</td>
+                                <td>{subModule.contact_hours}</td>
+                                <td>{subModule.module.name}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

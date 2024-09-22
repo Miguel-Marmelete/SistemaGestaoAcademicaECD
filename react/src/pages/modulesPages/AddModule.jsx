@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
-
+import ButtonMenu from "../../components/ButtonMenu";
+import { modulesMenuButtons } from "../../../scripts/buttonsData";
 const AddModule = () => {
     const { accessTokenData } = useAuth();
     const [loading, setLoading] = useState(false);
@@ -88,67 +89,70 @@ const AddModule = () => {
     };
 
     return (
-        <div className="container">
-            <form className="submitForm" onSubmit={handleSubmit}>
-                <h2>Adicionar Módulo</h2>
-                <div>
-                    <label>Nome</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        maxLength={255}
-                    />
-                </div>
-                <div>
-                    <label>Horas de Contacto</label>
-                    <input
-                        type="text"
-                        name="contact_hours"
-                        value={formData.contact_hours}
-                        onChange={handleChange}
-                        required
-                        pattern="\d+"
-                    />
-                </div>
-                <div>
-                    <label>Abreviatura</label>
-                    <input
-                        type="text"
-                        name="abbreviation"
-                        value={formData.abbreviation}
-                        onChange={handleChange}
-                        required
-                        maxLength={255}
-                    />
-                </div>
-                <div>
-                    <label>ECTS</label>
-                    <input
-                        type="text"
-                        name="ects"
-                        value={formData.ects}
-                        onChange={handleChange}
-                        required
-                        maxLength={255}
-                    />
-                </div>
-                <button type="submit" disabled={loading}>
-                    {loading ? "Submitting..." : "Submit"}
-                </button>
-            </form>
+        <div>
+            <ButtonMenu buttons={modulesMenuButtons} />
+            <div className="container">
+                <form className="submitForm" onSubmit={handleSubmit}>
+                    <h2>Adicionar Módulo</h2>
+                    <div>
+                        <label>Nome</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            maxLength={255}
+                        />
+                    </div>
+                    <div>
+                        <label>Horas de Contacto</label>
+                        <input
+                            type="text"
+                            name="contact_hours"
+                            value={formData.contact_hours}
+                            onChange={handleChange}
+                            required
+                            pattern="\d+"
+                        />
+                    </div>
+                    <div>
+                        <label>Abreviatura</label>
+                        <input
+                            type="text"
+                            name="abbreviation"
+                            value={formData.abbreviation}
+                            onChange={handleChange}
+                            required
+                            maxLength={255}
+                        />
+                    </div>
+                    <div>
+                        <label>ECTS</label>
+                        <input
+                            type="text"
+                            name="ects"
+                            value={formData.ects}
+                            onChange={handleChange}
+                            required
+                            maxLength={255}
+                        />
+                    </div>
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Submitting..." : "Submit"}
+                    </button>
+                </form>
 
-            <div className="list">
-                <h2>Existing Modules</h2>
-                <ul>
-                    {modules.map((module) => (
-                        <li key={module.module_id}>
-                            {module.name} - {module.abbreviation}
-                        </li>
-                    ))}
-                </ul>
+                <div className="list">
+                    <h2>Existing Modules</h2>
+                    <ul>
+                        {modules.map((module) => (
+                            <li key={module.module_id}>
+                                {module.name} - {module.abbreviation}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
-
+import ButtonMenu from "../../components/ButtonMenu";
+import { modulesMenuButtons } from "../../../scripts/buttonsData";
 const ProfessorsInChargeOfModulesList = () => {
     const { accessTokenData } = useAuth();
     const [courses, setCourses] = useState([]);
@@ -54,49 +55,52 @@ const ProfessorsInChargeOfModulesList = () => {
     }, [selectedCourse, professorsInCharge]);
 
     return (
-        <div className="table-list-container">
-            <header>
-                <h1>Professors in Charge of Modules</h1>
-            </header>
-            <div className="filters">
-                <label>
-                    Course:
-                    <select
-                        value={selectedCourse}
-                        onChange={(e) => setSelectedCourse(e.target.value)}
-                    >
-                        <option value="">All Courses</option>
-                        {courses.map((course) => (
-                            <option
-                                key={course.course_id}
-                                value={course.course_id}
-                            >
-                                {course.name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-            </div>
-            <table className="table-list" border="1" cellPadding="10">
-                <thead>
-                    <tr>
-                        <th>Module</th>
-                        <th>Professor</th>
-                        <th>Course</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredProfessorsInCharge.map((professorInCharge) => (
-                        <tr
-                            key={`${professorInCharge.module.module_id}-${professorInCharge.professor.professor_id}-${professorInCharge.course.course_id}`}
+        <div>
+            <ButtonMenu buttons={modulesMenuButtons} />
+            <div className="table-list-container">
+                <header>
+                    <h1>Professors in Charge of Modules</h1>
+                </header>
+                <div className="filters">
+                    <label>
+                        Course:
+                        <select
+                            value={selectedCourse}
+                            onChange={(e) => setSelectedCourse(e.target.value)}
                         >
-                            <td>{professorInCharge.module.name}</td>
-                            <td>{professorInCharge.professor.name}</td>
-                            <td>{professorInCharge.course.name}</td>
+                            <option value="">All Courses</option>
+                            {courses.map((course) => (
+                                <option
+                                    key={course.course_id}
+                                    value={course.course_id}
+                                >
+                                    {course.name}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                </div>
+                <table className="table-list" border="1" cellPadding="10">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Professor</th>
+                            <th>Course</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {filteredProfessorsInCharge.map((professorInCharge) => (
+                            <tr
+                                key={`${professorInCharge.module.module_id}-${professorInCharge.professor.professor_id}-${professorInCharge.course.course_id}`}
+                            >
+                                <td>{professorInCharge.module.name}</td>
+                                <td>{professorInCharge.professor.name}</td>
+                                <td>{professorInCharge.course.name}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

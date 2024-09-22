@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import { fetchCourses } from "../../../scripts/getCourses";
-
+import ButtonMenu from "../../components/ButtonMenu";
+import { modulesMenuButtons } from "../../../scripts/buttonsData";
 const AssociateModulesToCourse = () => {
     const [courses, setCourses] = useState([]);
     const [modules, setModules] = useState([]);
@@ -103,56 +104,61 @@ const AssociateModulesToCourse = () => {
     };
 
     return (
-        <div className="form-container">
-            <form onSubmit={handleSubmit}>
-                <h2>Associate Modules with Course</h2>
+        <div>
+            <ButtonMenu buttons={modulesMenuButtons} />
+            <div className="form-container">
+                <form onSubmit={handleSubmit}>
+                    <h2>Associate Modules with Course</h2>
 
-                <div>
-                    <label>Select Course</label>
-                    <select
-                        name="course"
-                        value={selectedCourse}
-                        onChange={handleCourseChange}
-                        required
-                    >
-                        <option value="" disabled>
-                            Select a course
-                        </option>
-                        {courses.map((course) => (
-                            <option
-                                key={course.course_id}
-                                value={course.course_id}
-                            >
-                                {course.name}
+                    <div>
+                        <label>Select Course</label>
+                        <select
+                            name="course"
+                            value={selectedCourse}
+                            onChange={handleCourseChange}
+                            required
+                        >
+                            <option value="" disabled>
+                                Select a course
                             </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div>
-                    <label>Modules</label>
-                    <div className="checkbox-group">
-                        {modules.map((module) => (
-                            <div key={module.module_id}>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        name="module_ids"
-                                        value={module.module_id}
-                                        checked={selectedModules.includes(
-                                            module.module_id
-                                        )}
-                                        onChange={handleModuleCheckboxChange}
-                                    />
-                                    {module.name}
-                                </label>
-                            </div>
-                        ))}
+                            {courses.map((course) => (
+                                <option
+                                    key={course.course_id}
+                                    value={course.course_id}
+                                >
+                                    {course.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
-                </div>
 
-                <button type="submit">Submeter</button>
-            </form>
+                    <div>
+                        <label>Modules</label>
+                        <div className="checkbox-group">
+                            {modules.map((module) => (
+                                <div key={module.module_id}>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="module_ids"
+                                            value={module.module_id}
+                                            checked={selectedModules.includes(
+                                                module.module_id
+                                            )}
+                                            onChange={
+                                                handleModuleCheckboxChange
+                                            }
+                                        />
+                                        {module.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <button type="submit">Submeter</button>
+                </form>
+            </div>
         </div>
     );
 };
