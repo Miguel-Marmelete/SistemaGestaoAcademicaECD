@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\CourseModule;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Log;
 class CourseModuleController extends Controller
 {
     /**
@@ -22,6 +22,48 @@ class CourseModuleController extends Controller
             return response()->json(['error' => 'An error occurred while retrieving course-module relationships', 'details' => $e->getMessage()], 500);
         }
     }
+
+
+
+/**
+     * Get modules associated with a specific course.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getModulesByCourse(Request $request)
+    {
+        // Validate the incoming request data for course_id
+        $validator = Validator::make($request->all(), [
+            'course_id' => 'required|exists:courses,course_id',
+        ]);
+
+        if ($validator->fails()) {
+            
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            // Retrieve course_id from the request query
+            $course_id = $request->query('course_id');
+
+            // Get the modules associated with the course
+            $modules = CourseModule::with('module')
+                ->where('course_id', $course_id)
+                ->get()
+                ->pluck('module'); // Only return the modules
+
+            return response()->json(['modules' => $modules], 200);
+        } catch (\Exception $e) {
+            Log::error('An error occurred while returning modules by course: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'An error occurred while retrieving modules for the course',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
     /**
      * Store a new course-module relationship.

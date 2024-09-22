@@ -80,6 +80,9 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
      Route::get('/getAllModulesCourseAssociation', [CourseModuleController::class, 'index']);
      // Get a specific Enrollment by ID
      Route::get('/getModulesCourseAssociation/{module_id}/{course_id}', [CourseModuleController::class, 'show']);
+
+     // Get a specific module by ID
+     Route::get('/getModulesByCourse', [CourseModuleController::class, 'getModulesByCourse']);
      // Create a new Enrollment
      Route::post('/associateModulesToCourse', [CourseModuleController::class, 'store']);
      // Update an existing course by ID
@@ -149,6 +152,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getAllModules', [ModuleController::class, 'index']);
     // Get a specific module by ID
     Route::get('/getModule/{id}', [ModuleController::class, 'show']);
+
     // Create a new module
     Route::post('/addModules', [ModuleController::class, 'store']);
     // Update an existing module by ID
@@ -183,6 +187,8 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::delete('/deleteProfessorInChargeOfModule/{id}', [ProfessorInChargeOfModuleController::class, 'destroy']);
     // Get submodules of professor
     Route::get('/getSubmodulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getSubmodulesOfProfessor']);
+    Route::get('/getProfessorsInChargeOfModulesByCourse', [ProfessorInChargeOfModuleController::class, 'getProfessorsInChargeOfModulesByCourse']);
+    
   //-----------------------------------------------------------------------
 
 

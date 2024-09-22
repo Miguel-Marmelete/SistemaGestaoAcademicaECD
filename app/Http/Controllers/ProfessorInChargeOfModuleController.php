@@ -27,17 +27,18 @@ class ProfessorInChargeOfModuleController extends Controller
         }
     }
 
+
     /**
-     * Store a new professor in charge of module record.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'professor_id' => 'required|exists:professors,professor_id',
-            'module_id' => 'required|exists:modules,module_id',
+ * Get professors and modules for a given course.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @return \Illuminate\Http\JsonResponse
+ */
+public function getProfessorsInChargeOfModulesByCourse(Request $request)
+{
+    try {
+        // Validate the request to ensure course_id exists
+        $validator = Validator::make($request->query(), [
             'course_id' => 'required|exists:courses,course_id',
         ]);
 
@@ -45,25 +46,59 @@ class ProfessorInChargeOfModuleController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Check if the entry already exists
-        $exists = ProfessorInChargeOfModule::where('professor_id', $request->professor_id)
-            ->where('module_id', $request->module_id)
-            ->where('course_id', $request->course_id)
-            ->exists();
+        $course_id = $request->query('course_id');
 
-        if ($exists) {
-            return response()->json(['message' => 'Professor already in charge of module'], 409);
-        }
+        // Retrieve the professors and their associated modules for the course
+        $professorsAndModules = ProfessorInChargeOfModule::with(['professor', 'module'])
+            ->where('course_id', $course_id)
+            ->get();
 
-        try {
-            $professorInCharge = ProfessorInChargeOfModule::create($validator->validated());
+        // If no records are found
+        /*
+        if ($professorsAndModules->isEmpty()) {
+            return response()->json(['message' => 'No professors or modules found for this course'], 404);
+        }*/
 
-            return response()->json(['message' => 'Professor in charge of module created successfully', 'professorInCharge' => $professorInCharge], 201);
-        } catch (\Exception $e) {
-            Log::error('Error creating professor in charge of module: ' . $e->getMessage());
-            return response()->json(['error' => 'An error occurred while creating the professor in charge of module record', 'details' => $e->getMessage()], 500);
-        }
+        return response()->json(['professorsAndModules' => $professorsAndModules], 200);
+    } catch (\Exception $e) {
+        Log::error('Error retrieving professors and modules: ' . $e->getMessage());
+        return response()->json([
+            'error' => 'An error occurred while retrieving professors and modules',
+            'details' => $e->getMessage()
+        ], 500);
     }
+}
+
+
+public function store(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'professor_id' => 'required|exists:professors,professor_id',
+        'module_id' => 'required|exists:modules,module_id',
+        'course_id' => 'required|exists:courses,course_id',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    try {
+        // Check if the entry already exists
+        $professorInCharge = ProfessorInChargeOfModule::updateOrCreate(
+            [
+                'module_id' => $request->module_id,
+                'course_id' => $request->course_id,
+            ],
+            ['professor_id' => $request->professor_id]
+        );
+
+        return response()->json(['message' => 'Professor in charge of module updated successfully', 'professorInCharge' => $professorInCharge], 200);
+    } catch (\Exception $e) {
+        Log::error('Error updating professor in charge of module: ' . $e->getMessage());
+        return response()->json(['error' => 'An error occurred while updating the professor in charge of module record', 'details' => $e->getMessage()], 500);
+    }
+}
+
 
     /**
      * Display the specified professor in charge of module record.

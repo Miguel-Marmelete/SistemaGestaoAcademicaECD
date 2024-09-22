@@ -3,27 +3,19 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
+
 const AssociateProfessorToModule = () => {
     const { accessTokenData } = useAuth();
     const [modules, setModules] = useState([]);
     const [professors, setProfessors] = useState([]);
     const [courses, setCourses] = useState([]);
+    const [professorsAndModules, setProfessorsAndModules] = useState([]); // New state for professors and modules
     const [selectedModule, setSelectedModule] = useState("");
     const [selectedProfessor, setSelectedProfessor] = useState("");
     const [selectedCourse, setSelectedCourse] = useState("");
 
+    // Fetch professors and courses only once when component mounts
     useEffect(() => {
-        fetch(endpoints.GET_MODULES, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => setModules(data.modules))
-            .catch((error) =>
-                alert("Failed to fetch modules: " + error.message)
-            );
-
         fetch(endpoints.GET_PROFESSORS, {
             headers: {
                 Authorization: `Bearer ${accessTokenData.access_token}`,
@@ -46,6 +38,49 @@ const AssociateProfessorToModule = () => {
                 alert("Failed to fetch courses: " + error.message)
             );
     }, [accessTokenData.access_token]);
+
+    // Fetch modules and professors-and-modules when a course is selected
+    useEffect(() => {
+        if (selectedCourse) {
+            // Fetch modules by course
+            fetch(
+                `${endpoints.GET_MODULES_BY_COURSE}?course_id=${selectedCourse}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                }
+            )
+                .then((response) => response.json())
+                .then((data) => setModules(data.modules.reverse()))
+                .catch((error) =>
+                    alert("Failed to fetch modules: " + error.message)
+                );
+
+            // Fetch professors and modules by course (new fetch)
+            fetch(
+                `${endpoints.GET_PROFESSORS_IN_CHARGE_OF_MODULES_BY_COURSE}?course_id=${selectedCourse}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                }
+            )
+                .then((response) => response.json())
+                .then((data) =>
+                    setProfessorsAndModules(data.professorsAndModules)
+                )
+                .catch((error) =>
+                    alert(
+                        "Failed to fetch professors and modules: " +
+                            error.message
+                    )
+                );
+        } else {
+            setModules([]); // Clear modules if no course is selected
+            setProfessorsAndModules([]); // Clear professors and modules if no course is selected
+        }
+    }, [selectedCourse, accessTokenData.access_token]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -88,6 +123,59 @@ const AssociateProfessorToModule = () => {
                 <form className="submitForm" onSubmit={handleSubmit}>
                     <h2>Associate Professor to Module</h2>
                     <div>
+                        <label>Course</label>
+                        <select
+                            name="course"
+                            value={selectedCourse}
+                            onChange={(e) => setSelectedCourse(e.target.value)}
+                            required
+                        >
+                            <option value="" disabled>
+                                Select a course
+                            </option>
+                            {courses && courses.length > 0 ? (
+                                courses.map((course) => (
+                                    <option
+                                        key={course.course_id}
+                                        value={course.course_id}
+                                    >
+                                        {course.name}
+                                    </option>
+                                ))
+                            ) : (
+                                <option disabled>No courses available</option>
+                            )}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Module</label>
+                        <select
+                            name="module"
+                            value={selectedModule}
+                            onChange={(e) => setSelectedModule(e.target.value)}
+                            disabled={!selectedCourse}
+                            required
+                        >
+                            <option value="" disabled>
+                                Select a module
+                            </option>
+                            {modules && modules.length > 0 ? (
+                                modules.map((module) => (
+                                    <option
+                                        key={module.module_id}
+                                        value={module.module_id}
+                                    >
+                                        {module.name}
+                                    </option>
+                                ))
+                            ) : (
+                                <option disabled>No modules available</option>
+                            )}
+                        </select>
+                    </div>
+
+                    <div>
                         <label>Professor</label>
                         <select
                             name="professor"
@@ -100,71 +188,43 @@ const AssociateProfessorToModule = () => {
                             <option value="" disabled>
                                 Select a professor
                             </option>
-                            {professors.map((professor) => (
-                                <option
-                                    key={professor.professor_id}
-                                    value={professor.professor_id}
-                                >
-                                    {professor.name}
+                            {professors && professors.length > 0 ? (
+                                professors.map((professor) => (
+                                    <option
+                                        key={professor.professor_id}
+                                        value={professor.professor_id}
+                                    >
+                                        {professor.name}
+                                    </option>
+                                ))
+                            ) : (
+                                <option disabled>
+                                    No professors available
                                 </option>
-                            ))}
+                            )}
                         </select>
                     </div>
-                    <div>
-                        <label>Module</label>
-                        <select
-                            name="module"
-                            value={selectedModule}
-                            onChange={(e) => setSelectedModule(e.target.value)}
-                            required
-                        >
-                            <option value="" disabled>
-                                Select a module
-                            </option>
-                            {modules.map((module) => (
-                                <option
-                                    key={module.module_id}
-                                    value={module.module_id}
-                                >
-                                    {module.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label>Course</label>
-                        <select
-                            name="course"
-                            value={selectedCourse}
-                            onChange={(e) => setSelectedCourse(e.target.value)}
-                            required
-                        >
-                            <option value="" disabled>
-                                Select a course
-                            </option>
-                            {courses.map((course) => (
-                                <option
-                                    key={course.course_id}
-                                    value={course.course_id}
-                                >
-                                    {course.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+
                     <button type="submit">Submit</button>
                 </form>
+
+                {/* Display existing professors and modules */}
                 <div className="list">
-                    <h2>Existing Modules and Professors in Charge</h2>
+                    <h2>Professors and Modules for the Selected Course</h2>
                     <ul>
-                        {modules.map((module) => (
-                            <li key={module.module_id}>
-                                {module.name} -{" "}
-                                {module.professor
-                                    ? module.professor.name
-                                    : "No professor assigned"}
-                            </li>
-                        ))}
+                        {professorsAndModules &&
+                        professorsAndModules.length > 0 ? (
+                            professorsAndModules.map((item) => (
+                                <li key={item.module.module_id}>
+                                    {item.module.name} -{" "}
+                                    {item.professor
+                                        ? item.professor.name
+                                        : "No professor assigned"}
+                                </li>
+                            ))
+                        ) : (
+                            <li>No data available</li> // Handle empty or undefined cases
+                        )}
                     </ul>
                 </div>
             </div>
