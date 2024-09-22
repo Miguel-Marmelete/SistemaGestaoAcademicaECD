@@ -20,6 +20,15 @@ class ProfessorInChargeOfLesson extends Model
 
     
 
+    // Override the method for handling composite keys in queries
+    protected function setKeysForSaveQuery($query)
+    {
+        foreach ($this->primaryKey as $key) {
+            $query->where($key, '=', $this->getAttribute($key));
+        }
+        return $query;
+    }
+
     public function professor(): BelongsTo
     {
         return $this->belongsTo(Professor::class, 'professor_id');

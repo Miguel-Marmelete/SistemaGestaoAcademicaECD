@@ -19,6 +19,14 @@ class Attendance extends Model
 
     protected $primaryKey = ['lesson_id', 'student_id'];
 
+    protected function setKeysForSaveQuery($query)
+    {
+        foreach ($this->primaryKey as $key) {
+            $query->where($key, '=', $this->getAttribute($key));
+        }
+        return $query;
+    }
+
     public function student()
     {
         return $this->belongsTo(Student::class, 'student_id');

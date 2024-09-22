@@ -178,19 +178,19 @@ public function store(Request $request)
     public function destroy($professor_id, $module_id, $course_id)
     {
         try {
-            $professorInCharge = ProfessorInChargeOfModule::where('professor_id', $professor_id)
+            $assignment = ProfessorInChargeOfModule::where('professor_id', $professor_id)
                 ->where('module_id', $module_id)
                 ->where('course_id', $course_id)
                 ->firstOrFail();
-            $professorInCharge->delete();
 
-            return response()->json(['message' => 'Professor in charge of module record deleted successfully'], 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Professor in charge of module record not found'], 404);
+            $assignment->delete();
+            return response()->json(['message' => 'Assignment deleted successfully'], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while deleting the professor in charge of module record', 'details' => $e->getMessage()], 500);
+            Log::error('Error deleting assignment: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to delete record', 'error' => $e->getMessage()], 500);
         }
     }
+    
     public function getSubmodulesOfProfessor(Request $request)
     {
         try {

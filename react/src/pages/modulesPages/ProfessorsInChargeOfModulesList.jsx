@@ -3,6 +3,7 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
+
 const ProfessorsInChargeOfModulesList = () => {
     const { accessTokenData } = useAuth();
     const [courses, setCourses] = useState([]);
@@ -54,6 +55,48 @@ const ProfessorsInChargeOfModulesList = () => {
         }
     }, [selectedCourse, professorsInCharge]);
 
+    const handleDelete = (module_id, professor_id, course_id) => {
+        console.log(typeof module_id, typeof professor_id, typeof course_id);
+        if (
+            !window.confirm(
+                "Are you sure you want to remove this professor from the module?"
+            )
+        ) {
+            return;
+        }
+
+        fetch(
+            `${endpoints.DELETE_PROFESSOR_IN_CHARGE_OF_MODULE}/${professor_id}/${module_id}/${course_id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${accessTokenData.access_token}`,
+                },
+            }
+        )
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to delete professor from module");
+                }
+                setFilteredProfessorsInCharge((prevProfessorsInCharge) =>
+                    prevProfessorsInCharge.filter(
+                        (professorInCharge) =>
+                            !(
+                                professorInCharge.module.module_id ===
+                                    module_id &&
+                                professorInCharge.professor.professor_id ===
+                                    professor_id &&
+                                professorInCharge.course.course_id === course_id
+                            )
+                    )
+                );
+                alert("Professor removed successfully from the module");
+            })
+            .catch((error) => {
+                alert(error.message);
+            });
+    };
+
     return (
         <div>
             <ButtonMenu buttons={modulesMenuButtons} />
@@ -86,6 +129,7 @@ const ProfessorsInChargeOfModulesList = () => {
                             <th>Module</th>
                             <th>Professor</th>
                             <th>Course</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -96,6 +140,22 @@ const ProfessorsInChargeOfModulesList = () => {
                                 <td>{professorInCharge.module.name}</td>
                                 <td>{professorInCharge.professor.name}</td>
                                 <td>{professorInCharge.course.name}</td>
+                                <td>
+                                    <button
+                                        onClick={() =>
+                                            handleDelete(
+                                                professorInCharge.module
+                                                    .module_id,
+                                                professorInCharge.professor
+                                                    .professor_id,
+                                                professorInCharge.course
+                                                    .course_id
+                                            )
+                                        }
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

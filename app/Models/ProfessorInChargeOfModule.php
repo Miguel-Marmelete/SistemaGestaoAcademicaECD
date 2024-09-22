@@ -6,22 +6,29 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProfessorInChargeOfModule extends Model
 {
-    // The table associated with the model
     protected $table = 'professor_in_charge_of_module';
 
-    // Primary key for the model
-    protected $primaryKey = ['professor_id', 'module_id', 'course_id'];
-
-    // Disable incrementing as composite keys are not auto-incrementing
+    // Disable incrementing for composite keys
     public $incrementing = false;
 
+    // Define the composite primary key
+    protected $primaryKey = ['professor_id', 'module_id', 'course_id'];
 
-    // Define the fillable attributes
+    // Fillable attributes
     protected $fillable = [
         'professor_id',
         'module_id',
         'course_id',
     ];
+
+  // Override the method for handling composite keys in queries
+  protected function setKeysForSaveQuery($query)
+  {
+      foreach ($this->primaryKey as $key) {
+          $query->where($key, '=', $this->getAttribute($key));
+      }
+      return $query;
+  }
 
     // Relationships
     public function professor()

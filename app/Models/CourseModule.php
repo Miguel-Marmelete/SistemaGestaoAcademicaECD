@@ -18,7 +18,13 @@ class CourseModule extends Model
 
     protected $primaryKey = ['module_id', 'course_id'];
 
-
+    protected function setKeysForSaveQuery($query)
+    {
+        foreach ($this->primaryKey as $key) {
+            $query->where($key, '=', $this->getAttribute($key));
+        }
+        return $query;
+    }
      // Relacionamento com o modelo Course
      public function course()
      {
