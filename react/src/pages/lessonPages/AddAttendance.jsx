@@ -36,7 +36,7 @@ const AddAttendance = () => {
                 setError("Failed to fetch courses: " + error.message);
                 setLoading(false);
             });
-    }, [accessTokenData.access_token]);
+    }, []);
 
     useEffect(() => {
         if (selectedCourse) {
@@ -65,7 +65,7 @@ const AddAttendance = () => {
                     setLoading(false);
                 });
         }
-    }, [selectedCourse, accessTokenData.access_token]);
+    }, [selectedCourse]);
 
     useEffect(() => {
         if (selectedCourse) {
@@ -96,7 +96,7 @@ const AddAttendance = () => {
                     setLoading(false);
                 });
         }
-    }, [selectedCourse, accessTokenData.access_token]);
+    }, [selectedCourse]);
 
     useEffect(() => {
         if (selectedCourse && selectedSubmodule) {
@@ -126,7 +126,7 @@ const AddAttendance = () => {
         } else {
             setLessons([]);
         }
-    }, [selectedCourse, selectedSubmodule, accessTokenData.access_token]);
+    }, [selectedCourse, selectedSubmodule]);
 
     const handleStudentChange = (e) => {
         const value = Array.from(

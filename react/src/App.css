@@ -547,7 +547,7 @@ form small {
     width: 35%;
     color: #fff;
     overflow-y: auto; /* Enable scrolling */
-    max-height: 500px; /* Initially give the list a static height */
+    height: 400px; /* Initially give the list a static height */
 }
 
 /* Make sure list content allows for scrolling */

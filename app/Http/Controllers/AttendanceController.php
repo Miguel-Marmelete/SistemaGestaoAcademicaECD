@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Log;
+use App\Models\Student; // Assuming Student model is defined in App\Models
 
 class AttendanceController extends Controller
 {
@@ -124,7 +125,6 @@ public function update(Request $request, $lesson_id, $student_id)
     }
 }
 
-
     /**
      * Remove the specified attendance record.
      *
@@ -147,4 +147,48 @@ public function update(Request $request, $lesson_id, $student_id)
             return response()->json(['error' => 'An error occurred while deleting the attendance record', 'details' => $e->getMessage()], 500);
         }
     }
+
+    public function getAttendance(Request $request)
+    {
+        // Validate the lesson_id from the query parameters
+        $validator = Validator::make($request->query(), [
+            'lesson_id' => 'required|exists:lessons,lesson_id',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+    
+        $lesson_id = $request->query('lesson_id');
+    
+        try {
+            // Get the students who were present for the lesson
+            $attendances = Attendance::with('student')
+                ->where('lesson_id', $lesson_id)
+                ->get();
+    
+            $presentStudents = $attendances->pluck('student')->pluck('student_id')->toArray();
+            
+            // Get all students
+            $allStudents = Student::all()->pluck('student_id')->toArray();
+            
+            // Get the student IDs who were absent
+            $absentStudentIds = array_diff($allStudents, $presentStudents);
+    
+            // Fetch the full absent student objects using their IDs
+            $absentStudents = Student::whereIn('student_id', $absentStudentIds)->get()->toArray();
+            
+            // Fetch full present student objects using their IDs
+            $presentStudents = Student::whereIn('student_id', $presentStudents)->get()->toArray();
+    
+            return response()->json([
+                'presentStudents' => $presentStudents,
+                'absentStudents' => $absentStudents,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('An error occurred while retrieving attendance: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while retrieving attendance', 'details' => $e->getMessage()], 500);
+        }
+    }
+    
 }

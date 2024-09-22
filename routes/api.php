@@ -50,7 +50,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
 
  //------------------ATTENDANCE ROUTES--------------------------------------
     // Get all attendance
-    Route::get('/getAllAttendances', [AttendanceController::class, 'index']);
+    Route::get('/getAttendance', [AttendanceController::class, 'getAttendance']);
     // Get a specific lesson by ID
     Route::get('/Attendance/{lesson_id}/{student_id}', [AttendanceController::class, 'show']);
     // Create a new lesson
