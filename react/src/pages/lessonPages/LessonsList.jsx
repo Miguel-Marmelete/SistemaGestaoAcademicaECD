@@ -3,6 +3,7 @@ import { useAuth } from "../../auth/AuthContext";
 import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { lessonsMenuButtons } from "../../../scripts/buttonsData";
+import { useNavigate } from "react-router-dom";
 
 const LessonsList = () => {
     const [filteredLessons, setFilteredLessons] = useState([]);
@@ -14,6 +15,11 @@ const LessonsList = () => {
     const [expandedLessonId, setExpandedLessonId] = useState(null);
     const [editedLesson, setEditedLesson] = useState({});
 
+    const navigate = useNavigate();
+
+    const handlePrint = (lesson) => {
+        navigate("/print-lesson", { state: { lesson } });
+    };
     // Fetch courses on mount
     useEffect(() => {
         fetch(endpoints.GET_COURSES, {
@@ -384,6 +390,13 @@ const LessonsList = () => {
                                                         }
                                                     >
                                                         Delete
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handlePrint(lesson)
+                                                        }
+                                                    >
+                                                        Print
                                                     </button>
                                                 </td>
                                             )}

@@ -54,7 +54,8 @@ body {
 
 .auth-buttons button,
 .admin_panel_button,
-.logout_button {
+.logout_button,
+.print_button {
     background-color: #007bff;
     color: white;
     border: none;
@@ -672,4 +673,135 @@ form small {
 .container .list ul li {
     padding: 8px 0;
     border-bottom: 1px solid #ddd;
+}
+
+/*------------------PRINT LESSON CSS------------------*/
+/* General Container */
+.lesson-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: "Arial", sans-serif;
+    background-color: #fff;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.lesson-content {
+    margin-top: 10px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    color: #333;
+}
+
+/* Header Image */
+.lesson-image {
+    width: 120px;
+    height: auto;
+    display: block;
+    margin-bottom: 20px;
+}
+
+/* Title */
+.lesson-title {
+    text-align: left;
+    font-size: 32px;
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Summary Details Grid */
+.lesson-summary-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10px;
+    margin-bottom: 20px;
+}
+
+.lesson-info {
+    font-size: 18px;
+    margin-bottom: 10px;
+    word-wrap: break-word; /* Ensure long words wrap to the next line */
+    white-space: normal; /* Ensure normal text flow for long lines */
+}
+
+.lesson-info p {
+    margin: 5px 0;
+}
+
+/* Lesson Time Details */
+.lesson-time-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Lesson Description */
+.lesson-description {
+    margin: 20px 0;
+}
+
+.lesson-description p {
+    font-size: 18px;
+    margin: 5px 0;
+    word-wrap: break-word; /* Ensure long summary text wraps */
+    white-space: normal;
+    overflow-wrap: break-word; /* Support for breaking long text in older browsers */
+}
+
+/* Subtitle */
+.lesson-subtitle {
+    font-size: 24px;
+    color: #333;
+    border-bottom: 1px solid #000;
+    margin-top: 30px;
+    padding-bottom: 5px;
+}
+
+/* Attendance Table */
+.lesson-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 16px;
+    text-align: left;
+}
+
+.lesson-table th,
+.lesson-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.lesson-table th {
+    background-color: #f9f9f9;
+    font-weight: bold;
+    color: #333;
+}
+
+.lesson-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.lesson-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Print Styles */
+@media print {
+    .lesson-container {
+        border: none;
+        box-shadow: none;
+        background-color: white;
+    }
+
+    .lesson-title,
+    .lesson-subtitle,
+    .lesson-info,
+    .lesson-description,
+    .lesson-table {
+        page-break-inside: avoid;
+    }
 }

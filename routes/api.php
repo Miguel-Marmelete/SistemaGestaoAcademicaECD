@@ -136,7 +136,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     // Get all lessons
     Route::get('/getAllLessons', [LessonController::class, 'index']);
     // Get a specific lesson by ID
-    Route::get('/getLesson/{id}', [LessonController::class, 'show']);
+    Route::get('/getLessonById/{id}', [LessonController::class, 'show']);
     Route::get('/getLessonsOfSubmodule', [LessonController::class, 'getLessonsOfSubmodule']);
     // Create a new lesson
     Route::post('/addLessons', [LessonController::class, 'store']);

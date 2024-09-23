@@ -29,6 +29,7 @@ import AttendanceList from "./pages/lessonPages/AttendanceList.jsx";
 import EvaluateEvaluationMoments from "./pages/evaluationMomentsPages/evaluateEvaluationsMoments.jsx";
 import AssociateProfessorToModule from "./pages/modulesPages/AssociateModuleToProfessor.jsx";
 import ProfessorsInChargeOfModulesList from "./pages/modulesPages/ProfessorsInChargeOfModulesList.jsx";
+import PrintLesson from "./pages/lessonPages/PrintLesson.jsx";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
         <AuthProvider>
@@ -191,6 +192,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         }
                     />
                     <Route path="/verify-email" element={<VerifyEmail />} />
+                    <Route path="/print-lesson" element={<PrintLesson />} />
                 </Route>
             </Routes>
         </AuthProvider>

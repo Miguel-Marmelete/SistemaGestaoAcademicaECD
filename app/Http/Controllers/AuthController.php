@@ -23,12 +23,7 @@ class AuthController extends Controller
     public function register(Request $request)
 {
     try {
-        // Check if the email is already in the pending_professors table
-        $pendingProfessor = PendingProfessor::where('email', $request->email)->first();
-        if ($pendingProfessor) {
-            return response()->json(['message' => 'Email is awaiting approval. Please check your inbox.'], 400);
-        }
-
+        
         // Validate request data
         $validator = Validator::make($request->all(), [
             'name' => 'required',
@@ -40,6 +35,13 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
+        // Check if the email is already in the pending_professors table
+        $pendingProfessor = PendingProfessor::where('email', $request->email)->first();
+        if ($pendingProfessor) {
+            return response()->json(['message' => 'Email is awaiting approval. Please check your inbox.'], 400);
+        }
+
+        
 
         // Generate a random token for email verification
         $token = Str::random(60);
