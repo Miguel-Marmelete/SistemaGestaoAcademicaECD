@@ -7,6 +7,7 @@ const endpoints = {
     LOGIN: `${API_BASE_URL}/login`,
     SIGNUP: `${API_BASE_URL}/signup`,
     LOGOUT: `${API_BASE_URL}/logout`,
+    REQUEST_ADMIN_ACCESS: `${API_BASE_URL}/requestAdminAccess`,
 
     // User Management
     GET_PROFESSORS: `${API_BASE_URL}/getAllProfessors`,

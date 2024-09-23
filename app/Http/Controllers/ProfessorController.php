@@ -6,7 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Professor;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use App\Models\ProfessorAdminToken;
+use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProfessorController extends Controller
 {
@@ -159,6 +163,62 @@ class ProfessorController extends Controller
             return response()->json(['error' => 'Professor not found'], 404);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while deleting the professor', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    public function initiateAdminSetting()
+    {
+        try {
+            // Find the professor by token
+            $professor = JWTAuth::user();
+
+            // Generate a random token
+            $token = Str::random(60);
+
+            // Create a professor admin token record
+            ProfessorAdminToken::create([
+                'professor_id' => $professor->professor_id,
+                'token' => $token,
+            ]);
+
+            // Send confirmation email to the professor
+            Mail::send('emails.confirm_admin', ['token' => $token], function($message) use ($professor) {
+                $message->to('20431@stu.ipbeja.pt');
+                $message->subject('Confirm Admin Status');
+            });
+
+            return response()->json(['message' => 'Admin setting initiated, please check your email for confirmation'], 201);
+        } catch (\Exception $e) {
+            Log::error('Error during admin setting initiation: ' . $e->getMessage());
+            return response()->json(['message' => 'Admin setting initiation failed'], 500);
+        }
+    }
+
+    public function confirmAdmin($token)
+    {
+        try {
+            // Find the professor admin token by token
+            $professorAdminToken = ProfessorAdminToken::where('token', $token)->first();
+
+            // Return error if token is invalid
+            if (!$professorAdminToken) {
+                return response()->json(['message' => 'Invalid token'], 400);
+            }
+
+            // Find the professor by ID
+            $professor = Professor::findOrFail($professorAdminToken->professor_id);
+
+            // Set the professor as admin
+            $professor->is_coordinator = true;
+            $professor->save();
+
+            // Delete the professor admin token entry
+            $professorAdminToken->delete();
+
+            return response()->json(['message' => 'Professor set as admin successfully']);
+        } catch (\Exception $e) {
+            Log::error('Error during admin confirmation: ' . $e->getMessage());
+            return response()->json(['message' => 'Admin confirmation failed'], 500);
         }
     }
 }

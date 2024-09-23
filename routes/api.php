@@ -18,10 +18,12 @@ use App\Http\Middleware\EnsureTokenIsValid;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubmoduleController;
 
+
 //------------------AUTH ROUTES--------------------------------------
  Route::post('/login', [AuthController::class, 'login']);
  Route::post('/signup', [AuthController::class, 'register']);
- 
+     Route::get('/confirmAdmin/{token}', [ProfessorController::class, 'confirmAdmin']);
+
  // Rota para verificação de e-mail do professor
  Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail']);
  
@@ -164,6 +166,9 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
   //------------------PROFESSOR ROUTES--------------------------------------
     // Get all Professor
     Route::get('/getAllProfessors', [ProfessorController::class, 'index']);
+    // Request admin access
+    Route::get('/requestAdminAccess', [ProfessorController::class, 'initiateAdminSetting']);
+    // Confirm admin status
     // Get a specific Professor by ID
     Route::get('/getProfessor/{id}', [ProfessorController::class, 'show']);
     // Create a new Professor

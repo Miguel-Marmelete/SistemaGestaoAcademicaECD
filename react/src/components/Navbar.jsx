@@ -1,9 +1,31 @@
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthContext.jsx";
-
+import endpoints from "../endpoints.js";
 function Navbar() {
-    const { professor, logout } = useAuth();
+    const { accessTokenData, professor, logout } = useAuth();
+
+    const requestAdminAccess = () => {
+        fetch(endpoints.REQUEST_ADMIN_ACCESS, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessTokenData.access_token}`,
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to request admin access");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                alert("Admin access requested successfully");
+            })
+            .catch((error) => {
+                alert("Error: " + error.message);
+            });
+    };
 
     return (
         <div className="navbar">
@@ -25,7 +47,7 @@ function Navbar() {
                 {professor ? (
                     <div className="navbar-info">
                         <span>{professor.name}</span>
-                        {professor.is_coordinator == 1 && (
+                        {professor.is_coordinator == 1 ? (
                             <Link
                                 to="/adminPanel"
                                 style={{
@@ -37,6 +59,13 @@ function Navbar() {
                                     Painel de Administrador
                                 </button>
                             </Link>
+                        ) : (
+                            <button
+                                className="request_admin_button"
+                                onClick={requestAdminAccess}
+                            >
+                                Pedir Admin
+                            </button>
                         )}
 
                         <button className="logout_button" onClick={logout}>
