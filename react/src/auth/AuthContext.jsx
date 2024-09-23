@@ -53,6 +53,7 @@ export const AuthProvider = ({ children }) => {
         const expirationTime = new Date(issuedAt * 1000 + expiresIn * 1000);
 
         setProfessor(professorData);
+        console.log("professorData", professorData);
         setAccessTokenData({
             ...tokenData,
             issued_at: issuedAt, // Store issued time
@@ -72,7 +73,7 @@ export const AuthProvider = ({ children }) => {
 
         // Set up the logout timer to log out just before token expires
         const timeUntilExpiration = expirationTime - new Date();
-        setTimeout(() => handleLogout(), timeUntilExpiration - 60000); // 1 minute before expiry
+        setTimeout(() => handleLogout(), timeUntilExpiration - 300000); // 1 minute before expiry
     };
 
     const handleLogout = async () => {

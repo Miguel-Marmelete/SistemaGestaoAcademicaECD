@@ -7,7 +7,7 @@ import { modulesMenuButtons } from "../../../scripts/buttonsData";
 const ModulesList = () => {
     const [modules, setModules] = useState([]);
     const [editedModule, setEditedModule] = useState({});
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, professor } = useAuth();
 
     // Fetch modules from API
     useEffect(() => {
@@ -116,7 +116,7 @@ const ModulesList = () => {
                             <th>Abreviatura</th>
                             <th>ECTS</th>
                             <th>Horas de Contacto</th>
-                            <th>Ações</th>
+                            {professor.is_coordinator === 1 && <th>Ações</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -160,15 +160,19 @@ const ModulesList = () => {
                                                 onChange={handleChange}
                                             />
                                         </td>
-                                        <td>
-                                            <button
-                                                onClick={() =>
-                                                    handleSave(module.module_id)
-                                                }
-                                            >
-                                                Save
-                                            </button>
-                                        </td>
+                                        {professor.is_coordinator === 1 && (
+                                            <td>
+                                                <button
+                                                    onClick={() =>
+                                                        handleSave(
+                                                            module.module_id
+                                                        )
+                                                    }
+                                                >
+                                                    Save
+                                                </button>
+                                            </td>
+                                        )}
                                     </>
                                 ) : (
                                     <>
@@ -176,24 +180,26 @@ const ModulesList = () => {
                                         <td>{module.abbreviation}</td>
                                         <td>{module.ects}</td>
                                         <td>{module.contact_hours}</td>
-                                        <td>
-                                            <button
-                                                onClick={() =>
-                                                    handleEditClick(module)
-                                                }
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        module.module_id
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
+                                        {professor.is_coordinator === 1 && (
+                                            <td>
+                                                <button
+                                                    onClick={() =>
+                                                        handleEditClick(module)
+                                                    }
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            module.module_id
+                                                        )
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        )}
                                     </>
                                 )}
                             </tr>

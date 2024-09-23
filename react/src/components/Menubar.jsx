@@ -24,6 +24,7 @@ function MenuBar() {
             subItems: [
                 { name: "Lista de Cursos", path: "/courses" },
                 { name: "Lista de Módulos", path: "/modules" },
+                { name: "Lista de Submódulos", path: "/submodules" },
             ],
         },
         {

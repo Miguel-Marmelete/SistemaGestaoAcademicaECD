@@ -7,7 +7,7 @@ import { modulesMenuButtons } from "../../../scripts/buttonsData";
 const SubModulesList = () => {
     const [subModules, setSubModules] = useState([]);
     const [editedSubModule, setEditedSubModule] = useState({});
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, professor } = useAuth();
 
     // Fetch submodules from API
     useEffect(() => {
@@ -120,7 +120,7 @@ const SubModulesList = () => {
                             <th>Abreviatura</th>
                             <th>Horas de Contacto</th>
                             <th>Módulo Principal</th>
-                            <th>Ações</th>
+                            {professor.is_coordinator === 1 && <th>Ações</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -158,17 +158,19 @@ const SubModulesList = () => {
                                             />
                                         </td>
                                         <td>{subModule.module.name}</td>
-                                        <td>
-                                            <button
-                                                onClick={() =>
-                                                    handleSave(
-                                                        subModule.submodule_id
-                                                    )
-                                                }
-                                            >
-                                                Save
-                                            </button>
-                                        </td>
+                                        {professor.is_coordinator === 1 && (
+                                            <td>
+                                                <button
+                                                    onClick={() =>
+                                                        handleSave(
+                                                            subModule.submodule_id
+                                                        )
+                                                    }
+                                                >
+                                                    Save
+                                                </button>
+                                            </td>
+                                        )}
                                     </>
                                 ) : (
                                     <>
@@ -176,24 +178,28 @@ const SubModulesList = () => {
                                         <td>{subModule.abbreviation}</td>
                                         <td>{subModule.contact_hours}</td>
                                         <td>{subModule.module.name}</td>
-                                        <td>
-                                            <button
-                                                onClick={() =>
-                                                    handleEditClick(subModule)
-                                                }
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        subModule.submodule_id
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
+                                        {professor.is_coordinator === 1 && (
+                                            <td>
+                                                <button
+                                                    onClick={() =>
+                                                        handleEditClick(
+                                                            subModule
+                                                        )
+                                                    }
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            subModule.submodule_id
+                                                        )
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        )}
                                     </>
                                 )}
                             </tr>
