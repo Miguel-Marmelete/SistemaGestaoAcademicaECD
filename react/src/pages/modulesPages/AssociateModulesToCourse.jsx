@@ -4,9 +4,11 @@ import { useAuth } from "../../auth/AuthContext";
 import { fetchCourses } from "../../../scripts/getCourses";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
+
 const AssociateModulesToCourse = () => {
     const [courses, setCourses] = useState([]);
     const [modules, setModules] = useState([]);
+    const [modulesInCourse, setModulesInCourse] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState(""); // Default to empty
     const [selectedModules, setSelectedModules] = useState([]); // To manage selected modules
     const { accessTokenData } = useAuth();
@@ -20,11 +22,8 @@ const AssociateModulesToCourse = () => {
             .catch((error) => {
                 alert(error);
             });
-    }, [accessTokenData.access_token]); // Added dependency to useEffect
 
-    // Fetch modules from API
-    useEffect(() => {
-        fetch(endpoints.GET_MODULES, {
+        fetch(`${endpoints.GET_MODULES}?course_id=${selectedCourse}`, {
             headers: {
                 Authorization: `Bearer ${accessTokenData.access_token}`,
             },
@@ -43,7 +42,34 @@ const AssociateModulesToCourse = () => {
                 console.error("Error fetching modules:", error);
                 alert("Failed to load modules.");
             });
-    }, [accessTokenData.access_token]); // Added dependency to useEffect
+    }, []);
+
+    useEffect(() => {
+        if (selectedCourse) {
+            fetch(
+                `${endpoints.GET_MODULES_BY_COURSE}?course_id=${selectedCourse}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                }
+            )
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch modules");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    setModulesInCourse(data.modules);
+                    console.log("modulesInCourse", data.modules);
+                })
+                .catch((error) => {
+                    console.error("Error fetching modules:", error);
+                    alert("Failed to load modules.");
+                });
+        }
+    }, [selectedCourse]);
 
     // Handle course change
     const handleCourseChange = (event) => {
@@ -106,8 +132,8 @@ const AssociateModulesToCourse = () => {
     return (
         <div>
             <ButtonMenu buttons={modulesMenuButtons} />
-            <div className="form-container">
-                <form onSubmit={handleSubmit}>
+            <div className="container">
+                <form className="submitForm" onSubmit={handleSubmit}>
                     <h2>Associate Modules with Course</h2>
 
                     <div>
@@ -156,8 +182,16 @@ const AssociateModulesToCourse = () => {
                         </div>
                     </div>
 
-                    <button type="submit">Submeter</button>
+                    <button type="submit">Submit</button>
                 </form>
+                <div className="list">
+                    <h2>Modules for Selected Course</h2>
+                    <ul>
+                        {modulesInCourse.map((module) => (
+                            <li key={module.module_id}>{module.name}</li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );

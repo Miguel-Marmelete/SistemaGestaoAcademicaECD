@@ -95,10 +95,36 @@ const AddLesson = () => {
                     console.error("Error:", error);
                     alert(error.message);
                 });
+
+            fetch(
+                `${endpoints.GET_STUDENTS_BY_COURSE}?course_id=${selectedCourse}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                }
+            )
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch students");
+                    }
+                    return response.json();
+                })
+                .then((studentsData) => {
+                    console.log(studentsData.students);
+
+                    setStudents(studentsData.students);
+                    setLoading(false);
+                })
+                .catch((error) => {
+                    setError("Failed to fetch students: " + error.message);
+                    setLoading(false);
+                });
         } else {
             setSubmodules([]);
         }
-    }, [selectedCourse, accessTokenData]);
+    }, [selectedCourse]);
 
     useEffect(() => {
         if (selectedCourse) {
@@ -126,7 +152,7 @@ const AddLesson = () => {
                     alert(error.message);
                 });
         }
-    }, [selectedCourse, selectedSubmodule, lessonAdded, accessTokenData]);
+    }, [selectedCourse, selectedSubmodule, lessonAdded]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
