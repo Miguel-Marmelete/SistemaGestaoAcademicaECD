@@ -11,7 +11,6 @@ const LessonsList = () => {
     const [submodules, setSubmodules] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState("");
     const [selectedSubmodule, setSelectedSubmodule] = useState("");
-    const [selectedModule, setSelectedModule] = useState("");
     const { accessTokenData, professor } = useAuth();
     const [expandedLessonId, setExpandedLessonId] = useState(null);
     const [editedLesson, setEditedLesson] = useState({});
@@ -40,22 +39,22 @@ const LessonsList = () => {
     // Fetch submodules when course changes
     useEffect(() => {
         if (!selectedCourse) {
-            setSubmodules([]);
+            setSubmodules([]); // Clear submodules if no course is selected
             return;
         }
 
         const fetchSubmodules = () => {
-            fetch(
-                `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
-            )
+            const url = `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`;
+
+            fetch(url, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${accessTokenData.access_token}`,
+                },
+            })
                 .then((response) => response.json())
                 .then((data) => {
+                    console.log("Fetched submodules data:", data); // Debugging line
                     setSubmodules(data.submodules);
                 })
                 .catch((error) =>
@@ -64,11 +63,11 @@ const LessonsList = () => {
         };
 
         fetchSubmodules();
-    }, [selectedModule]);
+    }, [selectedCourse, accessTokenData.access_token]);
 
     // Fetch lessons when course or submodule is selected
     useEffect(() => {
-        if (!selectedCourse || !selectedModule) {
+        if (!selectedCourse) {
             return;
         }
 
@@ -103,7 +102,6 @@ const LessonsList = () => {
         fetchFilteredLessons();
     }, [
         selectedCourse,
-        selectedModule,
         selectedSubmodule,
         accessTokenData.access_token,
         professor.professor_id,
