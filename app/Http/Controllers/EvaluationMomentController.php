@@ -6,6 +6,8 @@ use App\Models\EvaluationMoment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 class EvaluationMomentController extends Controller
 {
     /**
@@ -22,6 +24,7 @@ class EvaluationMomentController extends Controller
             return response()->json(['error' => 'An error occurred while retrieving evaluation moments', 'details' => $e->getMessage()], 500);
         }
     }
+    
 
     /**
      * Store a new evaluation moment.
@@ -129,6 +132,41 @@ class EvaluationMomentController extends Controller
             return response()->json(['error' => 'Evaluation moment not found'], 404);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while deleting the evaluation moment', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Get filtered evaluation moments based on course, module, and submodule.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProfessorEvaluationMoments()
+    {
+        try {
+            // Get the authenticated professor
+            $professor = JWTAuth::user();
+            if (!$professor) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            // Check if the professor is a coordinator
+            if ($professor->is_coordinator == 1) {
+                // Retrieve all evaluation moments
+                $evaluationMoments = EvaluationMoment::with(['course', 'professor', 'module', 'submodule'])->get();
+            } else {
+                // Retrieve evaluation moments for the authenticated professor
+                $evaluationMoments = EvaluationMoment::with(['course', 'professor', 'module', 'submodule'])
+                    ->where('professor_id', $professor->id)
+                    ->get();
+            }
+
+            return response()->json(['evaluationMoments' => $evaluationMoments], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred while retrieving evaluation moments',
+                'details' => $e->getMessage()
+            ], 500);
         }
     }
 }

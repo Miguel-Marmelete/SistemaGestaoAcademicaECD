@@ -104,6 +104,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
      Route::put('/updateEvaluationMoments/{id}', [EvaluationMomentController::class, 'update']);
      // Delete a EvaluationMoments by ID
      Route::delete('/deleteEvaluationMoments/{id}', [EvaluationMomentController::class, 'destroy']);  
+     Route::get('/getProfessorEvaluationMoments', [EvaluationMomentController::class, 'getProfessorEvaluationMoments']);
   //---------------------------------------------------------------------
 
   //------------------GRADE ROUTES---------------------------------------
@@ -193,6 +194,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     // Get submodules of professor
     Route::get('/getSubmodulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getSubmodulesOfProfessor']);
     Route::get('/getProfessorsInChargeOfModulesByCourse', [ProfessorInChargeOfModuleController::class, 'getProfessorsInChargeOfModulesByCourse']);
+    Route::get('/getModulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getModulesOfProfessor']);
     
   //-----------------------------------------------------------------------
 

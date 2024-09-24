@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
+import ButtonMenu from "../../components/ButtonMenu";
+import { evaluationMomentsMenuButtons } from "../../../scripts/buttonsData";
 
 const AddEvaluationMoment = () => {
     const { accessTokenData, professor } = useAuth();
     const [courses, setCourses] = useState([]);
     const [modules, setModules] = useState([]);
     const [submodules, setSubmodules] = useState([]);
-    const [loading, setLoading] = useState(false); // Add loading state
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         type: "",
         course_id: "",
@@ -166,97 +168,112 @@ const AddEvaluationMoment = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>Add Evaluation Moment</h2>
-            <div>
-                <label>Type</label>
-                <select
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                >
-                    <option value="" disabled>
-                        Select a type
-                    </option>
-                    <option value="Exame">Exame</option>
-                    <option value="Trabalho">Trabalho</option>
-                    <option value="Exame Recurso">Exame Recurso</option>
-                </select>
-            </div>
-            <div>
-                <label>Course</label>
-                <select
-                    name="course_id"
-                    value={formData.course_id}
-                    onChange={handleChange}
-                    required
-                >
-                    <option value="" disabled>
-                        Select a course
-                    </option>
-                    {courses.map((course) => (
-                        <option key={course.course_id} value={course.course_id}>
-                            {course.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div>
-                <label>Module</label>
-                <select
-                    name="module_id"
-                    value={formData.module_id}
-                    onChange={handleChange}
-                    required
-                >
-                    <option value="" disabled>
-                        Select a module
-                    </option>
-                    {modules.map((module) => (
-                        <option key={module.module_id} value={module.module_id}>
-                            {module.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            {formData.type === "Trabalho" && (
-                <div>
-                    <label>Submodule</label>
-                    <select
-                        name="submodule_id"
-                        value={formData.submodule_id || ""}
-                        onChange={handleChange}
-                    >
-                        <option value="" disabled>
-                            Select a submodule
-                        </option>
-                        <option value="">None</option>
-                        {submodules.map((submodule) => (
-                            <option
-                                key={submodule.submodule_id}
-                                value={submodule.submodule_id}
-                            >
-                                {submodule.name}
+        <div>
+            <ButtonMenu buttons={evaluationMomentsMenuButtons} />
+
+            <div className="container">
+                <form className="submitForm" onSubmit={handleSubmit}>
+                    <h2>Add Evaluation Moment</h2>
+                    <div>
+                        <label>Type</label>
+                        <select
+                            name="type"
+                            value={formData.type}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="" disabled>
+                                Select a type
                             </option>
-                        ))}
-                    </select>
-                </div>
-            )}
-            <div className="date_input_container">
-                <label className="date_input_label">Evaluation Date</label>
-                <input
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                    required
-                />
+                            <option value="Exame">Exame</option>
+                            <option value="Trabalho">Trabalho</option>
+                            <option value="Exame Recurso">Exame Recurso</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Course</label>
+                        <select
+                            name="course_id"
+                            value={formData.course_id}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="" disabled>
+                                Select a course
+                            </option>
+                            {courses.map((course) => (
+                                <option
+                                    key={course.course_id}
+                                    value={course.course_id}
+                                >
+                                    {course.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Module</label>
+                        <select
+                            name="module_id"
+                            value={formData.module_id}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="" disabled>
+                                Select a module
+                            </option>
+                            {modules.map((module) => (
+                                <option
+                                    key={module.module_id}
+                                    value={module.module_id}
+                                >
+                                    {module.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {formData.type === "Trabalho" && (
+                        <div>
+                            <label>Submodule</label>
+                            <select
+                                name="submodule_id"
+                                value={formData.submodule_id || ""}
+                                onChange={handleChange}
+                            >
+                                <option value="" disabled>
+                                    Select a submodule
+                                </option>
+                                <option value="">None</option>
+                                {submodules.map((submodule) => (
+                                    <option
+                                        key={submodule.submodule_id}
+                                        value={submodule.submodule_id}
+                                    >
+                                        {submodule.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                    <div className="date_input_container">
+                        <label className="date_input_label">
+                            Evaluation Date
+                        </label>
+                        <input
+                            type="date"
+                            name="date"
+                            value={formData.date}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Submitting..." : "Submit"}
+                    </button>
+                </form>
+                <div className="list"></div>
             </div>
-            <button type="submit" disabled={loading}>
-                {loading ? "Submitting..." : "Submit"}
-            </button>
-        </form>
+        </div>
     );
 };
 
