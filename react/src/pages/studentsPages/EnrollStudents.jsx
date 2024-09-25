@@ -12,6 +12,7 @@ const EnrollStudents = () => {
     const [enrolledStudents, setEnrolledStudents] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState("");
     const [selectedStudents, setSelectedStudents] = useState([]);
+    const [loading, setLoading] = useState(false); // Add loading state
 
     // Fetch courses on component mount
     useEffect(() => {
@@ -66,7 +67,7 @@ const EnrollStudents = () => {
                     return response.json();
                 })
                 .then((data) => {
-                    setEnrolledStudents(data.students);
+                    setEnrolledStudents(data.students.reverse());
                 })
                 .catch((error) => {
                     console.error("Error fetching enrolled students:", error);
@@ -91,6 +92,8 @@ const EnrollStudents = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (loading) return;
+        setLoading(true); // Set loading to true when form is submitted
 
         const enrollmentData = {
             course_id: selectedCourse,
@@ -121,6 +124,9 @@ const EnrollStudents = () => {
             .catch((error) => {
                 console.error("Error:", error);
                 alert(error.message);
+            })
+            .finally(() => {
+                setLoading(false); // Set loading to false after request completes
             });
     };
 
@@ -181,7 +187,9 @@ const EnrollStudents = () => {
                             )}
                         </div>
                     </div>
-                    <button type="submit">Inscrever</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Submitting..." : "Submit"}
+                    </button>
                 </form>
 
                 <div className="list">

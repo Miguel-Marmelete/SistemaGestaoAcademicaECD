@@ -143,6 +143,8 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getLessonsOfSubmodule', [LessonController::class, 'getLessonsOfSubmodule']);
     // Create a new lesson
     Route::post('/addLessons', [LessonController::class, 'store']);
+    // Create a new lesson and attendance
+    Route::post('/addLessonAndAttendance', [LessonController::class, 'addLessonAndAttendance']);
     // Update an existing lesson by ID
     Route::put('/updateLesson/{id}', [LessonController::class, 'update']);
     // Delete a student by ID
@@ -227,6 +229,8 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::put('/updateStudent/{id}', [StudentController::class, 'update']);
     // Delete a student by ID
     Route::delete('/deleteStudent/{id}', [StudentController::class, 'destroy']);
+    // Create a new student and enroll
+    Route::post('/addAndEnrollStudent', [StudentController::class, 'addAndEnrollStudent']);
   //-----------------------------------------------------------------------
 
 

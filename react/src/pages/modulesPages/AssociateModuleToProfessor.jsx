@@ -9,13 +9,15 @@ const AssociateProfessorToModule = () => {
     const [modules, setModules] = useState([]);
     const [professors, setProfessors] = useState([]);
     const [courses, setCourses] = useState([]);
-    const [professorsAndModules, setProfessorsAndModules] = useState([]); // New state for professors and modules
+    const [professorsAndModules, setProfessorsAndModules] = useState([]);
     const [selectedModule, setSelectedModule] = useState("");
     const [selectedProfessor, setSelectedProfessor] = useState("");
     const [selectedCourse, setSelectedCourse] = useState("");
+    const [loading, setLoading] = useState(false); // New loading state
 
     // Fetch professors and courses only once when component mounts
     useEffect(() => {
+        setLoading(true); // Start loading
         fetch(endpoints.GET_PROFESSORS, {
             headers: {
                 Authorization: `Bearer ${accessTokenData.access_token}`,
@@ -25,7 +27,8 @@ const AssociateProfessorToModule = () => {
             .then((data) => setProfessors(data.professors))
             .catch((error) =>
                 alert("Failed to fetch professors: " + error.message)
-            );
+            )
+            .finally(() => setLoading(false));
 
         fetch(endpoints.GET_COURSES, {
             headers: {
@@ -36,13 +39,13 @@ const AssociateProfessorToModule = () => {
             .then((data) => setCourses(data.courses.reverse()))
             .catch((error) =>
                 alert("Failed to fetch courses: " + error.message)
-            );
+            )
+            .finally(() => setLoading(false)); // End loading
     }, [accessTokenData.access_token]);
 
     // Fetch modules and professors-and-modules when a course is selected
     useEffect(() => {
         if (selectedCourse) {
-            // Fetch modules by course
             fetch(
                 `${endpoints.GET_MODULES_BY_COURSE}?course_id=${selectedCourse}`,
                 {
@@ -55,7 +58,8 @@ const AssociateProfessorToModule = () => {
                 .then((data) => setModules(data.modules.reverse()))
                 .catch((error) =>
                     alert("Failed to fetch modules: " + error.message)
-                );
+                )
+                .finally(() => {});
 
             // Fetch professors and modules by course (new fetch)
             fetch(
@@ -75,15 +79,18 @@ const AssociateProfessorToModule = () => {
                         "Failed to fetch professors and modules: " +
                             error.message
                     )
-                );
+                )
+                .finally(() => {});
         } else {
             setModules([]); // Clear modules if no course is selected
             setProfessorsAndModules([]); // Clear professors and modules if no course is selected
         }
-    }, [selectedCourse, accessTokenData.access_token]);
+    }, [selectedCourse]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (loading) return;
+        setLoading(true); // Start loading
 
         const associationData = {
             professor_id: selectedProfessor,
@@ -113,7 +120,8 @@ const AssociateProfessorToModule = () => {
                 setSelectedProfessor("");
                 setSelectedCourse("");
             })
-            .catch((error) => alert("Error: " + error.message));
+            .catch((error) => alert("Error: " + error.message))
+            .finally(() => setLoading(false)); // End loading
     };
 
     return (
@@ -147,7 +155,6 @@ const AssociateProfessorToModule = () => {
                             )}
                         </select>
                     </div>
-
                     <div>
                         <label>Module</label>
                         <select
@@ -174,7 +181,6 @@ const AssociateProfessorToModule = () => {
                             )}
                         </select>
                     </div>
-
                     <div>
                         <label>Professor</label>
                         <select
@@ -205,7 +211,9 @@ const AssociateProfessorToModule = () => {
                         </select>
                     </div>
 
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Submitting..." : "Submit"}
+                    </button>
                 </form>
 
                 {/* Display existing professors and modules */}
@@ -223,7 +231,7 @@ const AssociateProfessorToModule = () => {
                                 </li>
                             ))
                         ) : (
-                            <li>No data available</li> // Handle empty or undefined cases
+                            <li>No data available</li>
                         )}
                     </ul>
                 </div>

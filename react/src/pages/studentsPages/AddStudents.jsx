@@ -9,6 +9,7 @@ const AddStudents = () => {
     const [students, setStudents] = useState([]);
     const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState("");
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         ipbeja_email: "",
@@ -39,7 +40,8 @@ const AddStudents = () => {
                 return response.json();
             })
             .then((data) => setCourses(data.courses.reverse()))
-            .catch((error) => alert(error.message));
+            .catch((error) => alert(error.message))
+            .finally(() => {});
     }, []);
 
     useEffect(() => {
@@ -62,7 +64,8 @@ const AddStudents = () => {
                 return response.json();
             })
             .then((data) => setStudents(data.students.reverse()))
-            .catch((error) => alert(error.message));
+            .catch((error) => alert(error.message))
+            .finally(() => {});
     }, [selectedCourse]);
 
     const handleChange = (e) => {
@@ -118,67 +121,40 @@ const AddStudents = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
         if (!validateForm()) return;
+        if (loading) return;
 
-        let createdStudentId = null;
+        setLoading(true);
 
-        // First, create the student
-        fetch(endpoints.ADD_STUDENTS, {
+        // Send a single request to create the student and enroll them
+        fetch(endpoints.ADD_AND_ENROLL_STUDENT, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${accessTokenData.access_token}`,
             },
-            body: JSON.stringify(formData),
+            body: JSON.stringify({
+                ...formData, // Student data
+                course_id: selectedCourse, // Enrollment data
+            }),
         })
             .then((response) => {
+                // Handle errors if the request failed
                 if (!response.ok) {
                     return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
-                return response.json();
-            })
-            .then((createdStudent) => {
-                console.log(createdStudent);
-                createdStudentId = createdStudent.student.student_id;
-
-                // After the student is created, attempt to enroll them
-                const enrollmentPayload = {
-                    student_ids: [createdStudentId],
-                    course_id: selectedCourse,
-                };
-
-                return fetch(endpoints.ENROLL_STUDENTS, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                    body: JSON.stringify(enrollmentPayload),
-                });
-            })
-            .then((enrollmentResponse) => {
-                if (!enrollmentResponse.ok) {
-                    // If enrollment fails, roll back by deleting the created student
-                    return fetch(
-                        `${endpoints.DELETE_STUDENT}/${createdStudentId}`,
-                        {
-                            method: "DELETE",
-                            headers: {
-                                Authorization: `Bearer ${accessTokenData.access_token}`,
-                            },
-                        }
-                    ).then(() => {
                         throw new Error(
-                            "Failed to enroll the student, rolling back."
+                            errorData.details ||
+                                "Error creating and enrolling student."
                         );
                     });
                 }
-                return enrollmentResponse.json();
+                return response.json(); // Return response JSON
             })
-            .then((data) => {
-                alert(data.message);
+            .then((result) => {
+                alert(result.message); // Show success message
+
+                // Reset form fields
                 setFormData({
                     name: "",
                     ipbeja_email: "",
@@ -192,28 +168,16 @@ const AddStudents = () => {
                     personal_email: "",
                     nim: "",
                 });
-                setSelectedCourse("");
-
-                // Fetch updated students list after adding the new one
-                return fetch(endpoints.GET_STUDENTS, {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                });
+                setSelectedCourse(""); // Reset selected course
             })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
-                return response.json();
+            .catch((error) => {
+                // Handle any errors during the process
+                alert(error.message);
             })
-            .then((updatedData) => {
-                setStudents(updatedData.students.reverse());
-            })
-            .catch((error) => alert(error.message));
+            .finally(() => {
+                // Always stop the loading spinner after the process
+                setLoading(false);
+            });
     };
 
     return (
@@ -365,7 +329,9 @@ const AddStudents = () => {
                             maxLength={255}
                         />
                     </div>
-                    <button type="submit">Submeter</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Submitting..." : "Submeter"}
+                    </button>
                 </form>
 
                 <div className="list">

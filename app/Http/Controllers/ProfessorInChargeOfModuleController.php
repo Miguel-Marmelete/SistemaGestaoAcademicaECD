@@ -77,20 +77,30 @@ public function store(Request $request)
         'module_id' => 'required|exists:modules,module_id',
         'course_id' => 'required|exists:courses,course_id',
     ]);
-
+    Log::info('Request data: ', $request->all());
     if ($validator->fails()) {
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
     try {
         // Check if the entry already exists
-        $professorInCharge = ProfessorInChargeOfModule::updateOrCreate(
-            [
-                'module_id' => $request->module_id,
-                'course_id' => $request->course_id,
-            ],
-            ['professor_id' => $request->professor_id]
-        );
+        $professorInCharge = ProfessorInChargeOfModule::where('module_id', $request->module_id)
+            ->where('course_id', $request->course_id)
+            ->first();
+
+        if ($professorInCharge) {
+            // Delete the existing entry
+            Log::info('Existing entry found and will be deleted: ', $professorInCharge->toArray());
+            $professorInCharge->delete();
+        }
+
+        // Create a new entry
+        $professorInCharge = ProfessorInChargeOfModule::create([
+            'module_id' => (int) $request->module_id,
+            'course_id' => (int) $request->course_id,
+            'professor_id' => (int) $request->professor_id,
+        ]);
+        Log::info('New entry created: ', $professorInCharge->toArray());
 
         return response()->json(['message' => 'Professor in charge of module updated successfully', 'professorInCharge' => $professorInCharge], 200);
     } catch (\Exception $e) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Lesson;
+use App\Models\Attendance;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ProfessorInChargeOfLesson;
@@ -206,6 +207,61 @@ class LessonController extends Controller
             return response()->json(['error' => 'Lesson not found'], 404);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while deleting the lesson', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function addLessonAndAttendance(Request $request)    
+    {
+        try {
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:255',
+                'type' => 'required|string|in:Teórica,Laboratorial,Teórica-Prática',
+                'summary' => 'required|string',
+                'submodule_id' => 'required|exists:submodules,submodule_id',
+                'course_id' => 'required|exists:courses,course_id',
+                'date' => 'required|date_format:Y-m-d H:00:00',
+                'professor_ids' => 'required|array',
+                'professor_ids.*' => 'exists:professors,professor_id',
+                'student_ids' => 'required|array',
+                'student_ids.*' => 'exists:students,student_id',
+            ]);
+
+            if ($validator->fails()) {
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            // Create the Lesson without professor_ids and student_ids
+            $lessonData = $validator->validated();
+            unset($lessonData['professor_ids']);
+            unset($lessonData['student_ids']);
+            $lesson = Lesson::create($lessonData);
+
+            // Attach Professors to the Lesson using the ProfessorInChargeOfLesson model
+            $professorIds = $request->input('professor_ids');
+            foreach ($professorIds as $professorId) {
+                ProfessorInChargeOfLesson::firstOrCreate([
+                    'professor_id' => $professorId,
+                    'lesson_id' => $lesson->lesson_id,
+                ]);
+            }
+
+            // Register attendance for students
+            $studentIds = $request->input('student_ids');
+            foreach ($studentIds as $studentId) {
+                // Assuming you have an Attendance model to handle the attendance records
+                Attendance::firstOrCreate([
+                    'student_id' => $studentId,
+                    'lesson_id' => $lesson->lesson_id,
+                ]);
+            }
+
+            return response()->json(['message' => 'Lesson and attendance created successfully', 'lesson' => $lesson], 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating lesson and attendance: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while creating the lesson and attendance', 'details' => $e->getMessage()], 500);
         }
     }
 }

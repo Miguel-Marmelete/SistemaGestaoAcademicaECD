@@ -43,6 +43,8 @@ const endpoints = {
     ASSOCIATE_PROFESSOR_TO_MODULE: `${API_BASE_URL}/associateProfessorToModule`,
     CREATE_AND_ENROLL: `${API_BASE_URL}/createAndEnroll`,
     REGIST_ATTENDANCE: `${API_BASE_URL}/createAttendance`,
+    ADD_LESSON_AND_ATTENDANCE: `${API_BASE_URL}/addLessonAndAttendance`,
+    ADD_AND_ENROLL_STUDENT: `${API_BASE_URL}/addAndEnrollStudent`,
 
     //DELETE
     DELETE_COURSE: `${API_BASE_URL}/deleteCourse`,

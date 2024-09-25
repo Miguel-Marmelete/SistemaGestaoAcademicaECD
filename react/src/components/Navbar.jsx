@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useAuth } from "../auth/AuthContext.jsx";
 import endpoints from "../endpoints.js";
+import ipbejaLogo from "../assets/ipbejaLogo.png";
 function Navbar() {
     const { accessTokenData, professor, logout } = useAuth();
 
@@ -30,8 +31,8 @@ function Navbar() {
     return (
         <div className="navbar">
             <div className="navbar-left">
-                <img src="logo1.png" alt="Logo 1" className="logo" />
-                <img src="logo2.png" alt="Logo 2" className="logo" />
+                <img src={ipbejaLogo} className="logo" />
+                <img src={ipbejaLogo} className="logo" />
                 <h3>
                     <Link
                         to="/"

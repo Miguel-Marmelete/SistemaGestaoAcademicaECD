@@ -188,7 +188,8 @@ class StudentController extends Controller
         }
     }
     
-    public function createAndEnroll(Request $request)
+
+    public function addAndEnrollStudent(Request $request)
     {
         try {
             // Validate the request
@@ -212,21 +213,24 @@ class StudentController extends Controller
                 return response()->json(['details' => $validator->errors()], 400);
             }
 
-            // Create the student
-            $student = Student::create($validator->validated());
+            // Create the student without course_id
+            $studentData = $validator->validated();
+            unset($studentData['course_id']);
+            $student = Student::firstOrCreate($studentData);
 
             // Enroll the student in the course
-            Enrollment::create([
+            Enrollment::firstOrCreate([
                 'student_id' => $student->student_id,
                 'course_id' => $request->input('course_id'),
             ]);
 
-            return response()->json(['message' => 'Student created and enrolled successfully', 'student' => $student], 201);
+            return response()->json(['message' => 'Student created and enrolled successfully'], 201);
         } catch (\Exception $e) {
             Log::error('An error occurred while creating and enrolling the student: ' . $e->getMessage());
             return response()->json(['message' => 'An error occurred while creating and enrolling the student', 'details' => $e->getMessage()], 500);
         }
     }
+
 }
 
  

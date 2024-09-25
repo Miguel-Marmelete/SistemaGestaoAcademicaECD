@@ -9,8 +9,9 @@ const AssociateModulesToCourse = () => {
     const [courses, setCourses] = useState([]);
     const [modules, setModules] = useState([]);
     const [modulesInCourse, setModulesInCourse] = useState([]);
-    const [selectedCourse, setSelectedCourse] = useState(""); // Default to empty
-    const [selectedModules, setSelectedModules] = useState([]); // To manage selected modules
+    const [selectedCourse, setSelectedCourse] = useState("");
+    const [selectedModules, setSelectedModules] = useState([]);
+    const [loading, setLoading] = useState(false);
     const { accessTokenData } = useAuth();
 
     // Fetch courses from API
@@ -79,14 +80,12 @@ const AssociateModulesToCourse = () => {
     // Handle module selection via checkboxes
     const handleModuleCheckboxChange = (e) => {
         const { value, checked } = e.target;
-        const numericValue = parseInt(value, 10); // Convert value to a number
+        const numericValue = parseInt(value, 10);
 
         setSelectedModules((prevSelectedModules) => {
             if (checked) {
-                // Add module if checked
                 return [...prevSelectedModules, numericValue];
             } else {
-                // Remove module if unchecked
                 return prevSelectedModules.filter(
                     (module_id) => module_id !== numericValue
                 );
@@ -97,6 +96,10 @@ const AssociateModulesToCourse = () => {
     // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        if (loading) return;
+
+        setLoading(true);
 
         const associationData = {
             course_id: selectedCourse,
@@ -119,14 +122,14 @@ const AssociateModulesToCourse = () => {
             })
             .then(() => {
                 alert("Modules associated with course successfully!");
-                // Reset form
                 setSelectedCourse("");
                 setSelectedModules([]);
             })
             .catch((error) => {
                 console.error("Error:", error);
                 alert(error.message);
-            });
+            })
+            .finally(() => setLoading(false));
     };
 
     return (
@@ -182,7 +185,9 @@ const AssociateModulesToCourse = () => {
                         </div>
                     </div>
 
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Submitting..." : "Submit"}
+                    </button>
                 </form>
                 <div className="list">
                     <h2>Modules for Selected Course</h2>

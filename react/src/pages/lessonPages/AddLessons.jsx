@@ -68,7 +68,7 @@ const AddLesson = () => {
                 console.error("Error:", error);
                 alert(error.message);
             });
-    }, [accessTokenData]);
+    }, []);
 
     useEffect(() => {
         if (selectedCourse) {
@@ -114,7 +114,7 @@ const AddLesson = () => {
                 .then((studentsData) => {
                     console.log(studentsData.students);
 
-                    setStudents(studentsData.students);
+                    setStudents(studentsData.students.reverse());
                     setLoading(false);
                 })
                 .catch((error) => {
@@ -222,19 +222,21 @@ const AddLesson = () => {
             .replace("T", " ");
         const adjustedDate = formattedDate.slice(0, 13) + ":00:00";
 
-        const updatedFormData = {
+        const payload = {
             ...formData,
             date: adjustedDate,
             course_id: formData.course_id,
+            student_ids: formData.student_ids, // Include attendance data in the same payload
         };
 
-        fetch(endpoints.ADD_LESSONS, {
+        fetch(endpoints.ADD_LESSON_AND_ATTENDANCE, {
+            // Adjust endpoint accordingly
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${accessTokenData.access_token}`,
             },
-            body: JSON.stringify(updatedFormData),
+            body: JSON.stringify(payload),
         })
             .then((response) => {
                 if (response.ok) {
@@ -242,40 +244,15 @@ const AddLesson = () => {
                 } else {
                     return response.json().then((errorData) => {
                         throw new Error(
-                            `Failed to add lesson: ${JSON.stringify(
+                            `Failed to add lesson and record attendance: ${JSON.stringify(
                                 errorData.errors
                             )}`
                         );
                     });
                 }
             })
-            .then((createdLesson) => {
-                alert("Lesson added successfully!");
-
-                const attendancePayload = {
-                    lesson_id: createdLesson.lesson.lesson_id,
-                    student_ids: formData.student_ids,
-                };
-
-                return fetch(endpoints.REGIST_ATTENDANCE, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                    body: JSON.stringify(attendancePayload),
-                });
-            })
-            .then((attendanceResponse) => {
-                if (!attendanceResponse.ok) {
-                    throw new Error(
-                        "Failed to record attendance for the lesson"
-                    );
-                }
-                return attendanceResponse.json();
-            })
             .then(() => {
-                alert("Attendance recorded successfully!");
+                alert("Lesson added and attendance recorded successfully!");
                 setFormData({
                     title: "",
                     type: "",

@@ -17,7 +17,6 @@ const AddAttendance = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        setLoading(true);
         fetch(endpoints.GET_COURSES, {
             method: "GET",
             headers: {
@@ -30,17 +29,14 @@ const AddAttendance = () => {
             })
             .then((data) => {
                 setCourses(data.courses.reverse());
-                setLoading(false);
             })
             .catch((error) => {
                 setError("Failed to fetch courses: " + error.message);
-                setLoading(false);
             });
     }, []);
 
     useEffect(() => {
         if (selectedCourse) {
-            setLoading(true);
             fetch(
                 `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`,
                 {
@@ -58,18 +54,15 @@ const AddAttendance = () => {
                 })
                 .then((submodulesData) => {
                     setSubmodules(submodulesData.submodules);
-                    setLoading(false);
                 })
                 .catch((error) => {
                     setError("Failed to fetch submodules: " + error.message);
-                    setLoading(false);
                 });
         }
     }, [selectedCourse]);
 
     useEffect(() => {
         if (selectedCourse) {
-            setLoading(true);
             fetch(
                 `${endpoints.GET_STUDENTS_BY_COURSE}?course_id=${selectedCourse}`,
                 {
@@ -89,18 +82,15 @@ const AddAttendance = () => {
                     console.log(studentsData.students);
 
                     setStudents(studentsData.students);
-                    setLoading(false);
                 })
                 .catch((error) => {
                     setError("Failed to fetch students: " + error.message);
-                    setLoading(false);
                 });
         }
     }, [selectedCourse]);
 
     useEffect(() => {
         if (selectedCourse && selectedSubmodule) {
-            setLoading(true);
             fetch(
                 `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}&submodule_id=${selectedSubmodule}`,
                 {
@@ -117,11 +107,9 @@ const AddAttendance = () => {
                 })
                 .then((data) => {
                     setLessons(data.lessons);
-                    setLoading(false);
                 })
                 .catch((error) => {
                     setError("Failed to fetch lessons: " + error.message);
-                    setLoading(false);
                 });
         } else {
             setLessons([]);
@@ -142,6 +130,10 @@ const AddAttendance = () => {
             alert("Please select a lesson and at least one student.");
             return;
         }
+        if (loading) {
+            return;
+        }
+        setLoading(true); // Set loading to true when submitting
 
         fetch(endpoints.REGIST_ATTENDANCE, {
             method: "POST",
@@ -165,7 +157,10 @@ const AddAttendance = () => {
             })
             .catch((error) =>
                 alert("Failed to register attendance: " + error.message)
-            );
+            )
+            .finally(() => {
+                setLoading(false);
+            });
     };
 
     const resetForm = () => {
@@ -269,7 +264,7 @@ const AddAttendance = () => {
                         </select>
                     </div>
                     <button type="submit" disabled={loading}>
-                        Submit
+                        {loading ? "Submitting..." : "Submit"}
                     </button>
                 </form>
             </div>

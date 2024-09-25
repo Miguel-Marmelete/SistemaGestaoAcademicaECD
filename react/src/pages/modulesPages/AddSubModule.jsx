@@ -78,9 +78,9 @@ const AddSubModule = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (loading) return; // Prevent multiple submissions
+        if (loading) return;
 
-        setLoading(true); // Set loading to true
+        setLoading(true);
 
         try {
             const response = await fetch(endpoints.ADD_SUBMODULES, {

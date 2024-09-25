@@ -67,7 +67,7 @@ function MenuBar() {
                                 <Link
                                     key={subIndex}
                                     to={subItem.path}
-                                    className="dropdown-item" // Added class here
+                                    className="dropdown-item"
                                 >
                                     {subItem.name}
                                 </Link>

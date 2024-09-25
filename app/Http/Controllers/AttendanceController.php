@@ -52,7 +52,7 @@ class AttendanceController extends Controller
 
             $attendances = [];
             foreach ($student_ids as $student_id) {
-                $attendance = Attendance::create([
+                $attendance = Attendance::firstOrCreate([
                     'lesson_id' => $lesson_id,
                     'student_id' => $student_id,
                 ]);
@@ -61,6 +61,7 @@ class AttendanceController extends Controller
 
             return response()->json(['message' => 'Attendance records created successfully', 'attendances' => $attendances], 201);
         } catch (\Exception $e) {
+            Log::error('An error occurred while creating the attendance records: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while creating the attendance records', 'details' => $e->getMessage()], 500);
         }
     }

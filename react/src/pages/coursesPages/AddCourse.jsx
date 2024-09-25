@@ -84,7 +84,7 @@ const AddCourse = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (loading) return;
+        if (loading) return; // Prevent multiple fetches
         if (!validateForm()) return;
 
         setLoading(true);
