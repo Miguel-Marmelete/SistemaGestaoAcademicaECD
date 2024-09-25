@@ -186,10 +186,14 @@ input[type="password"] {
 .dropdown-item {
     padding: 8px 12px;
     cursor: pointer;
+    color: inherit; /* Inherit color from parent */
+    text-decoration: none; /* Remove underline */
 }
 
 .dropdown-item:hover {
     background-color: #e0e0e0;
+    color: inherit; /* Ensure color doesn't change on hover */
+    text-decoration: underline; /* Optional: Add underline on hover */
 }
 
 /*-----------------------ADMIN PANEL CSS----------------*/
