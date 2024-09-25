@@ -59,6 +59,7 @@ function Login() {
         <div className="login_container">
             <form className="login_form" onSubmit={handleSubmit}>
                 <h1 className="login_header">Login</h1>
+                <br></br>
                 <div className="email_container">
                     {" "}
                     <label htmlFor="email" className="email_label">

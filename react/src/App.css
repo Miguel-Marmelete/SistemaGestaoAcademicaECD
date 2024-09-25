@@ -449,7 +449,7 @@ form small {
     background-color: #343a40; /* Same dark grey background */
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 50%;
+    width: 100%;
 }
 
 .login_form h1,
@@ -497,7 +497,6 @@ form small {
     border-radius: 4px;
     background-color: #ffffff;
     width: 100%;
-    margin-left: 30%;
 }
 
 .login_button_container,
