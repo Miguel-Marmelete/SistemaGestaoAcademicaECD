@@ -3,6 +3,7 @@ import ButtonMenu from "../../components/ButtonMenu";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import { studentsMenuButtons } from "../../../scripts/buttonsData";
+import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 
 const AddStudents = () => {
     const { accessTokenData } = useAuth();
@@ -25,23 +26,13 @@ const AddStudents = () => {
     });
 
     useEffect(() => {
-        fetch(endpoints.GET_COURSES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
-                return response.json();
+        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+            .then((data) => {
+                setCourses(data.courses.reverse());
             })
-            .then((data) => setCourses(data.courses.reverse()))
-            .catch((error) => alert(error.message))
-            .finally(() => {});
+            .catch((error) => {
+                alert("Error fetching courses: " + error.message);
+            });
     }, []);
 
     useEffect(() => {

@@ -4,6 +4,7 @@ import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { lessonsMenuButtons } from "../../../scripts/buttonsData";
 import { useNavigate } from "react-router-dom";
+import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 
 const LessonsList = () => {
     const [filteredLessons, setFilteredLessons] = useState([]);
@@ -22,17 +23,13 @@ const LessonsList = () => {
     };
     // Fetch courses on mount
     useEffect(() => {
-        fetch(endpoints.GET_COURSES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => setCourses(data.courses.reverse()))
-            .catch((error) =>
-                alert("Failed to fetch courses: " + error.message)
-            );
+        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+            .then((data) => {
+                setCourses(data.courses.reverse());
+            })
+            .catch((error) => {
+                alert("Error fetching courses: " + error.message);
+            });
     }, [accessTokenData.access_token]);
 
     // Fetch submodules on mount

@@ -3,6 +3,7 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { evaluationMomentsMenuButtons } from "../../../scripts/buttonsData";
+import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 
 const AddEvaluationMoment = () => {
     const { accessTokenData, professor } = useAuth();
@@ -20,45 +21,14 @@ const AddEvaluationMoment = () => {
     });
 
     useEffect(() => {
-        // Fetch courses and modules
-        fetch(endpoints.GET_COURSES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch courses");
-                }
-                return response.json();
-            })
+        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
             .then((data) => {
-                setCourses(data.courses.reverse());
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                alert("An error occurred while fetching courses");
-            });
-
-        fetch(endpoints.GET_MODULES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch modules");
-                }
-                return response.json();
-            })
-            .then((data) => {
+                console.log(data.courses);
+                setCourses(data.courses);
                 setModules(data.modules);
             })
             .catch((error) => {
-                console.error("Error:", error);
-                alert("An error occurred while fetching modules");
+                alert(error.message);
             });
     }, [accessTokenData.access_token]);
 

@@ -3,7 +3,7 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
-
+import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesAndModulesOfProfessor";
 const ModulesList = () => {
     const [modules, setModules] = useState([]);
     const [editedModule, setEditedModule] = useState({});
@@ -11,23 +11,12 @@ const ModulesList = () => {
 
     // Fetch modules from API
     useEffect(() => {
-        fetch(endpoints.GET_MODULES, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch modules");
-                }
-                return response.json();
-            })
+        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
             .then((data) => {
-                console.log("modules", data.modules);
-                setModules(data.modules.reverse());
+                console.log(data.modules);
+                setModules(data.modules);
             })
             .catch((error) => {
-                console.error("Error fetching modules:", error);
                 alert(error.message);
             });
     }, []);

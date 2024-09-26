@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
-import { fetchCourses } from "../../../scripts/getCourses";
+import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 import { studentsMenuButtons } from "../../../scripts/buttonsData";
 import ButtonMenu from "../../components/ButtonMenu";
 
@@ -16,9 +16,9 @@ const StudentsList = () => {
 
     // Fetch courses from API
     useEffect(() => {
-        fetchCourses(accessTokenData.access_token)
-            .then((fetchedCourses) => {
-                setCourses(fetchedCourses.reverse());
+        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+            .then((data) => {
+                setCourses(data.courses.reverse());
             })
             .catch((error) => {
                 alert("Error fetching courses: " + error.message);
@@ -27,11 +27,7 @@ const StudentsList = () => {
 
     // Fetch students when the selected course changes
     useEffect(() => {
-        const fetchStudentsUrl = selectedCourse
-            ? `${endpoints.GET_STUDENTS_BY_COURSE}?course_id=${selectedCourse}`
-            : endpoints.GET_STUDENTS;
-
-        fetch(fetchStudentsUrl, {
+        fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
             headers: {
                 Authorization: `Bearer ${accessTokenData.access_token}`,
             },

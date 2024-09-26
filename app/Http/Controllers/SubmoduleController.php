@@ -4,10 +4,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Submodule;
+use App\Models\ProfessorInChargeOfModule;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Course;
 use App\Models\CourseModule;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SubmoduleController extends Controller
 {
@@ -16,10 +19,25 @@ class SubmoduleController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function getSubModules()
     {
         try {
-            $submodules = Submodule::with('module')->get();
+            // Retrieve the authenticated professor
+            $professor = JWTAuth::user();
+
+            // Check if the professor is a coordinator
+            if ($professor->is_coordinator == 1) {
+                // If the professor is a coordinator, return all submodules
+                $submodules = Submodule::with('module')->get();
+            } else {
+                // If the professor is not a coordinator, return only the submodules of the professor
+                $moduleIds = ProfessorInChargeOfModule::where('professor_id', $professor->professor_id)
+                    ->pluck('module_id');
+                $submodules = Submodule::with('module')
+                    ->whereIn('module_id', $moduleIds)
+                    ->get();
+            }
+
             return response()->json(['submodules' => $submodules], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while retrieving submodules', 'details' => $e->getMessage()], 500);

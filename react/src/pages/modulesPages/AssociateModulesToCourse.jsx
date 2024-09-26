@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
-import { fetchCourses } from "../../../scripts/getCourses";
+import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
 
@@ -16,9 +16,9 @@ const AssociateModulesToCourse = () => {
 
     // Fetch courses from API
     useEffect(() => {
-        fetchCourses(accessTokenData.access_token)
-            .then((courses) => {
-                setCourses(courses.reverse());
+        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+            .then((data) => {
+                setCourses(data.courses.reverse());
             })
             .catch((error) => {
                 alert(error);

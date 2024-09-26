@@ -39,6 +39,10 @@ function MenuBar() {
             subItems: [
                 { name: "Momentos de Avaliação", path: "/evaluationMoments" },
                 {
+                    name: "Criar Momento de Avaliação",
+                    path: "/addEvaluationMoment",
+                },
+                {
                     name: "Avaliar Momentos de Avaliação",
                     path: "/avaliacoes/avaliar",
                 },

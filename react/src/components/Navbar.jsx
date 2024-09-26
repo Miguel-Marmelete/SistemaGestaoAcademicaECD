@@ -31,8 +31,16 @@ function Navbar() {
     return (
         <div className="navbar">
             <div className="navbar-left">
-                <img src={ipbejaLogo} className="logo" />
-                <img src={ipbejaLogo} className="logo" />
+                <img
+                    src={ipbejaLogo}
+                    className="logo"
+                    style={{ width: "12%", height: "15%" }}
+                />
+                <img
+                    src={ipbejaLogo}
+                    className="logo"
+                    style={{ width: "12%", height: "15%" }}
+                />
                 <h3>
                     <Link
                         to="/"

@@ -12,17 +12,16 @@ const endpoints = {
     // User Management
     GET_PROFESSORS: `${API_BASE_URL}/getAllProfessors`,
     GET_COURSES: `${API_BASE_URL}/getAllCourses`,
-    GET_STUDENTS: `${API_BASE_URL}/getAllStudents`,
+    GET_STUDENTS: `${API_BASE_URL}/getStudents`,
     GET_FILTERED_STUDENTS: `${API_BASE_URL}/students/search`,
     GET_MODULES: `${API_BASE_URL}/getAllModules`,
-    GET_SUBMODULES: `${API_BASE_URL}/getAllSubModules`,
+    GET_SUBMODULES: `${API_BASE_URL}/getSubModules`,
     GET_LESSONS: `${API_BASE_URL}/getAllLessons`,
     GET_LESSON_BY_ID: `${API_BASE_URL}/getLessonById`,
     GET_EVALUATION_MOMENTS: `${API_BASE_URL}/getAllEvaluationMoments`,
     GET_PROFESSORS_IN_CHARGE_OF_MODULES: `${API_BASE_URL}/getAllProfessorsInChargeOfModules`,
     GET_SUBMODULES_BY_COURSE: `${API_BASE_URL}/getSubmodulesByCourse`,
     GET_LESSONS_OF_SUBMODULE: `${API_BASE_URL}/getLessonsOfSubmodule`,
-    GET_STUDENTS_BY_COURSE: `${API_BASE_URL}/getStudentsByCourse`,
     GET_FILTERED_LESSONS: `${API_BASE_URL}/getFilteredLessons`,
     GET_SUBMODULES_OF_PROFESSOR: `${API_BASE_URL}/getSubmodulesOfProfessor`,
     GET_ATTENDANCE: `${API_BASE_URL}/getAttendance`,
@@ -30,6 +29,7 @@ const endpoints = {
     GET_PROFESSORS_IN_CHARGE_OF_MODULES_BY_COURSE: `${API_BASE_URL}/getProfessorsInChargeOfModulesByCourse`,
     GET_MODULES_OF_PROFESSOR: `${API_BASE_URL}/getModulesOfProfessor`,
     GET_PROFESSOR_EVALUATION_MOMENTS: `${API_BASE_URL}/getProfessorEvaluationMoments`,
+    GET_COURSES_AND_MODULES_OF_PROFESSOR: `${API_BASE_URL}/getCoursesAndModulesOfProfessor`,
 
     // Posts
     ADD_STUDENTS: `${API_BASE_URL}/addStudents`,

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProfessorInChargeOfModule;
+use App\Models\Module;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log; 
@@ -223,23 +225,18 @@ public function store(Request $request)
             $query = Submodule::query();
     
             // If the professor is not a coordinator, filter by their assigned modules
-            if ($professor->is_coordinator == 0) {
+           
                 $moduleIds = ProfessorInChargeOfModule::where('professor_id', $professor->professor_id)
                     ->pluck('module_id');
     
                 // Filter by both module_id (from professor) and course_id (if provided)
                 if ($request->has('course_id')) {
-                    $courseModuleIds = CourseModule::where('course_id', $request->query('course_id'))
+                    $courseModuleIds = ProfessorInChargeOfModule::where('course_id', $request->query('course_id'))
                         ->whereIn('module_id', $moduleIds) // Ensure both conditions are met
                         ->pluck('module_id');
                     $query->whereIn('module_id', $courseModuleIds);
-                } else {
-                    $query->whereIn('module_id', $moduleIds);
                 }
-            }
-    
-        
-    
+            
             // Eager load relationships
             $submodules = $query->with(['module'])->get();
     
@@ -252,6 +249,63 @@ public function store(Request $request)
             ], 500);
         }
     }
+    
+   
+    
+    public function getCoursesAndModulesOfProfessor()
+    {
+        try {
+            // Retrieve the authenticated professor
+            $professor = JWTAuth::user();
+            if (!$professor) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+    
+            // Retrieve the entries based on the professor's role
+            if ($professor->is_coordinator == 1) {
+                // If the professor is a coordinator, return all courses and modules
+                $courses = Course::all();
+                $modules = Module::all();
+                return response()->json([
+                    'courses' => $courses,
+                    'modules' => $modules
+                ], 200);
+            } else {
+                // If the professor is not a coordinator, filter by their assigned modules
+                $entries = ProfessorInChargeOfModule::with(['course', 'module'])
+                    ->where('professor_id', $professor->professor_id)
+                    ->get();
+            }
+    
+            // Separate courses and modules into two arrays
+            $courses = [];
+            $modules = [];
+    
+            foreach ($entries as $entry) {
+                // Extract the course and module if they exist
+                if ($entry->course && !in_array($entry->course, $courses)) {
+                    $courses[] = $entry->course;
+                }
+                if ($entry->module && !in_array($entry->module, $modules)) {
+                    $modules[] = $entry->module;
+                }
+            }
+    
+            return response()->json([
+                'courses' => $courses,
+                'modules' => $modules
+            ], 200);
+    
+        } catch (\Exception $e) {
+            Log::error('Error retrieving courses and modules: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'An error occurred while retrieving courses and modules',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+
     
     
 

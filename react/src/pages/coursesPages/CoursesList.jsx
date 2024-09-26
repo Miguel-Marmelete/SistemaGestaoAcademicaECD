@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../auth/AuthContext";
-import { fetchCourses } from "../../../scripts/getCourses";
+import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesAndModulesOfProfessor";
 import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { coursesMenuButtons } from "../../../scripts/buttonsData";
@@ -11,9 +11,10 @@ const CoursesList = () => {
     const { accessTokenData, professor } = useAuth();
 
     useEffect(() => {
-        fetchCourses(accessTokenData.access_token)
-            .then((courses) => {
-                setCourses(courses.reverse());
+        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+            .then((data) => {
+                console.log(data.courses);
+                setCourses(data.courses);
             })
             .catch((error) => {
                 alert(error.message);

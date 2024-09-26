@@ -1,7 +1,7 @@
 import endpoints from "../src/endpoints";
 
-export const fetchCourses = (accessToken) => {
-    return fetch(endpoints.GET_COURSES, {
+export const fetchCoursesAndModulesOfProfessor = (accessToken) => {
+    return fetch(endpoints.GET_COURSES_AND_MODULES_OF_PROFESSOR, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -18,10 +18,10 @@ export const fetchCourses = (accessToken) => {
         })
         .then((data) => {
             console.log("API response:", data);
-            return data.courses;
+            return data;
         })
         .catch((error) => {
-            console.error("Error fetching courses:", error);
+            console.error("Error fetching courses and modules:", error);
             alert(error);
             throw error;
         });

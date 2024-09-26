@@ -197,6 +197,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getSubmodulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getSubmodulesOfProfessor']);
     Route::get('/getProfessorsInChargeOfModulesByCourse', [ProfessorInChargeOfModuleController::class, 'getProfessorsInChargeOfModulesByCourse']);
     Route::get('/getModulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getModulesOfProfessor']);
+    Route::get('/getCoursesAndModulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getCoursesAndModulesOfProfessor']);
     
   //-----------------------------------------------------------------------
 
@@ -216,7 +217,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
 
   //------------------STUDENT ROUTES--------------------------------------
     // Get all students
-    Route::get('/getAllStudents', [StudentController::class, 'index']);
+    Route::get('/getStudents', [StudentController::class, 'getStudents']);
     Route::post('/createAndEnroll', [StudentController::class, 'createAndEnroll']);
     // Get filtered students
     Route::get('/students/search', [StudentController::class, 'search']);
@@ -236,7 +237,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
 
   //------------------SUBMODULE ROUTES-----------------------------
      // Get all Submodule
-     Route::get('/getAllSubModules', [SubmoduleController::class, 'index']);
+     Route::get('/getSubModules', [SubmoduleController::class, 'getSubModules']);
      // Get a specific Submodule by ID
      Route::get('/getSubmodule/{id}', [SubmoduleController::class, 'show']);
      // Create a new Submodule

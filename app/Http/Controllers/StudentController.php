@@ -9,18 +9,43 @@ use App\Models\Student;
 use Illuminate\Support\Facades\Log; 
 class StudentController extends Controller
 {
-    /**
-     * Display a listing of the students.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index()
+
+
+    public function getStudents(Request $request)
     {
+        // Validate course_id if it's present
+        $request->validate([
+            'course_id' => 'nullable|integer|exists:courses,course_id',
+        ]);
+    
         try {
-            $students = Student::all();
+            // Extract course_id from query parameters
+            $courseId = $request->query('course_id');
+    
+            // If course_id is provided, fetch students for that course
+            if ($courseId) {
+                // Get student IDs from the enrollment table based on course_id
+                $studentIds = Enrollment::where('course_id', $courseId)
+                    ->pluck('student_id');
+    
+                // Retrieve students based on the obtained student IDs
+                $students = Student::whereIn('student_id', $studentIds)->get();
+            } else {
+                $students = Student::all();
+            }
+    
+            // Return students as a JSON response
             return response()->json(['students' => $students], 200);
+    
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while retrieving students', 'details' => $e->getMessage()], 500);
+            // Log the error for debugging purposes
+            Log::error('Search error: ' . $e->getMessage());
+    
+            // Return a JSON response with the error message
+            return response()->json([
+                'error' => 'An unexpected error occurred.',
+                'details' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -149,44 +174,7 @@ class StudentController extends Controller
     }
 
 
-    public function getStudentsByCourse(Request $request)
-    {
-        // Validate course_id if it's present
-        $request->validate([
-            'course_id' => 'nullable|integer|exists:courses,course_id',
-        ]);
-    
-        try {
-            // Extract course_id from query parameters
-            $courseId = $request->query('course_id');
-    
-            // If course_id is provided, fetch students for that course
-            if ($courseId) {
-                // Get student IDs from the enrollment table based on course_id
-                $studentIds = Enrollment::where('course_id', $courseId)
-                    ->pluck('student_id');
-    
-                // Retrieve students based on the obtained student IDs
-                $students = Student::whereIn('student_id', $studentIds)->get();
-            } else {
-            // If no course_id is provided, return a message
-            return response()->json(['message' => 'No students are enrolled in the provided course'], 200);
-            }
-    
-            // Return students as a JSON response
-            return response()->json(['students' => $students], 200);
-    
-        } catch (\Exception $e) {
-            // Log the error for debugging purposes
-            Log::error('Search error: ' . $e->getMessage());
-    
-            // Return a JSON response with the error message
-            return response()->json([
-                'error' => 'An unexpected error occurred.',
-                'details' => $e->getMessage()
-            ], 500);
-        }
-    }
+
     
 
     public function addAndEnrollStudent(Request $request)

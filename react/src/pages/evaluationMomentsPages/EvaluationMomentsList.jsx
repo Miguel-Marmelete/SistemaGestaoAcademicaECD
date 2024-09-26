@@ -98,8 +98,6 @@ const EvaluationMomentsList = () => {
                         selectedSubmodule))
     );
 
-    const filterByCourseOnly = selectedCourse && !selectedModule;
-
     return (
         <div>
             <ButtonMenu buttons={evaluationMomentsMenuButtons} />
@@ -215,10 +213,7 @@ const EvaluationMomentsList = () => {
                         </tbody>
                     </table>
                 ) : (
-                    <p>
-                        Por favor, selecione um curso ou um módulo para ver os
-                        momentos de avaliação.
-                    </p>
+                    <p>Nenhum momento de avaliação encontrado.</p>
                 )}
             </div>
         </div>

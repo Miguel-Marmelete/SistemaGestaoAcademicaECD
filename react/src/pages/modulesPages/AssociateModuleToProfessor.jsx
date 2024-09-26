@@ -17,7 +17,6 @@ const AssociateProfessorToModule = () => {
 
     // Fetch professors and courses only once when component mounts
     useEffect(() => {
-        setLoading(true); // Start loading
         fetch(endpoints.GET_PROFESSORS, {
             headers: {
                 Authorization: `Bearer ${accessTokenData.access_token}`,
@@ -28,7 +27,7 @@ const AssociateProfessorToModule = () => {
             .catch((error) =>
                 alert("Failed to fetch professors: " + error.message)
             )
-            .finally(() => setLoading(false));
+            .finally(() => {});
 
         fetch(endpoints.GET_COURSES, {
             headers: {
@@ -40,7 +39,7 @@ const AssociateProfessorToModule = () => {
             .catch((error) =>
                 alert("Failed to fetch courses: " + error.message)
             )
-            .finally(() => setLoading(false)); // End loading
+            .finally(() => {});
     }, [accessTokenData.access_token]);
 
     // Fetch modules and professors-and-modules when a course is selected
