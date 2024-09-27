@@ -162,11 +162,12 @@ class LessonController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $lessonId)
     {
         try {
-            $lesson = Lesson::findOrFail($id);
-
+            $lesson = Lesson::find($lessonId);
+            Log::info('lesson', array($lesson));
+            
             $validator = Validator::make($request->all(), [
                 'title' => 'sometimes|string|max:255',
                 'type' => 'sometimes|string|in:Teórica,Laboratorial,Teórica-Prática',
@@ -179,16 +180,17 @@ class LessonController extends Controller
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
-
             $lesson->update($validator->validated());
-
             return response()->json(['message' => 'Lesson updated successfully', 'lesson' => $lesson], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error($e->getMessage());
             return response()->json(['error' => 'Lesson not found'], 404);
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
             return response()->json(['error' => 'An error occurred while updating the lesson', 'details' => $e->getMessage()], 500);
         }
     }
+    
 
     /**
      * Remove the specified lesson.

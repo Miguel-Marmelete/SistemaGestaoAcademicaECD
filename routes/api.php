@@ -146,7 +146,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     // Create a new lesson and attendance
     Route::post('/addLessonAndAttendance', [LessonController::class, 'addLessonAndAttendance']);
     // Update an existing lesson by ID
-    Route::put('/updateLesson/{id}', [LessonController::class, 'update']);
+    Route::put('/updateLesson/{lessonId}', [LessonController::class, 'update']);
     // Delete a student by ID
     Route::delete('/deleteLesson/{id}', [LessonController::class, 'destroy']);
     Route::get('/getFilteredLessons', [LessonController::class, 'getFilteredLessons']);
@@ -198,6 +198,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getProfessorsInChargeOfModulesByCourse', [ProfessorInChargeOfModuleController::class, 'getProfessorsInChargeOfModulesByCourse']);
     Route::get('/getModulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getModulesOfProfessor']);
     Route::get('/getCoursesAndModulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getCoursesAndModulesOfProfessor']);
+    Route::get('/getModulesOfCourseOfProfessor', [ProfessorInChargeOfModuleController::class, 'getModulesOfCourseOfProfessor']);
     
   //-----------------------------------------------------------------------
 

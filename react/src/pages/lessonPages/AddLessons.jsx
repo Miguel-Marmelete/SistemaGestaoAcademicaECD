@@ -76,6 +76,7 @@ const AddLesson = () => {
                     }
                 })
                 .then((data) => {
+                    console.log("submodulos", data.submodules);
                     setSubmodules(data.submodules);
                 })
                 .catch((error) => {
@@ -83,15 +84,12 @@ const AddLesson = () => {
                     alert(error.message);
                 });
 
-            fetch(
-                `${endpoints.GET_STUDENTS_BY_COURSE}?course_id=${selectedCourse}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
-            )
+            fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${accessTokenData.access_token}`,
+                },
+            })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error("Failed to fetch students");
@@ -105,7 +103,6 @@ const AddLesson = () => {
                     setLoading(false);
                 })
                 .catch((error) => {
-                    setError("Failed to fetch students: " + error.message);
                     setLoading(false);
                 });
         } else {

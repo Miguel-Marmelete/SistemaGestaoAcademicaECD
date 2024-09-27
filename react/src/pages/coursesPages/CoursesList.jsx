@@ -1,40 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../auth/AuthContext";
-import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesAndModulesOfProfessor";
 import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { coursesMenuButtons } from "../../../scripts/buttonsData";
+import customFetch from "../../../scripts/customFetch";
 
 const CoursesList = () => {
     const [courses, setCourses] = useState([]);
     const [editedCourse, setEditedCourse] = useState({});
-    const { accessTokenData, professor } = useAuth();
+    const { accessTokenData, setAccessTokenData, professor } = useAuth();
 
-    useEffect(() => {
-        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
-            .then((data) => {
-                console.log(data.courses);
-                setCourses(data.courses);
-            })
-            .catch((error) => {
-                alert(error.message);
-            });
-    }, []);
+    customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
+        .then((data) => {
+            setCourses(data.courses.reverse());
+        })
+        .catch((error) => console.error(error));
 
     const handleDelete = (courseId) => {
         if (!window.confirm("Are you sure you want to delete this course?")) {
             return;
         }
-        fetch(endpoints.DELETE_COURSE + `/${courseId}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to delete course");
-                }
+        customFetch(
+            endpoints.DELETE_COURSE + `/${courseId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "DELETE"
+        )
+            .then(() => {
                 setCourses((prevCourses) =>
                     prevCourses.filter(
                         (course) => course.course_id !== courseId
@@ -42,9 +34,7 @@ const CoursesList = () => {
                 );
                 alert("Course deleted successfully");
             })
-            .catch((error) => {
-                alert(error.message);
-            });
+            .catch((error) => console.error(error));
     };
 
     const handleEditClick = (course) => {
@@ -60,23 +50,14 @@ const CoursesList = () => {
         if (!window.confirm("Are you sure you want to update this course?")) {
             return;
         }
-
-        fetch(endpoints.UPDATE_COURSE + `/${courseId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(editedCourse),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to update course");
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.UPDATE_COURSE + `/${courseId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "PUT",
+            editedCourse
+        )
             .then(() => {
-                // Use the updated course data, but fallback to previous data for missing fields
                 setCourses((prevCourses) =>
                     prevCourses.map((course) =>
                         course.course_id === courseId
@@ -87,9 +68,7 @@ const CoursesList = () => {
                 setEditedCourse({});
                 alert("Course updated successfully");
             })
-            .catch((error) => {
-                alert(error.message);
-            });
+            .catch((error) => console.error(error));
     };
 
     return (

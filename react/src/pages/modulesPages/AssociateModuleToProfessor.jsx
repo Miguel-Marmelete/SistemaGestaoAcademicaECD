@@ -3,6 +3,7 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
+import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 
 const AssociateProfessorToModule = () => {
     const { accessTokenData } = useAuth();
@@ -29,17 +30,13 @@ const AssociateProfessorToModule = () => {
             )
             .finally(() => {});
 
-        fetch(endpoints.GET_COURSES, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => setCourses(data.courses.reverse()))
-            .catch((error) =>
-                alert("Failed to fetch courses: " + error.message)
-            )
-            .finally(() => {});
+        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+            .then((data) => {
+                setCourses(data.courses);
+            })
+            .catch((error) => {
+                alert("Failed to fetch courses and modules: " + error.message);
+            });
     }, [accessTokenData.access_token]);
 
     // Fetch modules and professors-and-modules when a course is selected

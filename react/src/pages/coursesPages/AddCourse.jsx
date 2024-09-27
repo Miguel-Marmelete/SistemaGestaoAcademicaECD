@@ -3,9 +3,10 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { coursesMenuButtons } from "../../../scripts/buttonsData";
+import customFetch from "../../../scripts/customFetch";
 
 const AddCourse = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [loading, setLoading] = useState(false);
     const [courses, setCourses] = useState([]);
     const [courseAdded, setCourseAdded] = useState(false);
@@ -18,27 +19,11 @@ const AddCourse = () => {
     const [editedCourse, setEditedCourse] = useState({});
 
     useEffect(() => {
-        fetch(endpoints.GET_COURSES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
-                return response.json();
-            })
+        customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
-            .catch((error) => {
-                console.error(error);
-                alert(error);
-            });
+            .catch((error) => console.error(error));
     }, [courseAdded]);
 
     const handleChange = (e) => {
@@ -89,23 +74,13 @@ const AddCourse = () => {
 
         setLoading(true);
 
-        fetch(endpoints.ADD_COURSES, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(formData),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        console.log(errorData);
-                        throw new Error(errorData.details);
-                    });
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.ADD_COURSES,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            formData
+        )
             .then(() => {
                 alert("Course added successfully!");
                 setFormData({

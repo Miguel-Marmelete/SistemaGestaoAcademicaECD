@@ -36,11 +36,9 @@ const AddStudents = () => {
     }, []);
 
     useEffect(() => {
-        const fetchUrl = selectedCourse
-            ? `${endpoints.GET_STUDENTS_BY_COURSE}?course_id=${selectedCourse}`
-            : endpoints.GET_STUDENTS;
+        `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`;
 
-        fetch(fetchUrl, {
+        fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${accessTokenData.access_token}`,

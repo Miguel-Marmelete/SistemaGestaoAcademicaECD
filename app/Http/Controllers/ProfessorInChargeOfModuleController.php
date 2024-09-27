@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log; 
 use App\Models\Submodule;
 use App\Models\CourseModule;
+use App\Models\Professor;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class ProfessorInChargeOfModuleController extends Controller
@@ -221,25 +222,14 @@ public function store(Request $request)
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
     
-            // Initialize the query for submodules
-            $query = Submodule::query();
-    
             // If the professor is not a coordinator, filter by their assigned modules
-           
-                $moduleIds = ProfessorInChargeOfModule::where('professor_id', $professor->professor_id)
-                    ->pluck('module_id');
-    
-                // Filter by both module_id (from professor) and course_id (if provided)
-                if ($request->has('course_id')) {
-                    $courseModuleIds = ProfessorInChargeOfModule::where('course_id', $request->query('course_id'))
-                        ->whereIn('module_id', $moduleIds) // Ensure both conditions are met
-                        ->pluck('module_id');
-                    $query->whereIn('module_id', $courseModuleIds);
-                }
-            
-            // Eager load relationships
-            $submodules = $query->with(['module'])->get();
-    
+            $moduleIds = ProfessorInChargeOfModule::where('professor_id', $professor->professor_id)
+                ->where('course_id', $request->query('course_id'))
+                ->pluck('module_id');
+            if($professor->is_coordinator == 1){
+                $moduleIds = ProfessorInChargeOfModule::where('course_id', $request->query('course_id'))
+                ->pluck('module_id');            }
+            $submodules = Submodule::whereIn('module_id', $moduleIds)->get();
             return response()->json(['submodules' => $submodules], 200);
         } catch (\Exception $e) {
             Log::error('Error retrieving submodules: ' . $e->getMessage());
@@ -303,6 +293,45 @@ public function store(Request $request)
                 'details' => $e->getMessage()
             ], 500);
         }
+    }
+    
+    function getModulesOfCourseOfProfessor()
+    {
+        // Obtém o professor autenticado
+        $professor = JWTAuth::user();
+        
+        if (!$professor) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    
+        // Obtém os cursos do professor, com detalhes completos
+        $courses = Course::whereIn('course_id', function($query) use ($professor) {
+            $query->select('course_id')
+                  ->from('professor_in_charge_of_module')
+                  ->where('professor_id', $professor->professor_id);
+        })->get();
+        if($professor->is_coordinator == 1){
+            $courses = Course::all();
+        }
+    
+        // Para cada curso, obtenha os módulos associados
+        $courseModules = [];
+        foreach ($courses as $course) {
+            $modules = ProfessorInChargeOfModule::where('course_id', $course->course_id)
+                        ->pluck('module_id');
+            
+            // Obtenha detalhes completos dos módulos
+            $modulesDetails = Module::whereIn('module_id', $modules)->get();
+    
+            // Adiciona o curso e seus módulos ao array de resposta
+            $courseModules[] = [
+                'course' => $course,  // Detalhes completos do curso
+                'modules' => $modulesDetails  // Detalhes completos dos módulos
+            ];
+        }
+    
+        // Retorna a resposta JSON com os cursos e seus módulos
+        return response()->json(['courseModules' => $courseModules], 200);
     }
     
 

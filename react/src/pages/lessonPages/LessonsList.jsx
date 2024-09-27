@@ -4,7 +4,7 @@ import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { lessonsMenuButtons } from "../../../scripts/buttonsData";
 import { useNavigate } from "react-router-dom";
-import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
+import customFetch from "../../../scripts/customFetch";
 
 const LessonsList = () => {
     const [filteredLessons, setFilteredLessons] = useState([]);
@@ -12,7 +12,7 @@ const LessonsList = () => {
     const [submodules, setSubmodules] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState("");
     const [selectedSubmodule, setSelectedSubmodule] = useState("");
-    const { accessTokenData, professor } = useAuth();
+    const { accessTokenData, setAccessTokenData, professor } = useAuth();
     const [expandedLessonId, setExpandedLessonId] = useState(null);
     const [editedLesson, setEditedLesson] = useState({});
 
@@ -23,16 +23,15 @@ const LessonsList = () => {
     };
     // Fetch courses on mount
     useEffect(() => {
-        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+        customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
             .catch((error) => {
                 alert("Error fetching courses: " + error.message);
             });
-    }, [accessTokenData.access_token]);
+    }, [accessTokenData, setAccessTokenData]);
 
-    // Fetch submodules on mount
     // Fetch submodules when course changes
     useEffect(() => {
         if (!selectedCourse) {
@@ -40,27 +39,18 @@ const LessonsList = () => {
             return;
         }
 
-        const fetchSubmodules = () => {
-            const url = `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`;
-
-            fetch(url, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
+        customFetch(
+            `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`,
+            accessTokenData,
+            setAccessTokenData
+        )
+            .then((data) => {
+                setSubmodules(data.submodules);
             })
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log("Fetched submodules data:", data); // Debugging line
-                    setSubmodules(data.submodules);
-                })
-                .catch((error) =>
-                    alert("Failed to fetch submodules: " + error.message)
-                );
-        };
-
-        fetchSubmodules();
-    }, [selectedCourse, accessTokenData.access_token]);
+            .catch((error) => {
+                alert("Error fetching submodules: " + error.message);
+            });
+    }, [selectedCourse, accessTokenData, setAccessTokenData]);
 
     // Fetch lessons when course or submodule is selected
     useEffect(() => {
@@ -68,41 +58,22 @@ const LessonsList = () => {
             return;
         }
 
-        const fetchFilteredLessons = () => {
-            let url = `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}`;
-            if (selectedSubmodule) {
-                url += `&submodule_id=${selectedSubmodule}`;
-            }
-
-            console.log("Fetching lessons with URL:", url); // Debugging line
-            fetch(url, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
+        let url = `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}`;
+        if (selectedSubmodule) {
+            url += `&submodule_id=${selectedSubmodule}`;
+        }
+        customFetch(url, accessTokenData, setAccessTokenData)
+            .then((data) => {
+                setFilteredLessons(data.lessons.reverse());
             })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch lessons");
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log("Fetched lessons data:", data); // Debugging line
-                    setFilteredLessons(data.lessons.reverse());
-                })
-                .catch((error) => {
-                    alert(error.message);
-                });
-        };
-
-        fetchFilteredLessons();
+            .catch((error) => {
+                alert("Error fetching lessons: " + error.message);
+            });
     }, [
         selectedCourse,
         selectedSubmodule,
-        accessTokenData.access_token,
-        professor.professor_id,
-        professor.is_coordinator,
+        accessTokenData,
+        setAccessTokenData,
     ]);
 
     const toggleSummary = (lessonId) => {
@@ -110,7 +81,9 @@ const LessonsList = () => {
     };
 
     const handleEditClick = (lesson) => {
-        setEditedLesson({ ...lesson });
+        // Format the date to yyyy-MM-dd
+        const formattedDate = lesson.date.split(" ")[0];
+        setEditedLesson({ ...lesson, date: formattedDate });
     };
 
     const handleChange = (e) => {
@@ -123,27 +96,24 @@ const LessonsList = () => {
             return;
         }
 
-        fetch(`${endpoints.UPDATE_LESSON}/${lessonId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(editedLesson),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
-                return response.json();
-            })
+        // Ensure the date is in yyyy-MM-dd format
+        const formattedEditedLesson = {
+            ...editedLesson,
+            date: editedLesson.date, // Already formatted in handleEditClick
+        };
+
+        customFetch(
+            `${endpoints.UPDATE_LESSON}/${lessonId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "PUT",
+            JSON.stringify(formattedEditedLesson)
+        )
             .then(() => {
                 setFilteredLessons((prevLessons) =>
                     prevLessons.map((lesson) =>
                         lesson.lesson_id === lessonId
-                            ? { ...lesson, ...editedLesson }
+                            ? { ...lesson, ...formattedEditedLesson }
                             : lesson
                     )
                 );
@@ -314,6 +284,13 @@ const LessonsList = () => {
                                                     >
                                                         Save
                                                     </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            setEditedLesson({})
+                                                        }
+                                                    >
+                                                        Cancel
+                                                    </button>
                                                 </td>
                                             )}
                                         </>
@@ -362,7 +339,13 @@ const LessonsList = () => {
                                             </td>
                                             <td>{lesson.submodule.name}</td>
                                             <td>{lesson.course.name}</td>
-                                            <td>{lesson.date}</td>
+                                            <td>
+                                                {
+                                                    new Date(lesson.date)
+                                                        .toISOString()
+                                                        .split("T")[0]
+                                                }
+                                            </td>
                                             <td>
                                                 {lesson.professors
                                                     .map((prof) => prof.name)

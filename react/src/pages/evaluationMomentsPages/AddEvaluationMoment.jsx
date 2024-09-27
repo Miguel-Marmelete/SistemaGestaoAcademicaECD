@@ -3,13 +3,12 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { evaluationMomentsMenuButtons } from "../../../scripts/buttonsData";
-import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 
 const AddEvaluationMoment = () => {
     const { accessTokenData, professor } = useAuth();
-    const [courses, setCourses] = useState([]);
-    const [modules, setModules] = useState([]);
-    const [submodules, setSubmodules] = useState([]);
+    const [courses, setCourses] = useState([]); // Store courses and modules array
+    const [modules, setModules] = useState([]); // Modules of selected course
+    const [submodules, setSubmodules] = useState([]); // Submodules for selected module
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         type: "",
@@ -20,20 +19,25 @@ const AddEvaluationMoment = () => {
         date: "",
     });
 
+    // Fetch courses and modules when component mounts
     useEffect(() => {
-        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+        fetch(endpoints.GET_MODULES_OF_COURSE_OF_PROFESSOR, {
+            headers: {
+                Authorization: `Bearer ${accessTokenData.access_token}`,
+            },
+        })
+            .then((response) => response.json())
             .then((data) => {
-                console.log(data.courses);
-                setCourses(data.courses);
-                setModules(data.modules);
+                console.log(data.courseModules);
+                setCourses(data.courseModules); // Set the full data with courses and their modules
             })
-            .catch((error) => {
-                alert(error.message);
-            });
+            .catch((error) =>
+                alert("Failed to fetch courses: " + error.message)
+            );
     }, [accessTokenData.access_token]);
 
+    // Fetch submodules when a module is selected and the type is "Trabalho"
     useEffect(() => {
-        // Fetch submodules when a module is selected and the type is "Trabalho"
         if (formData.module_id && formData.type === "Trabalho") {
             fetch(
                 `${endpoints.GET_SUBMODULES}?module_id=${formData.module_id}`,
@@ -68,6 +72,15 @@ const AddEvaluationMoment = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        // When a course is selected, update modules based on the course
+        if (name === "course_id") {
+            const selectedCourse = courses.find(
+                (course) => course.course.course_id === parseInt(value)
+            );
+            setModules(selectedCourse ? selectedCourse.modules : []); // Set modules of the selected course
+        }
+
         setFormData({
             ...formData,
             [name]: value,
@@ -171,14 +184,15 @@ const AddEvaluationMoment = () => {
                             <option value="" disabled>
                                 Select a course
                             </option>
-                            {courses.map((course) => (
-                                <option
-                                    key={course.course_id}
-                                    value={course.course_id}
-                                >
-                                    {course.name}
-                                </option>
-                            ))}
+                            {courses.length > 0 &&
+                                courses.map((course) => (
+                                    <option
+                                        key={course.course.course_id}
+                                        value={course.course.course_id}
+                                    >
+                                        {course.course.name}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                     <div>

@@ -30,6 +30,7 @@ const endpoints = {
     GET_MODULES_OF_PROFESSOR: `${API_BASE_URL}/getModulesOfProfessor`,
     GET_PROFESSOR_EVALUATION_MOMENTS: `${API_BASE_URL}/getProfessorEvaluationMoments`,
     GET_COURSES_AND_MODULES_OF_PROFESSOR: `${API_BASE_URL}/getCoursesAndModulesOfProfessor`,
+    GET_MODULES_OF_COURSE_OF_PROFESSOR: `${API_BASE_URL}/getModulesOfCourseOfProfessor`,
 
     // Posts
     ADD_STUDENTS: `${API_BASE_URL}/addStudents`,
