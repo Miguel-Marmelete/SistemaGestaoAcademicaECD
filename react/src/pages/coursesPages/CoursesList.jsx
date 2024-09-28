@@ -9,13 +9,13 @@ const CoursesList = () => {
     const [courses, setCourses] = useState([]);
     const [editedCourse, setEditedCourse] = useState({});
     const { accessTokenData, setAccessTokenData, professor } = useAuth();
-
-    customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
-        .then((data) => {
-            setCourses(data.courses.reverse());
-        })
-        .catch((error) => console.error(error));
-
+    useEffect(() => {
+        customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
+            .then((data) => {
+                setCourses(data.courses.reverse());
+            })
+            .catch((error) => console.error(error));
+    }, []);
     const handleDelete = (courseId) => {
         if (!window.confirm("Are you sure you want to delete this course?")) {
             return;
@@ -50,6 +50,7 @@ const CoursesList = () => {
         if (!window.confirm("Are you sure you want to update this course?")) {
             return;
         }
+        console.log("editedCourse", editedCourse);
         customFetch(
             endpoints.UPDATE_COURSE + `/${courseId}`,
             accessTokenData,

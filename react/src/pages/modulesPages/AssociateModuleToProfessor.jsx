@@ -32,7 +32,7 @@ const AssociateProfessorToModule = () => {
 
         fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
             .then((data) => {
-                setCourses(data.courses);
+                setCourses(data.courses.reverse());
             })
             .catch((error) => {
                 alert("Failed to fetch courses and modules: " + error.message);

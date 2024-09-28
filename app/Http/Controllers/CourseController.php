@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Course;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\JwtAuth;
 class CourseController extends Controller
 {
      // Método para listar todos os cursos
@@ -58,6 +59,7 @@ class CourseController extends Controller
  
      public function update(Request $request, $id)
      {
+      
          try {
              // Verifica se o curso existe
              $course = Course::findOrFail($id);

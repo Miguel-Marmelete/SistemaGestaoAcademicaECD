@@ -44,7 +44,7 @@ function MenuBar() {
                 },
                 {
                     name: "Avaliar Momentos de Avaliação",
-                    path: "/avaliacoes/avaliar",
+                    path: "/evaluateEvaluationMoments",
                 },
                 { name: "Pauta", path: "/avaliacoes/pauta" },
             ],

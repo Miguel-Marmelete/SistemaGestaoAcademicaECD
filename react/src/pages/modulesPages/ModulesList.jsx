@@ -14,7 +14,7 @@ const ModulesList = () => {
         fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
             .then((data) => {
                 console.log(data.modules);
-                setModules(data.modules);
+                setModules(data.modules.reverse());
             })
             .catch((error) => {
                 alert(error.message);

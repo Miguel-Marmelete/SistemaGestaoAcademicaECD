@@ -81,8 +81,11 @@ const LessonsList = () => {
     };
 
     const handleEditClick = (lesson) => {
-        // Format the date to yyyy-MM-dd
-        const formattedDate = lesson.date.split(" ")[0];
+        // Format the date to yyyy-MM-dd HH:00:00
+        const formattedDate = new Date(lesson.date)
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
         setEditedLesson({ ...lesson, date: formattedDate });
     };
 
@@ -96,10 +99,17 @@ const LessonsList = () => {
             return;
         }
 
-        // Ensure the date is in yyyy-MM-dd format
+        // Extract only the editable fields
+        const { title, type, summary, date } = editedLesson;
+        const formattedDate = new Date(date)
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
         const formattedEditedLesson = {
-            ...editedLesson,
-            date: editedLesson.date, // Already formatted in handleEditClick
+            title,
+            type,
+            summary,
+            date: formattedDate,
         };
 
         customFetch(
@@ -107,7 +117,7 @@ const LessonsList = () => {
             accessTokenData,
             setAccessTokenData,
             "PUT",
-            JSON.stringify(formattedEditedLesson)
+            formattedEditedLesson
         )
             .then(() => {
                 setFilteredLessons((prevLessons) =>

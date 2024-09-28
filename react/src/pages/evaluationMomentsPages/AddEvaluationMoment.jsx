@@ -8,7 +8,7 @@ const AddEvaluationMoment = () => {
     const { accessTokenData, professor } = useAuth();
     const [courses, setCourses] = useState([]); // Store courses and modules array
     const [modules, setModules] = useState([]); // Modules of selected course
-    const [submodules, setSubmodules] = useState([]); // Submodules for selected module
+    const [submodules, setSubmodules] = useState([]);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         type: "",
@@ -29,12 +29,12 @@ const AddEvaluationMoment = () => {
             .then((response) => response.json())
             .then((data) => {
                 console.log(data.courseModules);
-                setCourses(data.courseModules); // Set the full data with courses and their modules
+                setCourses(data.courseModules.reverse());
             })
             .catch((error) =>
                 alert("Failed to fetch courses: " + error.message)
             );
-    }, [accessTokenData.access_token]);
+    }, []);
 
     // Fetch submodules when a module is selected and the type is "Trabalho"
     useEffect(() => {
@@ -55,7 +55,7 @@ const AddEvaluationMoment = () => {
                     return response.json();
                 })
                 .then((data) => {
-                    setSubmodules(data.submodules);
+                    setSubmodules(data.submodules.reverse());
                 })
                 .catch((error) => {
                     console.error("Error:", error);
@@ -206,14 +206,15 @@ const AddEvaluationMoment = () => {
                             <option value="" disabled>
                                 Select a module
                             </option>
-                            {modules.map((module) => (
-                                <option
-                                    key={module.module_id}
-                                    value={module.module_id}
-                                >
-                                    {module.name}
-                                </option>
-                            ))}
+                            {modules.length > 0 &&
+                                modules.map((module) => (
+                                    <option
+                                        key={module.module_id}
+                                        value={module.module_id}
+                                    >
+                                        {module.name}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                     {formData.type === "Trabalho" && (
@@ -227,15 +228,15 @@ const AddEvaluationMoment = () => {
                                 <option value="" disabled>
                                     Select a submodule
                                 </option>
-                                <option value="">None</option>
-                                {submodules.map((submodule) => (
-                                    <option
-                                        key={submodule.submodule_id}
-                                        value={submodule.submodule_id}
-                                    >
-                                        {submodule.name}
-                                    </option>
-                                ))}
+                                {submodules.length > 0 &&
+                                    submodules.map((submodule) => (
+                                        <option
+                                            key={submodule.submodule_id}
+                                            value={submodule.submodule_id}
+                                        >
+                                            {submodule.name}
+                                        </option>
+                                    ))}
                             </select>
                         </div>
                     )}

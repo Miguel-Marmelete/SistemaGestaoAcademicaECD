@@ -63,15 +63,12 @@ const AddAttendance = () => {
 
     useEffect(() => {
         if (selectedCourse) {
-            fetch(
-                `${endpoints.GET_STUDENTS_BY_COURSE}?course_id=${selectedCourse}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
-            )
+            fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${accessTokenData.access_token}`,
+                },
+            })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error("Failed to fetch students");
@@ -84,7 +81,7 @@ const AddAttendance = () => {
                     setStudents(studentsData.students);
                 })
                 .catch((error) => {
-                    setError("Failed to fetch students: " + error.message);
+                    alert("Failed to fetch students: " + error.message);
                 });
         }
     }, [selectedCourse]);
@@ -116,12 +113,17 @@ const AddAttendance = () => {
         }
     }, [selectedCourse, selectedSubmodule]);
 
-    const handleStudentChange = (e) => {
-        const value = Array.from(
-            e.target.selectedOptions,
-            (option) => option.value
-        );
-        setSelectedStudents(value);
+    const handleStudentCheckboxChange = (e) => {
+        const { value, checked } = e.target;
+        const numericValue = parseInt(value, 10);
+
+        setSelectedStudents((prevSelectedStudents) => {
+            if (checked) {
+                return [...prevSelectedStudents, numericValue];
+            } else {
+                return prevSelectedStudents.filter((id) => id !== numericValue);
+            }
+        });
     };
 
     const handleSubmit = (e) => {
@@ -243,25 +245,29 @@ const AddAttendance = () => {
                     </div>
                     <div>
                         <label>Students</label>
-                        <select
-                            multiple
-                            value={selectedStudents}
-                            onChange={handleStudentChange}
-                            required
-                        >
+                        <div className="checkbox-group">
                             {students.length > 0 ? (
                                 students.map((student) => (
-                                    <option
-                                        key={student.student_id}
-                                        value={student.student_id}
-                                    >
-                                        {student.name}
-                                    </option>
+                                    <div key={student.student_id}>
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                value={student.student_id}
+                                                checked={selectedStudents.includes(
+                                                    student.student_id
+                                                )}
+                                                onChange={
+                                                    handleStudentCheckboxChange
+                                                }
+                                            />
+                                            {student.name}
+                                        </label>
+                                    </div>
                                 ))
                             ) : (
-                                <option disabled>No students available</option>
+                                <p>No students available</p>
                             )}
-                        </select>
+                        </div>
                     </div>
                     <button type="submit" disabled={loading}>
                         {loading ? "Submitting..." : "Submit"}

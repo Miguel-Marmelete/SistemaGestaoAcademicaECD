@@ -1,4 +1,10 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, {
+    createContext,
+    useState,
+    useContext,
+    useEffect,
+    useRef,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import endpoints from "../endpoints";
 
@@ -7,6 +13,8 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [professor, setProfessor] = useState(null);
     const [accessTokenData, setAccessTokenData] = useState(null);
+    const logoutTimerRef = useRef(null);
+
     const navigate = useNavigate();
 
     // Check if token is expired
@@ -24,13 +32,11 @@ export const AuthProvider = ({ children }) => {
 
         if (tokenData && professorData) {
             const { issued_at, expires_in } = tokenData;
-            console.log("issued at", issued_at);
-            console.log("expires in", issued_at);
             if (isTokenExpired(issued_at, expires_in)) {
                 alert("Sessão Expirada, faça o Login novamente.");
                 handleLogout(); // Log out if token is expired
             } else {
-                setAccessTokenData(tokenData);
+                setAccessTokenData(tokenData); // Initial token data
                 setProfessor(professorData);
 
                 // Calculate the remaining time until the token expires
@@ -43,7 +49,37 @@ export const AuthProvider = ({ children }) => {
                 setTimeout(() => handleLogout(), timeUntilExpiration - 60000); // 1 minute before expiry
             }
         }
-    }, []);
+    }, []); // Only run this effect once, on component mount
+
+    // Sync accessTokenData with sessionStorage whenever it changes
+    useEffect(() => {
+        if (accessTokenData) {
+            // Update sessionStorage whenever accessTokenData changes
+            console.log("accessTokenData", accessTokenData);
+            sessionStorage.setItem(
+                "tokenData",
+                JSON.stringify(accessTokenData)
+            );
+
+            // Clear the previous timeout if it exists
+            if (logoutTimerRef.current) {
+                clearTimeout(logoutTimerRef.current);
+            }
+
+            // Calculate the remaining time until the token expires
+            const { issued_at, expires_in } = accessTokenData;
+            const expirationTime = new Date(
+                issued_at * 1000 + expires_in * 1000
+            );
+            const timeUntilExpiration = expirationTime - new Date();
+
+            // Set up the logout timer to log out just before token expires
+            logoutTimerRef.current = setTimeout(
+                () => handleLogout(),
+                timeUntilExpiration - 60000
+            ); // 1 minute before expiry
+        }
+    }, [accessTokenData]);
 
     const login = (professorData, tokenData) => {
         const issuedAt = Math.floor(Date.now() / 1000); // Current time in seconds
@@ -53,7 +89,6 @@ export const AuthProvider = ({ children }) => {
         const expirationTime = new Date(issuedAt * 1000 + expiresIn * 1000);
 
         setProfessor(professorData);
-        console.log("professorData", professorData);
         setAccessTokenData({
             ...tokenData,
             issued_at: issuedAt, // Store issued time
@@ -73,7 +108,7 @@ export const AuthProvider = ({ children }) => {
 
         // Set up the logout timer to log out just before token expires
         const timeUntilExpiration = expirationTime - new Date();
-        setTimeout(() => handleLogout(), timeUntilExpiration - 300000); // 1 minute before expiry
+        setTimeout(() => handleLogout(), timeUntilExpiration - 300000); // 5 minutes before expiry
     };
 
     const handleLogout = async () => {

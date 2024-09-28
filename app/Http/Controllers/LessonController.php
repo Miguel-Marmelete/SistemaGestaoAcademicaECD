@@ -166,21 +166,20 @@ class LessonController extends Controller
     {
         try {
             $lesson = Lesson::find($lessonId);
-            Log::info('lesson', array($lesson));
             
             $validator = Validator::make($request->all(), [
                 'title' => 'sometimes|string|max:255',
                 'type' => 'sometimes|string|in:Teórica,Laboratorial,Teórica-Prática',
                 'summary' => 'sometimes|string',
-                'submodule_id' => 'sometimes|exists:submodules,submodule_id',
-                'course_id' => 'sometimes|exists:courses,course_id',
                 'date' => 'sometimes|date_format:Y-m-d H:00:00',
             ]);
-
+            Log::info($request['title']);
             if ($validator->fails()) {
+                Log::info($validator->errors());
                 return response()->json(['errors' => $validator->errors()], 422);
             }
             $lesson->update($validator->validated());
+        
             return response()->json(['message' => 'Lesson updated successfully', 'lesson' => $lesson], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error($e->getMessage());

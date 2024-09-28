@@ -51,15 +51,12 @@ const EnrollStudents = () => {
     // Fetch enrolled students whenever the selected course changes
     useEffect(() => {
         if (selectedCourse) {
-            fetch(
-                `${endpoints.GET_STUDENTS_BY_COURSE}?course_id=${selectedCourse}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
-            )
+            fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${accessTokenData.access_token}`,
+                },
+            })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error("Failed to fetch enrolled students");

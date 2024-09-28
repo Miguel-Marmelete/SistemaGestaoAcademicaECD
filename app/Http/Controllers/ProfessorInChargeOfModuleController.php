@@ -227,7 +227,7 @@ public function store(Request $request)
                 ->where('course_id', $request->query('course_id'))
                 ->pluck('module_id');
             if($professor->is_coordinator == 1){
-                $moduleIds = ProfessorInChargeOfModule::where('course_id', $request->query('course_id'))
+                $moduleIds = CourseModule::where('course_id', $request->query('course_id'))
                 ->pluck('module_id');            }
             $submodules = Submodule::whereIn('module_id', $moduleIds)->get();
             return response()->json(['submodules' => $submodules], 200);
@@ -319,7 +319,10 @@ public function store(Request $request)
         foreach ($courses as $course) {
             $modules = ProfessorInChargeOfModule::where('course_id', $course->course_id)
                         ->pluck('module_id');
-            
+            if($professor->is_coordinator == 1){
+                $modules = CourseModule::where('course_id', $course->course_id)
+                ->pluck('module_id');
+            }
             // Obtenha detalhes completos dos módulos
             $modulesDetails = Module::whereIn('module_id', $modules)->get();
     

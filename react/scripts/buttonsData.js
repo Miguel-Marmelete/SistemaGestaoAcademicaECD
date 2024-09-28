@@ -32,7 +32,10 @@ export const modulesMenuButtons = [
 export const evaluationMomentsMenuButtons = [
     { name: "Listar Momentos de Avaliação", link: "/evaluationMoments" },
     { name: "Adicionar Momentos de Avaliação", link: "/addEvaluationMoment" },
-    { name: "Editar Momentos de Avaliação", link: "/editEvaluationMoment" },
+    {
+        name: "Avaliar Momentos de Avaliação",
+        link: "/evaluateEvaluationMoments",
+    },
 ];
 
 export const gradesMenuButtons = [

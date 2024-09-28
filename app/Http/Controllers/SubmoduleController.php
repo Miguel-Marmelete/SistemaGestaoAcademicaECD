@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Submodule;
 use App\Models\ProfessorInChargeOfModule;
-
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Course;
@@ -19,30 +19,38 @@ class SubmoduleController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getSubModules()
+    public function getSubModules(Request $request)
     {
         try {
             // Retrieve the authenticated professor
             $professor = JWTAuth::user();
-
-            // Check if the professor is a coordinator
+            $moduleId = $request->query('module_id');
+            Log::info('moduleId: ' . $moduleId);
+    
+            // Define a base query for submodules
+            $submodulesQuery = Submodule::with('module');
+    
             if ($professor->is_coordinator == 1) {
-                // If the professor is a coordinator, return all submodules
-                $submodules = Submodule::with('module')->get();
+                // If the professor is a coordinator, optionally filter by module_id
+                if ($moduleId) {
+                    $submodulesQuery->where('module_id', $moduleId);
+                }
             } else {
-                // If the professor is not a coordinator, return only the submodules of the professor
+                // If the professor is not a coordinator, retrieve only their submodules
                 $moduleIds = ProfessorInChargeOfModule::where('professor_id', $professor->professor_id)
                     ->pluck('module_id');
-                $submodules = Submodule::with('module')
-                    ->whereIn('module_id', $moduleIds)
-                    ->get();
+                $submodulesQuery->whereIn('module_id', $moduleIds);
             }
-
+    
+            // Execute the query
+            $submodules = $submodulesQuery->get();
+    
             return response()->json(['submodules' => $submodules], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while retrieving submodules', 'details' => $e->getMessage()], 500);
         }
     }
+    
 
     /**
      * Store a new submodule.
