@@ -32,6 +32,8 @@ function MenuBar() {
             subItems: [
                 { name: "Lista de Aulas", path: "/lessons" },
                 { name: "Adicionar Aulas", path: "/addLesson" },
+                { name: "Ver Presenças", path: "/attendance" },
+                { name: "Marcar Presenças", path: "/addAttendance" },
             ],
         },
         {

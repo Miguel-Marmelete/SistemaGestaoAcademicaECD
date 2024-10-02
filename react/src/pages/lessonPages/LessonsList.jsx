@@ -224,9 +224,7 @@ const LessonsList = () => {
                                 <th>Course</th>
                                 <th>Date</th>
                                 <th>Professors</th>
-                                {professor.is_coordinator === 1 && (
-                                    <th>Actions</th>
-                                )}
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -283,26 +281,25 @@ const LessonsList = () => {
                                                     .map((prof) => prof.name)
                                                     .join(", ")}
                                             </td>
-                                            {professor.is_coordinator === 1 && (
-                                                <td>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleSave(
-                                                                lesson.lesson_id
-                                                            )
-                                                        }
-                                                    >
-                                                        Save
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            setEditedLesson({})
-                                                        }
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </td>
-                                            )}
+
+                                            <td>
+                                                <button
+                                                    onClick={() =>
+                                                        handleSave(
+                                                            lesson.lesson_id
+                                                        )
+                                                    }
+                                                >
+                                                    Save
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        setEditedLesson({})
+                                                    }
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </td>
                                         </>
                                     ) : (
                                         <>
@@ -361,35 +358,31 @@ const LessonsList = () => {
                                                     .map((prof) => prof.name)
                                                     .join(", ")}
                                             </td>
-                                            {professor.is_coordinator === 1 && (
-                                                <td>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleEditClick(
-                                                                lesson
-                                                            )
-                                                        }
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                lesson.lesson_id
-                                                            )
-                                                        }
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            handlePrint(lesson)
-                                                        }
-                                                    >
-                                                        Print
-                                                    </button>
-                                                </td>
-                                            )}
+                                            <td>
+                                                <button
+                                                    onClick={() =>
+                                                        handleEditClick(lesson)
+                                                    }
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            lesson.lesson_id
+                                                        )
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        handlePrint(lesson)
+                                                    }
+                                                >
+                                                    Print
+                                                </button>
+                                            </td>
                                         </>
                                     )}
                                 </tr>

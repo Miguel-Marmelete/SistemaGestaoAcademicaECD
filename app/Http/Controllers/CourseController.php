@@ -5,15 +5,27 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Course;
+use App\Models\ProfessorInChargeOfModule;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\JwtAuth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 class CourseController extends Controller
 {
      // Método para listar todos os cursos
      public function index()
      {
         try {
-            $courses = Course::all();
+            $professor = JWTAuth::user();
+            if ($professor->is_coordinator == 0) {
+                $courses_ids = ProfessorInChargeOfModule::with('course')
+                    ->where('professor_id', $professor->professor_id)
+                    ->get()
+                    ->pluck('course_id');
+                $courses = Course::whereIn('course_id', $courses_ids)->get();
+
+            }else{
+                $courses = Course::all();
+                
+            }
             return response()->json(['courses' => $courses], 200);
         } catch (\Exception $e) {
             Log::error('Error fetching courses:', ['message' => $e->getMessage()]);

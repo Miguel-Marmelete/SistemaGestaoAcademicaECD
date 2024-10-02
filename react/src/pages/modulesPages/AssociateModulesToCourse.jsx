@@ -37,7 +37,7 @@ const AssociateModulesToCourse = () => {
             })
             .then((data) => {
                 console.log("modules", data.modules);
-                setModules(data.modules);
+                setModules(data.modules.reverse());
             })
             .catch((error) => {
                 console.error("Error fetching modules:", error);
@@ -62,7 +62,7 @@ const AssociateModulesToCourse = () => {
                     return response.json();
                 })
                 .then((data) => {
-                    setModulesInCourse(data.modules);
+                    setModulesInCourse(data.modules.reverse());
                     console.log("modulesInCourse", data.modules);
                 })
                 .catch((error) => {
@@ -124,6 +124,7 @@ const AssociateModulesToCourse = () => {
                 alert("Modules associated with course successfully!");
                 setSelectedCourse("");
                 setSelectedModules([]);
+                setModulesInCourse([]);
             })
             .catch((error) => {
                 console.error("Error:", error);
@@ -163,25 +164,39 @@ const AssociateModulesToCourse = () => {
 
                     <div>
                         <label>Modules</label>
-                        <div className="checkbox-group">
-                            {modules.map((module) => (
-                                <div key={module.module_id}>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="module_ids"
-                                            value={module.module_id}
-                                            checked={selectedModules.includes(
-                                                module.module_id
-                                            )}
-                                            onChange={
-                                                handleModuleCheckboxChange
-                                            }
-                                        />
-                                        {module.name}
-                                    </label>
-                                </div>
-                            ))}
+                        <div className="form-table-responsive">
+                            {modules.length > 0 ? (
+                                <table className="form-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Select</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {modules.map((module) => (
+                                            <tr key={module.module_id}>
+                                                <td>{module.name}</td>
+                                                <td>
+                                                    <input
+                                                        type="checkbox"
+                                                        name="module_ids"
+                                                        value={module.module_id}
+                                                        checked={selectedModules.includes(
+                                                            module.module_id
+                                                        )}
+                                                        onChange={
+                                                            handleModuleCheckboxChange
+                                                        }
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <p>No modules available</p>
+                            )}
                         </div>
                     </div>
 

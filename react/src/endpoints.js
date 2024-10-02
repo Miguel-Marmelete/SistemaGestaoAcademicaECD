@@ -10,6 +10,7 @@ const endpoints = {
     REQUEST_ADMIN_ACCESS: `${API_BASE_URL}/requestAdminAccess`,
 
     // User Management
+    ME: `${API_BASE_URL}/me`,
     GET_PROFESSORS: `${API_BASE_URL}/getAllProfessors`,
     GET_COURSES: `${API_BASE_URL}/getAllCourses`,
     GET_STUDENTS: `${API_BASE_URL}/getStudents`,
@@ -65,6 +66,7 @@ const endpoints = {
     UPDATE_EVALUATION_MOMENT: `${API_BASE_URL}/updateEvaluationMoment`,
     UPDATE_PROFESSOR: `${API_BASE_URL}/updateProfessor`,
     UPDATE_STUDENT: `${API_BASE_URL}/updateStudent`,
+    UPDATE_ATTENDANCE: `${API_BASE_URL}/updateAttendance`,
 };
 
 export default endpoints;

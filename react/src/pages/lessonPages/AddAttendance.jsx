@@ -88,6 +88,7 @@ const AddAttendance = () => {
 
     useEffect(() => {
         if (selectedCourse && selectedSubmodule) {
+            setLoading(true);
             fetch(
                 `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}&submodule_id=${selectedSubmodule}`,
                 {
@@ -106,12 +107,21 @@ const AddAttendance = () => {
                     setLessons(data.lessons);
                 })
                 .catch((error) => {
-                    setError("Failed to fetch lessons: " + error.message);
+                    console.error("Failed to fetch lessons:", error);
+                    alert("Failed to fetch lessons: " + error.message);
+                })
+                .finally(() => {
+                    setLoading(false);
                 });
         } else {
             setLessons([]);
         }
-    }, [selectedCourse, selectedSubmodule]);
+    }, [selectedCourse, selectedSubmodule, accessTokenData.access_token]);
+
+    useEffect(() => {
+        setSelectedSubmodule("");
+        setSelectedLesson("");
+    }, [selectedCourse]);
 
     const handleStudentCheckboxChange = (e) => {
         const { value, checked } = e.target;
@@ -172,6 +182,12 @@ const AddAttendance = () => {
         setSelectedStudents([]);
     };
 
+    const handleCourseChange = (e) => {
+        setSelectedCourse(e.target.value);
+        setSelectedSubmodule("");
+        setSelectedLesson("");
+    };
+
     return (
         <div>
             <ButtonMenu buttons={lessonsMenuButtons} />
@@ -183,7 +199,7 @@ const AddAttendance = () => {
                         <label>Course</label>
                         <select
                             value={selectedCourse}
-                            onChange={(e) => setSelectedCourse(e.target.value)}
+                            onChange={handleCourseChange}
                             required
                         >
                             <option value="" disabled>
@@ -227,11 +243,15 @@ const AddAttendance = () => {
                         <select
                             value={selectedLesson}
                             onChange={(e) => setSelectedLesson(e.target.value)}
-                            disabled={!selectedSubmodule}
+                            disabled={!selectedSubmodule || loading}
                             required
                         >
                             <option value="" disabled>
-                                Select a Lesson
+                                {loading
+                                    ? "Loading lessons..."
+                                    : lessons.length === 0
+                                    ? "No lessons found"
+                                    : "Select a Lesson"}
                             </option>
                             {lessons.map((lesson) => (
                                 <option
@@ -245,25 +265,39 @@ const AddAttendance = () => {
                     </div>
                     <div>
                         <label>Students</label>
-                        <div className="checkbox-group">
+                        <div className="form-table-responsive">
                             {students.length > 0 ? (
-                                students.map((student) => (
-                                    <div key={student.student_id}>
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                value={student.student_id}
-                                                checked={selectedStudents.includes(
-                                                    student.student_id
-                                                )}
-                                                onChange={
-                                                    handleStudentCheckboxChange
-                                                }
-                                            />
-                                            {student.name}
-                                        </label>
-                                    </div>
-                                ))
+                                <table className="form-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Number</th>
+                                            <th>Select</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {students.map((student) => (
+                                            <tr key={student.student_id}>
+                                                <td>{student.name}</td>
+                                                <td>{student.number}</td>
+                                                <td>
+                                                    <input
+                                                        type="checkbox"
+                                                        value={
+                                                            student.student_id
+                                                        }
+                                                        checked={selectedStudents.includes(
+                                                            student.student_id
+                                                        )}
+                                                        onChange={
+                                                            handleStudentCheckboxChange
+                                                        }
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             ) : (
                                 <p>No students available</p>
                             )}

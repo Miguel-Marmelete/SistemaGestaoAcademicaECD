@@ -1,17 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
 const ButtonMenu = ({ buttons }) => {
     const { professor } = useAuth();
+    const [isCoordinator, setIsCoordinator] = useState(false);
+
+    useEffect(() => {
+        if (professor) {
+            setIsCoordinator(professor.is_coordinator === 1);
+        }
+    }, [professor]);
+
+    if (!isCoordinator) {
+        return null; // Return nothing if not a coordinator
+    }
+
     return (
         <div className="button-container">
-            {professor.is_coordinator === 1 &&
-                buttons.map((button, index) => (
-                    <Link key={index} to={button.link}>
-                        <button className="panel-button">{button.name}</button>
-                    </Link>
-                ))}
+            {buttons.map((button, index) => (
+                <Link key={index} to={button.link}>
+                    <button className="panel-button">{button.name}</button>
+                </Link>
+            ))}
         </div>
     );
 };

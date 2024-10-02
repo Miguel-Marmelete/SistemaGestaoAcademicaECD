@@ -9,6 +9,14 @@ const CoursesList = () => {
     const [courses, setCourses] = useState([]);
     const [editedCourse, setEditedCourse] = useState({});
     const { accessTokenData, setAccessTokenData, professor } = useAuth();
+    const [isCoordinator, setIsCoordinator] = useState(false);
+
+    useEffect(() => {
+        if (professor) {
+            setIsCoordinator(professor.is_coordinator === 1);
+        }
+    }, [professor]);
+
     useEffect(() => {
         customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
@@ -85,7 +93,7 @@ const CoursesList = () => {
                         <th>Nome</th>
                         <th>Abreviatura</th>
                         <th>Data de Inicio</th>
-                        {professor.is_coordinator === 1 && <th>Ações</th>}
+                        {isCoordinator && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -117,7 +125,7 @@ const CoursesList = () => {
                                             onChange={handleChange}
                                         />
                                     </td>
-                                    {professor.is_coordinator === 1 && (
+                                    {isCoordinator && (
                                         <td>
                                             <button
                                                 onClick={() =>
@@ -134,7 +142,7 @@ const CoursesList = () => {
                                     <td>{course.name}</td>
                                     <td>{course.abbreviation}</td>
                                     <td>{course.date}</td>
-                                    {professor.is_coordinator === 1 && (
+                                    {isCoordinator && (
                                         <td>
                                             <button
                                                 onClick={() =>

@@ -11,7 +11,7 @@ use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Carbon\Carbon;
 
-class EnsureTokenIsValid
+class RenewTokenMiddleware
 {
     /**
      * Handle an incoming request.

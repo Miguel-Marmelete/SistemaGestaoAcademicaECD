@@ -8,6 +8,13 @@ const ModulesList = () => {
     const [modules, setModules] = useState([]);
     const [editedModule, setEditedModule] = useState({});
     const { accessTokenData, professor } = useAuth();
+    const [isCoordinator, setIsCoordinator] = useState(false);
+
+    useEffect(() => {
+        if (professor) {
+            setIsCoordinator(professor.is_coordinator === 1);
+        }
+    }, [professor]);
 
     // Fetch modules from API
     useEffect(() => {
@@ -105,7 +112,7 @@ const ModulesList = () => {
                             <th>Abreviatura</th>
                             <th>ECTS</th>
                             <th>Horas de Contacto</th>
-                            {professor.is_coordinator === 1 && <th>Ações</th>}
+                            {isCoordinator && <th>Ações</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -149,7 +156,7 @@ const ModulesList = () => {
                                                 onChange={handleChange}
                                             />
                                         </td>
-                                        {professor.is_coordinator === 1 && (
+                                        {isCoordinator === 1 && (
                                             <td>
                                                 <button
                                                     onClick={() =>
@@ -169,7 +176,7 @@ const ModulesList = () => {
                                         <td>{module.abbreviation}</td>
                                         <td>{module.ects}</td>
                                         <td>{module.contact_hours}</td>
-                                        {professor.is_coordinator === 1 && (
+                                        {isCoordinator === 1 && (
                                             <td>
                                                 <button
                                                     onClick={() =>

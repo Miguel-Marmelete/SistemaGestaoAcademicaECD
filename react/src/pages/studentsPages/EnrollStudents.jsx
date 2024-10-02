@@ -157,28 +157,42 @@ const EnrollStudents = () => {
                     </div>
                     <div>
                         <label>Students</label>
-                        <div className="checkbox-group">
+                        <div className="form-table-responsive">
                             {students.length > 0 ? (
-                                students.map((student) => (
-                                    <div key={student.student_id}>
-                                        <input
-                                            type="checkbox"
-                                            id={student.student_id}
-                                            value={student.student_id}
-                                            onChange={() =>
-                                                handleStudentChange(
-                                                    student.student_id
-                                                )
-                                            }
-                                            checked={selectedStudents.includes(
-                                                student.student_id
-                                            )}
-                                        />
-                                        <label htmlFor={student.student_id}>
-                                            {student.name}
-                                        </label>
-                                    </div>
-                                ))
+                                <table className="form-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Number</th>
+                                            <th>Select</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {students.map((student) => (
+                                            <tr key={student.student_id}>
+                                                <td>{student.name}</td>
+                                                <td>{student.number}</td>
+                                                <td>
+                                                    <input
+                                                        type="checkbox"
+                                                        id={student.student_id}
+                                                        value={
+                                                            student.student_id
+                                                        }
+                                                        onChange={() =>
+                                                            handleStudentChange(
+                                                                student.student_id
+                                                            )
+                                                        }
+                                                        checked={selectedStudents.includes(
+                                                            student.student_id
+                                                        )}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             ) : (
                                 <p>No students available</p>
                             )}

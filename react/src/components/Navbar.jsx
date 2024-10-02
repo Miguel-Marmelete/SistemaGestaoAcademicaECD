@@ -4,7 +4,7 @@ import { useAuth } from "../auth/AuthContext.jsx";
 import endpoints from "../endpoints.js";
 import ipbejaLogo from "../assets/ipbejaLogo.png";
 function Navbar() {
-    const { accessTokenData, professor, logout } = useAuth();
+    const { accessTokenData, professor, logout, loading } = useAuth();
 
     const requestAdminAccess = () => {
         fetch(endpoints.REQUEST_ADMIN_ACCESS, {
@@ -83,12 +83,14 @@ function Navbar() {
                     </div>
                 ) : (
                     <div className="auth-buttons">
-                        <Link to={`/Login`}>
-                            <button>Login</button>
-                        </Link>
-                        <Link to={`/SignUp`}>
-                            <button>SignUp</button>
-                        </Link>
+                        <>
+                            <Link to={`/Login`}>
+                                <button>Login</button>
+                            </Link>
+                            <Link to={`/SignUp`}>
+                                <button>SignUp</button>
+                            </Link>
+                        </>
                     </div>
                 )}
             </div>

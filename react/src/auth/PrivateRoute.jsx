@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
 
 const PrivateRoute = ({ children }) => {
-    const { professor, loading } = useAuth(); // Assume loading is managed in the AuthContext
+    const { professor, loading, accessTokenData } = useAuth(); // Assume loading is managed in the AuthContext
     const [isAuthenticating, setIsAuthenticating] = useState(true);
 
     useEffect(() => {
@@ -20,7 +20,7 @@ const PrivateRoute = ({ children }) => {
         return <div>Loading...</div>;
     }
 
-    if (!professor) {
+    if (!professor && !loading && !accessTokenData) {
         alert("Não autenticado. Redirecionando para a página de login.");
         return <Navigate to="/login" />;
     }

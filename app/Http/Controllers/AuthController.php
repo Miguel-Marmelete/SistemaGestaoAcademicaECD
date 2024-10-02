@@ -206,7 +206,7 @@ class AuthController extends Controller
     {
         try {
             // Return the authenticated user
-            return response()->json(JWTAuth::user());
+            return response()->json(['professor' => JWTAuth::user()]);
 
         } catch (\Exception $e) {
             // Log the error and return error response

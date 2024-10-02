@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import endpoints from "../endpoints";
+import customFetch from "../../scripts/customFetch";
 
 const AuthContext = createContext();
 
@@ -14,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     const [professor, setProfessor] = useState(null);
     const [accessTokenData, setAccessTokenData] = useState(null);
     const logoutTimerRef = useRef(null);
+    const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
 
@@ -26,18 +28,15 @@ export const AuthProvider = ({ children }) => {
     // Load authentication state from sessionStorage on initial render
     useEffect(() => {
         const tokenData = JSON.parse(sessionStorage.getItem("tokenData"));
-        const professorData = JSON.parse(
-            sessionStorage.getItem("professorData")
-        );
 
-        if (tokenData && professorData) {
+        if (tokenData) {
             const { issued_at, expires_in } = tokenData;
             if (isTokenExpired(issued_at, expires_in)) {
                 alert("Sessão Expirada, faça o Login novamente.");
                 handleLogout(); // Log out if token is expired
             } else {
                 setAccessTokenData(tokenData); // Initial token data
-                setProfessor(professorData);
+                getProfessor(); // Fetch professor data from server
 
                 // Calculate the remaining time until the token expires
                 const expirationTime = new Date(
@@ -60,6 +59,7 @@ export const AuthProvider = ({ children }) => {
                 "tokenData",
                 JSON.stringify(accessTokenData)
             );
+            getProfessor(); // Fetch professor data from server
 
             // Clear the previous timeout if it exists
             if (logoutTimerRef.current) {
@@ -81,6 +81,17 @@ export const AuthProvider = ({ children }) => {
         }
     }, [accessTokenData]);
 
+    const getProfessor = () => {
+        setLoading(true);
+        customFetch(endpoints.ME, accessTokenData, setAccessTokenData)
+            .then((data) => {
+                console.log(data);
+                setProfessor(data.professor);
+            })
+            .catch((error) => console.error(error))
+            .finally(() => setLoading(false));
+    };
+
     const login = (professorData, tokenData) => {
         const issuedAt = Math.floor(Date.now() / 1000); // Current time in seconds
         const expiresIn = tokenData.expires_in; // Token expiration time in seconds
@@ -88,12 +99,12 @@ export const AuthProvider = ({ children }) => {
         // Calculate expiration timestamp
         const expirationTime = new Date(issuedAt * 1000 + expiresIn * 1000);
 
-        setProfessor(professorData);
         setAccessTokenData({
             ...tokenData,
             issued_at: issuedAt, // Store issued time
             expires_in: expiresIn, // Store expiration duration
         });
+        setProfessor(professorData);
 
         // Store token and professor data in sessionStorage
         sessionStorage.setItem(
@@ -104,7 +115,6 @@ export const AuthProvider = ({ children }) => {
                 expires_in: expiresIn, // Store expiration duration
             })
         );
-        sessionStorage.setItem("professorData", JSON.stringify(professorData));
 
         // Set up the logout timer to log out just before token expires
         const timeUntilExpiration = expirationTime - new Date();
@@ -145,6 +155,7 @@ export const AuthProvider = ({ children }) => {
                 professor,
                 accessTokenData,
                 setAccessTokenData,
+                loading,
                 login,
                 logout,
             }}

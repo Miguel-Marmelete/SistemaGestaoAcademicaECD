@@ -5,7 +5,7 @@ import ButtonMenu from "../../components/ButtonMenu";
 import { lessonsMenuButtons } from "../../../scripts/buttonsData";
 import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 const AddLesson = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, professor } = useAuth();
     const [submodules, setSubmodules] = useState([]);
     const [courses, setCourses] = useState([]);
     const [professors, setProfessors] = useState([]);
@@ -25,6 +25,15 @@ const AddLesson = () => {
         professor_ids: [],
         student_ids: [],
     });
+
+    useEffect(() => {
+        if (professor) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                professor_ids: [professor.professor_id],
+            }));
+        }
+    }, [professor]);
 
     useEffect(() => {
         fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
@@ -354,50 +363,87 @@ const AddLesson = () => {
                     </div>
                     <div>
                         <label>Professors</label>
-                        <div className="checkbox-group">
-                            {professors.map((professor) => (
-                                <div key={professor.professor_id}>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="professor_ids"
-                                            value={professor.professor_id}
-                                            checked={formData.professor_ids.includes(
-                                                professor.professor_id
-                                            )}
-                                            onChange={
-                                                handleProfessorCheckboxChange
-                                            }
-                                        />
-                                        {professor.name}
-                                    </label>
-                                </div>
-                            ))}
+                        <div className="form-table-responsive">
+                            {professors.length > 0 ? (
+                                <table className="form-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Professor ID</th>
+                                            <th>Select</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {professors.map((prof) => (
+                                            <tr key={prof.professor_id}>
+                                                <td>{prof.name}</td>
+                                                <td>{prof.professor_id}</td>
+                                                <td>
+                                                    <input
+                                                        type="checkbox"
+                                                        name="professor_ids"
+                                                        value={
+                                                            prof.professor_id
+                                                        }
+                                                        checked={formData.professor_ids.includes(
+                                                            prof.professor_id
+                                                        )}
+                                                        onChange={
+                                                            handleProfessorCheckboxChange
+                                                        }
+                                                        disabled={
+                                                            prof.professor_id ===
+                                                            professor.professor_id
+                                                        }
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <p>No professors found</p>
+                            )}
                         </div>
                     </div>
+
                     {selectedCourse && (
                         <div>
                             <label>Students</label>
-                            <div className="checkbox-group">
+                            <div className="form-table-responsive">
                                 {students.length > 0 ? (
-                                    students.map((student) => (
-                                        <div key={student.student_id}>
-                                            <label>
-                                                <input
-                                                    type="checkbox"
-                                                    name="student_ids"
-                                                    value={student.student_id}
-                                                    checked={formData.student_ids.includes(
-                                                        student.student_id
-                                                    )}
-                                                    onChange={
-                                                        handleStudentCheckboxChange
-                                                    }
-                                                />
-                                                {student.name}
-                                            </label>
-                                        </div>
-                                    ))
+                                    <table className="form-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Number</th>
+                                                <th>Select</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {students.map((student) => (
+                                                <tr key={student.student_id}>
+                                                    <td>{student.name}</td>
+                                                    <td>{student.number}</td>
+                                                    <td>
+                                                        <input
+                                                            type="checkbox"
+                                                            name="student_ids"
+                                                            value={
+                                                                student.student_id
+                                                            }
+                                                            checked={formData.student_ids.includes(
+                                                                student.student_id
+                                                            )}
+                                                            onChange={
+                                                                handleStudentCheckboxChange
+                                                            }
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 ) : (
                                     <p>No students enrolled in course</p>
                                 )}

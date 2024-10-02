@@ -14,10 +14,10 @@ use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\ProfessorInChargeOfLessonController;
 use App\Http\Controllers\ProfessorInChargeOfModuleController;
-use App\Http\Middleware\EnsureTokenIsValid;
+use App\Http\Middleware\RenewTokenMiddleware;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubmoduleController;
-
+use App\Http\Middleware\CheckCoordinatorMiddleware;
 
 //------------------AUTH ROUTES--------------------------------------
  Route::post('/login', [AuthController::class, 'login']);
@@ -34,19 +34,122 @@ use App\Http\Controllers\SubmoduleController;
 
 
  // Rotas protegidas com o middleware JWT
-Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
+Route::middleware([RenewTokenMiddleware::class, 'auth:api'])->group(function () {
+  Route::middleware([CheckCoordinatorMiddleware::class, 'auth:api'])->group(function () {
+  
 
+    
   //------------------COURSE ROUTES----------------------------------------
-     // Get all course
-     Route::get('/getAllCourses', [CourseController::class, 'index']);
-     // Get a specific course by ID
-     Route::get('/getCourse/{id}', [CourseController::class, 'show']);
      // Create a new course
      Route::post('/addCourses', [CourseController::class, 'store']);
      // Update an existing course by ID
      Route::put('/updateCourse/{id}', [CourseController::class, 'update']);
      // Delete a course by ID
      Route::delete('/deleteCourse/{id}', [CourseController::class, 'destroy']);  
+  //----------------------------------------------------------------------
+
+  //------------------ENROLLMENT ROUTES-------------------------------
+     // Create a new Enrollment
+     Route::post('/enrollStudents', [EnrollmentController::class, 'store']);
+     // Update an existing course by ID
+     Route::put('/updateEnrollment/{student_id}/{course_id}', [EnrollmentController::class, 'update']);
+     // Delete a Enrollment by ID
+     Route::delete('/deleteEnrollment/{student_id}/{course_id}', [EnrollmentController::class, 'destroy']);  
+  //---------------------------------------------------------------------
+
+    //------------------ASSOCIATE MODULES TO COURSE ROUTES-------------------------------
+     // Create a new Enrollment
+     Route::post('/associateModulesToCourse', [CourseModuleController::class, 'store']);
+     // Update an existing course by ID
+     Route::put('/updateModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'update']);
+     // Delete a Enrollment by ID
+     Route::delete('/deleteModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'destroy']);  
+    //---------------------------------------------------------------------
+
+
+    // Create a new module
+    Route::post('/addModules', [ModuleController::class, 'store']);
+    // Update an existing module by ID
+    Route::put('/updateModule/{id}', [ModuleController::class, 'update']);
+    // Delete a module by ID
+    Route::delete('/deleteModule/{id}', [ModuleController::class, 'destroy']);
+  //-----------------------------------------------------------------------
+
+  //------------------PROFESSOR ROUTES--------------------------------------
+    // Create a new Professor
+    Route::post('/createProfessor', [ProfessorController::class, 'store']);
+    // Update an existing Professor by ID
+    Route::put('/updateProfessor/{id}', [ProfessorController::class, 'update']);
+    // Delete a Professor by ID
+    Route::delete('/deleteProfessor/{id}', [ProfessorController::class, 'destroy']);
+  //-----------------------------------------------------------------------
+
+  //------------------PROFESSOR IN CHARGE OF MODULE ROUTES--------------------------------------
+
+    // Create a new ProfessorInChargeOfModule
+    Route::post('/associateProfessorToModule', [ProfessorInChargeOfModuleController::class, 'store']);
+    // Update an existing ProfessorInChargeOfModule by ID
+    Route::put('/updateProfessorInChargeOfModule/{id}', [ProfessorInChargeOfModuleController::class, 'update']);
+    // Delete a ProfessorInChargeOfModule by ID
+    Route::delete('/deleteProfessorInChargeOfModule/{professor_id}/{module_id}/{course_id}', [ProfessorInChargeOfModuleController::class, 'destroy']);
+  //-----------------------------------------------------------------------
+
+
+  //------------------PROFESSOR IN CHARGE OF LESSON ROUTES--------------------------------------
+    // Create a new ProfessorInChargeOfLesson
+    Route::post('/createProfessorInChargeOfLesson', [ProfessorInChargeOfLessonController::class, 'store']);
+    // Update an existing ProfessorInChargeOfLesson by ID
+    Route::put('/updateProfessorInChargeOfLesson/{id}', [ProfessorInChargeOfLessonController::class, 'update']);
+    // Delete a ProfessorInChargeOfLesson by ID
+    Route::delete('/deleteProfessorInChargeOfLesson/{id}', [ProfessorInChargeOfLessonController::class, 'destroy']);
+  //-----------------------------------------------------------------------
+
+  //------------------STUDENT ROUTES--------------------------------------
+    // Get all students
+    Route::post('/createAndEnroll', [StudentController::class, 'createAndEnroll']);
+    // Create a new student
+    Route::post('/addStudents', [StudentController::class, 'store']);
+    // Update an existing student by ID
+    Route::put('/updateStudent/{id}', [StudentController::class, 'update']);
+    // Delete a student by ID
+    Route::delete('/deleteStudent/{id}', [StudentController::class, 'destroy']);
+    // Create a new student and enroll
+    Route::post('/addAndEnrollStudent', [StudentController::class, 'addAndEnrollStudent']);
+  //-----------------------------------------------------------------------
+
+
+  //------------------SUBMODULE ROUTES-----------------------------
+     // Create a new Submodule
+     Route::post('/addSubmodule', [SubmoduleController::class, 'store']);
+     // Update an existing Submodule by ID
+     Route::put('/updateSubmodule/{id}', [SubmoduleController::class, 'update']);
+     // Delete a Submodule by ID
+     Route::delete('/deleteSubmodule/{id}', [SubmoduleController::class, 'destroy']);  
+  //---------------------------------------------------------------------
+
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //------------------COURSE ROUTES----------------------------------------
+     // Get all course
+     Route::get('/getAllCourses', [CourseController::class, 'index']);
+     // Get a specific course by ID
+     Route::get('/getCourse/{id}', [CourseController::class, 'show']);
+
   //----------------------------------------------------------------------
 
 
@@ -58,7 +161,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     // Create a new lesson
     Route::post('/createAttendance', [AttendanceController::class, 'store']);
     // Update an existing lesson by ID
-    Route::put('/updateAttendance/{lesson_id}/{student_id}', [AttendanceController::class, 'update']);
+    Route::put('/updateAttendance/{lesson_id}', [AttendanceController::class, 'update']);
     // Delete a student by ID
     Route::delete('/deleteAttendance/{lesson_id}/{student_id}', [AttendanceController::class, 'destroy']);
   //-----------------------------------------------------------------------
@@ -69,12 +172,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
      Route::get('/getAllEnrollment', [EnrollmentController::class, 'index']);
      // Get a specific Enrollment by ID
      Route::get('/getEnrollment/{student_id}/{course_id}', [EnrollmentController::class, 'show']);
-     // Create a new Enrollment
-     Route::post('/enrollStudents', [EnrollmentController::class, 'store']);
-     // Update an existing course by ID
-     Route::put('/updateEnrollment/{student_id}/{course_id}', [EnrollmentController::class, 'update']);
-     // Delete a Enrollment by ID
-     Route::delete('/deleteEnrollment/{student_id}/{course_id}', [EnrollmentController::class, 'destroy']);  
+
   //---------------------------------------------------------------------
 
     //------------------ASSOCIATE MODULES TO COURSE ROUTES-------------------------------
@@ -85,12 +183,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
 
      // Get a specific module by ID
      Route::get('/getModulesByCourse', [CourseModuleController::class, 'getModulesByCourse']);
-     // Create a new Enrollment
-     Route::post('/associateModulesToCourse', [CourseModuleController::class, 'store']);
-     // Update an existing course by ID
-     Route::put('/updateModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'update']);
-     // Delete a Enrollment by ID
-     Route::delete('/deleteModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'destroy']);  
+
   //---------------------------------------------------------------------
 
   //------------------EVALUATION MOMENT ROUTES-------------------------------
@@ -157,13 +250,6 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getAllModules', [ModuleController::class, 'index']);
     // Get a specific module by ID
     Route::get('/getModule/{id}', [ModuleController::class, 'show']);
-
-    // Create a new module
-    Route::post('/addModules', [ModuleController::class, 'store']);
-    // Update an existing module by ID
-    Route::put('/updateModule/{id}', [ModuleController::class, 'update']);
-    // Delete a module by ID
-    Route::delete('/deleteModule/{id}', [ModuleController::class, 'destroy']);
   //-----------------------------------------------------------------------
 
   //------------------PROFESSOR ROUTES--------------------------------------
@@ -174,12 +260,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     // Confirm admin status
     // Get a specific Professor by ID
     Route::get('/getProfessor/{id}', [ProfessorController::class, 'show']);
-    // Create a new Professor
-    Route::post('/createProfessor', [ProfessorController::class, 'store']);
-    // Update an existing Professor by ID
-    Route::put('/updateProfessor/{id}', [ProfessorController::class, 'update']);
-    // Delete a Professor by ID
-    Route::delete('/deleteProfessor/{id}', [ProfessorController::class, 'destroy']);
+
   //-----------------------------------------------------------------------
 
   //------------------PROFESSOR IN CHARGE OF MODULE ROUTES--------------------------------------
@@ -187,13 +268,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getAllProfessorsInChargeOfModules', [ProfessorInChargeOfModuleController::class, 'index']);
     // Get a specific ProfessorInChargeOfModule by ID
     Route::get('/getProfessorInChargeOfModule/{id}', [ProfessorInChargeOfModuleController::class, 'show']);
-    // Create a new ProfessorInChargeOfModule
-    Route::post('/associateProfessorToModule', [ProfessorInChargeOfModuleController::class, 'store']);
-    // Update an existing ProfessorInChargeOfModule by ID
-    Route::put('/updateProfessorInChargeOfModule/{id}', [ProfessorInChargeOfModuleController::class, 'update']);
-    // Delete a ProfessorInChargeOfModule by ID
-    Route::delete('/deleteProfessorInChargeOfModule/{professor_id}/{module_id}/{course_id}', [ProfessorInChargeOfModuleController::class, 'destroy']);
-    // Get submodules of professor
+   // Get submodules of professor
     Route::get('/getSubmodulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getSubmodulesOfProfessor']);
     Route::get('/getProfessorsInChargeOfModulesByCourse', [ProfessorInChargeOfModuleController::class, 'getProfessorsInChargeOfModulesByCourse']);
     Route::get('/getModulesOfProfessor', [ProfessorInChargeOfModuleController::class, 'getModulesOfProfessor']);
@@ -210,10 +285,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getProfessorInChargeOfLesson/{id}', [ProfessorInChargeOfLessonController::class, 'show']);
     // Create a new ProfessorInChargeOfLesson
     Route::post('/createProfessorInChargeOfLesson', [ProfessorInChargeOfLessonController::class, 'store']);
-    // Update an existing ProfessorInChargeOfLesson by ID
-    Route::put('/updateProfessorInChargeOfLesson/{id}', [ProfessorInChargeOfLessonController::class, 'update']);
-    // Delete a ProfessorInChargeOfLesson by ID
-    Route::delete('/deleteProfessorInChargeOfLesson/{id}', [ProfessorInChargeOfLessonController::class, 'destroy']);
+
   //-----------------------------------------------------------------------
 
   //------------------STUDENT ROUTES--------------------------------------
@@ -225,14 +297,7 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
     Route::get('/getStudentsByCourse', [StudentController::class, 'getStudentsByCourse']);
     // Get a specific student by ID
     Route::get('/getStudent/{id}', [StudentController::class, 'show']);
-    // Create a new student
-    Route::post('/addStudents', [StudentController::class, 'store']);
-    // Update an existing student by ID
-    Route::put('/updateStudent/{id}', [StudentController::class, 'update']);
-    // Delete a student by ID
-    Route::delete('/deleteStudent/{id}', [StudentController::class, 'destroy']);
-    // Create a new student and enroll
-    Route::post('/addAndEnrollStudent', [StudentController::class, 'addAndEnrollStudent']);
+
   //-----------------------------------------------------------------------
 
 
@@ -241,20 +306,8 @@ Route::middleware([EnsureTokenIsValid::class, 'auth:api'])->group(function () {
      Route::get('/getSubModules', [SubmoduleController::class, 'getSubModules']);
      // Get a specific Submodule by ID
      Route::get('/getSubmodule/{id}', [SubmoduleController::class, 'show']);
-     // Create a new Submodule
-     Route::post('/addSubmodule', [SubmoduleController::class, 'store']);
-     // Update an existing Submodule by ID
-     Route::put('/updateSubmodule/{id}', [SubmoduleController::class, 'update']);
-     // Delete a Submodule by ID
-     Route::delete('/deleteSubmodule/{id}', [SubmoduleController::class, 'destroy']);  
      Route::get('/getSubmodulesByCourse/{course_id}', [SubmoduleController::class, 'getSubmodulesByCourse']);
   //---------------------------------------------------------------------
-
-
-
-
-
-
 
 
      Route::post('/logout', [AuthController::class, 'logout']);

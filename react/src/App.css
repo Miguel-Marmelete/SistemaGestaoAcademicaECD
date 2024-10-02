@@ -55,7 +55,8 @@ body {
 .auth-buttons button,
 .admin_panel_button,
 .logout_button,
-.print_button {
+.print_button,
+.request_admin_button {
     background-color: #007bff;
     color: white;
     border: none;
@@ -807,4 +808,63 @@ form small {
     .lesson-table {
         page-break-inside: avoid;
     }
+}
+
+/*------------------FORM TABLE CSS------------------*/
+/* Add styles for the form table */
+.form-table-responsive {
+    max-height: 200px; /* Set maximum height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+.form-table thead {
+    position: sticky;
+    top: 0;
+    background-color: #f8f8f8;
+    z-index: 1;
+}
+
+.form-table th,
+.form-table td {
+    padding: 12px 15px;
+    border: 3px solid #000000;
+    text-align: left;
+}
+
+.form-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-table tr:hover {
+    background-color: #777272;
+}
+
+/* Add styles for checkboxes */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.checkbox-group div {
+    margin-right: 15px;
+    margin-bottom: 10px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 8px;
 }

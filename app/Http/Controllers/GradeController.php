@@ -35,7 +35,7 @@ class GradeController extends Controller
             $validator = Validator::make($request->all(), [
                 'module_id' => 'required|exists:modules,module_id',
                 'student_id' => 'required|exists:students,student_id',
-                'grade_value' => 'required|integer|min:0|max:100', // Assuming grade values are between 0 and 100
+                'grade_value' => 'required|integer|min:0|max:20', 
             ]);
 
             if ($validator->fails()) {

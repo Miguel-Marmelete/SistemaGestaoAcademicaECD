@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Log;
-use App\Models\Student; // Assuming Student model is defined in App\Models
+use App\Models\Student; 
 use App\Models\Lesson;
 use App\Models\Enrollment;
 
@@ -90,43 +90,47 @@ class AttendanceController extends Controller
     }
 
     /**
- * Update the specified attendance record.
- *
- * @param  \Illuminate\Http\Request  $request
- * @param  int  $lesson_id
- * @param  int  $student_id
- * @return \Illuminate\Http\JsonResponse
- */
-public function update(Request $request, $lesson_id, $student_id)
-{
-    try {
-        // First, check if the attendance record exists
-        $attendance = Attendance::where('lesson_id', $lesson_id)
-            ->where('student_id', $student_id)
-            ->first();
+     * Update the specified attendance record.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $lesson_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $lesson_id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'studentsPresent' => 'required|array',
+                'studentsPresent.*' => 'required|exists:students,student_id',
+                'lesson_id' => 'required|exists:lessons,lesson_id',
+            ]);
 
-        if (!$attendance) {
-            return response()->json(['error' => 'Attendance record not found'], 404);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $studentsPresentIds = $request->input('studentsPresent');
+            Log::info('Request: ' . json_encode($request->all()));
+
+            // Delete existing attendance records for the lesson
+            Attendance::where('lesson_id', $lesson_id)->delete();
+
+            // Create new attendance records
+            $attendances = [];
+            foreach ($studentsPresentIds as $student_id) {
+                $attendance = Attendance::create([
+                    'lesson_id' => $lesson_id,
+                    'student_id' => $student_id,
+                ]);
+                $attendances[] = $attendance;
+            }
+
+            return response()->json(['message' => 'Attendance updated successfully', 'attendances' => $attendances], 200);
+        } catch (\Exception $e) {
+            Log::error('An error occurred while updating the attendance record: ' . json_encode($e->getMessage()));
+            return response()->json(['error' => 'An error occurred while updating the attendance record', 'details' => $e->getMessage()], 500);
         }
-
-        // Validate the incoming request data
-        $validator = Validator::make($request->all(), [
-            'lesson_id' => 'required|exists:lessons,lesson_id',
-            'student_id' => 'required|exists:students,student_id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        // Update the attendance record with the validated data
-        $attendance->update($validator->validated());
-
-        return response()->json(['message' => 'Attendance record updated successfully', 'attendance' => $attendance], 200);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'An error occurred while updating the attendance record', 'details' => $e->getMessage()], 500);
     }
-}
 
     /**
      * Remove the specified attendance record.
