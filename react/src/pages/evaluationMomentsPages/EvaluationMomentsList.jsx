@@ -3,6 +3,9 @@ import { useAuth } from "../../auth/AuthContext";
 import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { evaluationMomentsMenuButtons } from "../../../scripts/buttonsData";
+import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
+import customFetch from "../../../scripts/customFetch";
+
 const EvaluationMomentsList = () => {
     const [evaluationMoments, setEvaluationMoments] = useState([]);
     const [courses, setCourses] = useState([]);
@@ -12,91 +15,72 @@ const EvaluationMomentsList = () => {
     const [selectedModule, setSelectedModule] = useState("");
     const [selectedSubmodule, setSelectedSubmodule] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
 
     useEffect(() => {
-        fetch(endpoints.GET_PROFESSOR_EVALUATION_MOMENTS, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch evaluation moments");
-                }
-                return response.json();
-            })
+        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
             .then((data) => {
-                const evaluationMoments = data.evaluationMoments;
-                setEvaluationMoments(evaluationMoments);
-
-                // Extract unique courses, modules, and submodules from the evaluation moments
-                const uniqueCourses = [
-                    ...new Set(
-                        evaluationMoments.map(
-                            (moment) => moment.course.course_id
-                        )
-                    ),
-                ].map(
-                    (id) =>
-                        evaluationMoments.find(
-                            (moment) => moment.course.course_id === id
-                        ).course
-                );
-
-                const uniqueModules = [
-                    ...new Set(
-                        evaluationMoments.map(
-                            (moment) => moment.module.module_id
-                        )
-                    ),
-                ].map(
-                    (id) =>
-                        evaluationMoments.find(
-                            (moment) => moment.module.module_id === id
-                        ).module
-                );
-
-                const uniqueSubmodules = [
-                    ...new Set(
-                        evaluationMoments
-                            .map(
-                                (moment) =>
-                                    moment.submodule &&
-                                    moment.submodule.submodule_id
-                            )
-                            .filter((submodule) => submodule)
-                    ),
-                ].map(
-                    (id) =>
-                        evaluationMoments.find(
-                            (moment) =>
-                                moment.submodule &&
-                                moment.submodule.submodule_id === id
-                        ).submodule
-                );
-
-                setCourses(uniqueCourses);
-                setModules(uniqueModules);
-                setSubmodules(uniqueSubmodules);
+                setCourses(data.courses);
+                setModules(data.modules);
             })
             .catch((error) => {
-                setErrorMessage(error.message);
+                setErrorMessage(
+                    "Failed to fetch courses and modules: " + error.message
+                );
             });
     }, [accessTokenData.access_token]);
 
-    const filteredEvaluationMoments = evaluationMoments.filter(
-        (moment) =>
-            (!selectedCourse ||
-                moment.course.course_id.toString() === selectedCourse) &&
-            (!selectedModule ||
-                moment.module.module_id.toString() === selectedModule) &&
-            (!selectedSubmodule ||
-                (moment.submodule &&
-                    moment.submodule.submodule_id.toString() ===
-                        selectedSubmodule))
-    );
+    useEffect(() => {
+        if (selectedModule) {
+            fetch(
+                `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?module_id=${selectedModule}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                }
+            )
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch submodules");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    setSubmodules(data.submodules);
+                })
+                .catch((error) => {
+                    setErrorMessage(
+                        "Failed to load submodules: " + error.message
+                    );
+                });
+        } else {
+            setSubmodules([]);
+        }
+    }, [selectedModule, accessTokenData.access_token]);
+
+    useEffect(() => {
+        if (selectedCourse) {
+            customFetch(
+                `${endpoints.GET_EVALUATION_MOMENTS_OF_PROFESSOR}?course_id=${selectedCourse}&module_id=${selectedModule}&submodule_id=${selectedSubmodule}`,
+                accessTokenData,
+                setAccessTokenData
+            )
+                .then((data) => {
+                    setEvaluationMoments(data.evaluationMoments);
+                })
+                .catch((error) => {
+                    setErrorMessage(
+                        "Failed to load evaluation moments: " + error.message
+                    );
+                });
+        }
+    }, [
+        selectedCourse,
+        selectedModule,
+        selectedSubmodule,
+        accessTokenData.access_token,
+    ]);
 
     return (
         <div>
@@ -117,20 +101,19 @@ const EvaluationMomentsList = () => {
                             value={selectedCourse}
                             onChange={(e) => {
                                 setSelectedCourse(e.target.value);
-                                setSelectedModule(""); // Reset module when selecting a new course
-                                setSelectedSubmodule(""); // Reset submodule
+                                setSelectedModule("");
+                                setSelectedSubmodule("");
                             }}
                         >
                             <option value="">Todos os Cursos</option>
-                            {courses.length > 0 &&
-                                courses.map((course) => (
-                                    <option
-                                        key={course.course_id}
-                                        value={course.course_id}
-                                    >
-                                        {course.name}
-                                    </option>
-                                ))}
+                            {courses.map((course) => (
+                                <option
+                                    key={course.course_id}
+                                    value={course.course_id}
+                                >
+                                    {course.name}
+                                </option>
+                            ))}
                         </select>
                     </label>
 
@@ -138,11 +121,21 @@ const EvaluationMomentsList = () => {
                         Módulo:
                         <select
                             value={selectedModule}
-                            onChange={(e) => setSelectedModule(e.target.value)}
+                            onChange={(e) => {
+                                setSelectedModule(e.target.value);
+                                setSelectedSubmodule("");
+                            }}
+                            disabled={!selectedCourse}
                         >
                             <option value="">Todos os Módulos</option>
-                            {modules.length > 0 &&
-                                modules.map((module) => (
+                            {modules
+                                .filter(
+                                    (module) =>
+                                        !selectedCourse ||
+                                        module.course_id ===
+                                            parseInt(selectedCourse)
+                                )
+                                .map((module) => (
                                     <option
                                         key={module.module_id}
                                         value={module.module_id}
@@ -160,17 +153,17 @@ const EvaluationMomentsList = () => {
                             onChange={(e) =>
                                 setSelectedSubmodule(e.target.value)
                             }
+                            disabled={!selectedModule}
                         >
                             <option value="">Todos os Submódulos</option>
-                            {submodules.length > 0 &&
-                                submodules.map((submodule) => (
-                                    <option
-                                        key={submodule.submodule_id}
-                                        value={submodule.submodule_id}
-                                    >
-                                        {submodule.name}
-                                    </option>
-                                ))}
+                            {submodules.map((submodule) => (
+                                <option
+                                    key={submodule.submodule_id}
+                                    value={submodule.submodule_id}
+                                >
+                                    {submodule.name}
+                                </option>
+                            ))}
                         </select>
                     </label>
                 </div>
@@ -188,8 +181,8 @@ const EvaluationMomentsList = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredEvaluationMoments.length > 0 ? (
-                                filteredEvaluationMoments.map((moment) => (
+                            {evaluationMoments.length > 0 ? (
+                                evaluationMoments.map((moment) => (
                                     <tr key={moment.evaluation_moment_id}>
                                         <td>{moment.type}</td>
                                         <td>{moment.course.name}</td>

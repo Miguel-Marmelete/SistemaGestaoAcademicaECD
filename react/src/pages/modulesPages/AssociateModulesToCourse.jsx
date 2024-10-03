@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
-import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
+import customFetch from "../../../scripts/customFetch";
 
 const AssociateModulesToCourse = () => {
     const [courses, setCourses] = useState([]);
@@ -12,11 +12,15 @@ const AssociateModulesToCourse = () => {
     const [selectedCourse, setSelectedCourse] = useState("");
     const [selectedModules, setSelectedModules] = useState([]);
     const [loading, setLoading] = useState(false);
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
 
     // Fetch courses from API
     useEffect(() => {
-        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+        customFetch(
+            endpoints.GET_COURSES_AND_MODULES_OF_PROFESSOR,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
@@ -24,50 +28,27 @@ const AssociateModulesToCourse = () => {
                 alert(error);
             });
 
-        fetch(`${endpoints.GET_MODULES}?course_id=${selectedCourse}`, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch modules");
-                }
-                return response.json();
-            })
+        customFetch(endpoints.GET_MODULES, accessTokenData, setAccessTokenData)
             .then((data) => {
-                console.log("modules", data.modules);
                 setModules(data.modules.reverse());
             })
             .catch((error) => {
-                console.error("Error fetching modules:", error);
-                alert("Failed to load modules.");
+                alert(error);
             });
     }, []);
 
     useEffect(() => {
         if (selectedCourse) {
-            fetch(
+            customFetch(
                 `${endpoints.GET_MODULES_BY_COURSE}?course_id=${selectedCourse}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch modules");
-                    }
-                    return response.json();
-                })
                 .then((data) => {
                     setModulesInCourse(data.modules.reverse());
-                    console.log("modulesInCourse", data.modules);
                 })
                 .catch((error) => {
-                    console.error("Error fetching modules:", error);
-                    alert("Failed to load modules.");
+                    alert(error);
                 });
         }
     }, [selectedCourse]);
@@ -106,22 +87,15 @@ const AssociateModulesToCourse = () => {
             module_ids: selectedModules,
         };
 
-        fetch(endpoints.ASSOCIATE_MODULES_TO_COURSE, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(associationData),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to associate modules with course");
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.ASSOCIATE_MODULES_TO_COURSE,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            associationData
+        )
             .then(() => {
-                alert("Modules associated with course successfully!");
+                alert("Módulos associados ao curso com sucesso!");
                 setSelectedCourse("");
                 setSelectedModules([]);
                 setModulesInCourse([]);
@@ -138,10 +112,10 @@ const AssociateModulesToCourse = () => {
             <ButtonMenu buttons={modulesMenuButtons} />
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
-                    <h2>Associate Modules with Course</h2>
+                    <h2>Associar Módulos ao Curso</h2>
 
                     <div>
-                        <label>Select Course</label>
+                        <label>Selecione um Curso</label>
                         <select
                             name="course"
                             value={selectedCourse}
@@ -149,7 +123,7 @@ const AssociateModulesToCourse = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a course
+                                Selecione um Curso
                             </option>
                             {courses.map((course) => (
                                 <option
@@ -163,14 +137,14 @@ const AssociateModulesToCourse = () => {
                     </div>
 
                     <div>
-                        <label>Modules</label>
+                        <label>Módulos</label>
                         <div className="form-table-responsive">
                             {modules.length > 0 ? (
                                 <table className="form-table">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Select</th>
+                                            <th>Nome</th>
+                                            <th>Selecione</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -195,22 +169,35 @@ const AssociateModulesToCourse = () => {
                                     </tbody>
                                 </table>
                             ) : (
-                                <p>No modules available</p>
+                                <p>Não há módulos disponíveis</p>
                             )}
                         </div>
                     </div>
 
                     <button type="submit" disabled={loading}>
-                        {loading ? "Submitting..." : "Submit"}
+                        {loading ? "A submeter..." : "Submeter"}
                     </button>
                 </form>
                 <div className="list">
-                    <h2>Modules for Selected Course</h2>
-                    <ul>
-                        {modulesInCourse.map((module) => (
-                            <li key={module.module_id}>{module.name}</li>
-                        ))}
-                    </ul>
+                    <h2>Módulos Associados ao Curso </h2>
+                    {modulesInCourse.length > 0 ? (
+                        <table className="form-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {modulesInCourse.map((module) => (
+                                    <tr key={module.module_id}>
+                                        <td>{module.name}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>Não há módulos associados a este curso</p>
+                    )}
                 </div>
             </div>
         </div>

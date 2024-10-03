@@ -3,8 +3,10 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
+import customFetch from "../../../scripts/customFetch";
+
 const AddModule = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [loading, setLoading] = useState(false);
     const [modules, setModules] = useState([]); // State for fetched modules
     const [moduleAdded, setModuleAdded] = useState(false); // State to track if a module was added
@@ -17,18 +19,7 @@ const AddModule = () => {
     });
 
     useEffect(() => {
-        fetch(endpoints.GET_MODULES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch modules");
-                }
-                return response.json();
-            })
+        customFetch(endpoints.GET_MODULES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setModules(data.modules.reverse());
             })
@@ -53,21 +44,13 @@ const AddModule = () => {
 
         setLoading(true);
 
-        fetch(endpoints.ADD_MODULES, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(formData),
-        })
-            .then(async (response) => {
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "Failed to add module");
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.ADD_MODULES,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            formData
+        )
             .then(() => {
                 alert("Module added successfully!");
                 // Reset form
@@ -139,19 +122,28 @@ const AddModule = () => {
                         />
                     </div>
                     <button type="submit" disabled={loading}>
-                        {loading ? "Submitting..." : "Submit"}
+                        {loading ? "A submeter..." : "Submeter"}
                     </button>
                 </form>
 
                 <div className="list">
-                    <h2>Existing Modules</h2>
-                    <ul>
-                        {modules.map((module) => (
-                            <li key={module.module_id}>
-                                {module.name} - {module.abbreviation}
-                            </li>
-                        ))}
-                    </ul>
+                    <h2>Módulos Existentes</h2>
+                    <table className="form-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Abreviatura</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {modules.map((module) => (
+                                <tr key={module.module_id}>
+                                    <td>{module.name}</td>
+                                    <td>{module.abbreviation}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

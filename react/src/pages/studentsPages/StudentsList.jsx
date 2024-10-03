@@ -166,6 +166,7 @@ const StudentsList = () => {
                             <th>Nome</th>
                             <th>Número</th>
                             <th>Email</th>
+                            <th>Telefone</th> {/* New column */}
                             {professor.is_coordinator === 1 && <th>Ações</th>}
                         </tr>
                     </thead>
@@ -204,6 +205,16 @@ const StudentsList = () => {
                                                 onChange={handleChange}
                                             />
                                         </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="phone"
+                                                value={
+                                                    editedStudent.phone || ""
+                                                }
+                                                onChange={handleChange}
+                                            />
+                                        </td>
                                         {professor.is_coordinator === 1 && (
                                             <td>
                                                 <button
@@ -223,6 +234,8 @@ const StudentsList = () => {
                                         <td>{student.name}</td>
                                         <td>{student.number}</td>
                                         <td>{student.personal_email}</td>
+                                        <td>{student.mobile}</td>{" "}
+                                        {/* New column */}
                                         {professor.is_coordinator === 1 && (
                                             <td>
                                                 <button

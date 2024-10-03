@@ -19,7 +19,7 @@ const endpoints = {
     GET_SUBMODULES: `${API_BASE_URL}/getSubModules`,
     GET_LESSONS: `${API_BASE_URL}/getAllLessons`,
     GET_LESSON_BY_ID: `${API_BASE_URL}/getLessonById`,
-    GET_EVALUATION_MOMENTS: `${API_BASE_URL}/getAllEvaluationMoments`,
+    GET_EVALUATION_MOMENTS_OF_PROFESSOR: `${API_BASE_URL}/getEvaluationMomentsOfProfessor`,
     GET_PROFESSORS_IN_CHARGE_OF_MODULES: `${API_BASE_URL}/getAllProfessorsInChargeOfModules`,
     GET_SUBMODULES_BY_COURSE: `${API_BASE_URL}/getSubmodulesByCourse`,
     GET_LESSONS_OF_SUBMODULE: `${API_BASE_URL}/getLessonsOfSubmodule`,

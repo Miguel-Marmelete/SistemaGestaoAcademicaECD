@@ -3,25 +3,27 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
+import customFetch from "../../../scripts/customFetch";
 
 const SubModulesList = () => {
     const [subModules, setSubModules] = useState([]);
     const [editedSubModule, setEditedSubModule] = useState({});
-    const { accessTokenData, professor } = useAuth();
+    const { accessTokenData, setAccessTokenData, professor } = useAuth();
+    const [isCoordinator, setIsCoordinator] = useState(false);
+
+    useEffect(() => {
+        if (professor) {
+            setIsCoordinator(professor.is_coordinator === 1);
+        }
+    }, [professor]);
 
     // Fetch submodules from API
     useEffect(() => {
-        fetch(endpoints.GET_SUBMODULES, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch submodules");
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.GET_SUBMODULES,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
                 console.log(data);
                 setSubModules(data.submodules.reverse());
@@ -38,16 +40,13 @@ const SubModulesList = () => {
         ) {
             return;
         }
-        fetch(endpoints.DELETE_SUBMODULE + `/${subModuleId}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to delete submodule");
-                }
+        customFetch(
+            endpoints.DELETE_SUBMODULE + `/${subModuleId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "DELETE"
+        )
+            .then(() => {
                 setSubModules((prevSubModules) =>
                     prevSubModules.filter(
                         (subModule) => subModule.submodule_id !== subModuleId
@@ -76,20 +75,13 @@ const SubModulesList = () => {
             return;
         }
 
-        fetch(endpoints.UPDATE_SUBMODULE + `/${subModuleId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(editedSubModule),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to update submodule");
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.UPDATE_SUBMODULE + `/${subModuleId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "PUT",
+            editedSubModule
+        )
             .then(() => {
                 setSubModules((prevSubModules) =>
                     prevSubModules.map((subModule) =>
@@ -99,7 +91,7 @@ const SubModulesList = () => {
                     )
                 );
                 setEditedSubModule({});
-                alert("Submodule updated successfully");
+                alert("Submódulo atualizado com sucesso");
             })
             .catch((error) => {
                 alert(error.message);
@@ -120,7 +112,7 @@ const SubModulesList = () => {
                             <th>Abreviatura</th>
                             <th>Horas de Contacto</th>
                             <th>Módulo Principal</th>
-                            {professor.is_coordinator === 1 && <th>Ações</th>}
+                            {isCoordinator && <th>Ações</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -158,7 +150,7 @@ const SubModulesList = () => {
                                             />
                                         </td>
                                         <td>{subModule.module.name}</td>
-                                        {professor.is_coordinator === 1 && (
+                                        {isCoordinator && (
                                             <td>
                                                 <button
                                                     onClick={() =>
@@ -178,7 +170,7 @@ const SubModulesList = () => {
                                         <td>{subModule.abbreviation}</td>
                                         <td>{subModule.contact_hours}</td>
                                         <td>{subModule.module.name}</td>
-                                        {professor.is_coordinator === 1 && (
+                                        {isCoordinator && (
                                             <td>
                                                 <button
                                                     onClick={() =>

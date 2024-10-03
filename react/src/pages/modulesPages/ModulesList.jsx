@@ -3,11 +3,11 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
-import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesAndModulesOfProfessor";
+import customFetch from "../../../scripts/customFetch";
 const ModulesList = () => {
     const [modules, setModules] = useState([]);
     const [editedModule, setEditedModule] = useState({});
-    const { accessTokenData, professor } = useAuth();
+    const { accessTokenData, setAccessTokenData, professor } = useAuth();
     const [isCoordinator, setIsCoordinator] = useState(false);
 
     useEffect(() => {
@@ -18,7 +18,11 @@ const ModulesList = () => {
 
     // Fetch modules from API
     useEffect(() => {
-        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+        customFetch(
+            endpoints.GET_COURSES_AND_MODULES_OF_PROFESSOR,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
                 console.log(data.modules);
                 setModules(data.modules.reverse());
@@ -32,26 +36,17 @@ const ModulesList = () => {
         if (!window.confirm("Are you sure you want to delete this module?")) {
             return;
         }
-        fetch(endpoints.DELETE_MODULE + `/${moduleId}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to delete module");
-                }
-                setModules((prevModules) =>
-                    prevModules.filter(
-                        (module) => module.module_id !== moduleId
-                    )
-                );
-                alert("Module deleted successfully");
-            })
-            .catch((error) => {
-                alert(error.message);
-            });
+        customFetch(
+            endpoints.DELETE_MODULE + `/${moduleId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "DELETE"
+        ).then(() => {
+            setModules((prevModules) =>
+                prevModules.filter((module) => module.module_id !== moduleId)
+            );
+            alert("Módulo apagado com sucesso");
+        });
     };
 
     const handleEditClick = (module) => {
@@ -64,24 +59,19 @@ const ModulesList = () => {
     };
 
     const handleSave = (moduleId) => {
-        if (!window.confirm("Are you sure you want to update this module?")) {
+        if (
+            !window.confirm("Tem a certeza que deseja atualizar este módulo?")
+        ) {
             return;
         }
 
-        fetch(endpoints.UPDATE_MODULE + `/${moduleId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(editedModule),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to update module");
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.UPDATE_MODULE + `/${moduleId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "PUT",
+            editedModule
+        )
             .then(() => {
                 setModules((prevModules) =>
                     prevModules.map((module) =>
@@ -91,7 +81,7 @@ const ModulesList = () => {
                     )
                 );
                 setEditedModule({});
-                alert("Module updated successfully");
+                alert("Módulo atualizado com sucesso");
             })
             .catch((error) => {
                 alert(error.message);
@@ -156,7 +146,7 @@ const ModulesList = () => {
                                                 onChange={handleChange}
                                             />
                                         </td>
-                                        {isCoordinator === 1 && (
+                                        {isCoordinator && (
                                             <td>
                                                 <button
                                                     onClick={() =>
@@ -176,7 +166,7 @@ const ModulesList = () => {
                                         <td>{module.abbreviation}</td>
                                         <td>{module.ects}</td>
                                         <td>{module.contact_hours}</td>
-                                        {isCoordinator === 1 && (
+                                        {isCoordinator && (
                                             <td>
                                                 <button
                                                     onClick={() =>

@@ -325,13 +325,23 @@ const AddStudents = () => {
 
                 <div className="list">
                     <h2>Existing Students</h2>
-                    <ul>
-                        {students.map((student) => (
-                            <li key={student.student_id}>
-                                {student.name} - {student.number}
-                            </li>
-                        ))}
-                    </ul>
+
+                    <table className="form-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {students.map((student) => (
+                                <tr key={student.student_id}>
+                                    <td>{student.name}</td>
+                                    <td>{student.number}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

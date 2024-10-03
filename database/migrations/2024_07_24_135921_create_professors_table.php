@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('professors', function (Blueprint $table) {
             $table->id('professor_id');
             $table->string('name');
-            $table->integer('cc')->nullable();
-            $table->date('cc_expire_date')->nullable();
-            $table->integer('mobile')->nullable();
-            $table->string('email');
+            $table->integer('cc')->unique();
+            $table->date('cc_expire_date');
+            $table->integer('mobile')->unique();
+            $table->string('email')->unique();
             $table->boolean('is_coordinator')->default(false);
             $table->string('password');
             $table->string('profile_picture')->nullable();

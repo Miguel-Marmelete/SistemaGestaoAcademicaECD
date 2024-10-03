@@ -15,7 +15,10 @@ export const lessonsMenuButtons = [
 ];
 export const modulesMenuButtons = [
     { name: "Listar Módulos", link: "/modules" },
+    { name: "Listar Submódulos", link: "/subModules" },
     { name: "Adicionar Módulos", link: "/addModule" },
+    { name: "Adicionar Submódulos", link: "/addSubmodule" },
+    { name: "Associar Módulos a Curso", link: "/associateModulesToCourse" },
     {
         name: "Atribuir Módulo a Professor",
         link: "/associateProfessorToModule",
@@ -24,9 +27,6 @@ export const modulesMenuButtons = [
         name: "Prof. Encarregues de Módulos",
         link: "/professorsInChargeOfModules",
     },
-    { name: "Listar Submódulos", link: "/subModules" },
-    { name: "Adicionar Submódulos", link: "/addSubmodule" },
-    { name: "Associar Módulos a Curso", link: "/associateModulesToCourse" },
 ];
 
 export const evaluationMomentsMenuButtons = [

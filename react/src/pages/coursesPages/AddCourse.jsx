@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
@@ -17,6 +17,7 @@ const AddCourse = () => {
         schedule: "",
     });
     const [editedCourse, setEditedCourse] = useState({});
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
@@ -100,14 +101,64 @@ const AddCourse = () => {
             });
     };
 
+    const handleCSVUpload = (e) => {
+        e.preventDefault();
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            console.log(file);
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const csvData = event.target.result;
+                processAndUploadCSV(csvData);
+            };
+            reader.readAsText(file);
+        }
+    };
+
+    const processAndUploadCSV = (csvData) => {
+        const rows = csvData.split("\n").map((row) => row.split(","));
+        const courses = rows.slice(1).map((row) => ({
+            name: row[0],
+            abbreviation: row[1],
+            date: row[2],
+            schedule: row[3] || "",
+        }));
+        console.log(courses);
+        /*
+        setLoading(true);
+        customFetch(
+            endpoints.ADD_MULTIPLE_COURSES,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            { courses }
+        )
+            .then(() => {
+                alert("Courses added successfully!");
+                setCourseAdded((prev) => !prev);
+            })
+            .catch((error) => {
+                console.error("Error:", error.message);
+                alert(error.message);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+*/
+    };
+
     return (
         <div>
             <ButtonMenu buttons={coursesMenuButtons} />
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
-                    <h2>Add Course</h2>
+                    <h2>Adicionar Curso</h2>
                     <div>
-                        <label>Course Name</label>
+                        <label>Nome do Curso</label>
                         <input
                             type="text"
                             name="name"
@@ -118,7 +169,7 @@ const AddCourse = () => {
                         />
                     </div>
                     <div>
-                        <label>Abbreviation</label>
+                        <label>Abreviatura</label>
                         <input
                             type="text"
                             name="abbreviation"
@@ -129,7 +180,7 @@ const AddCourse = () => {
                         />
                     </div>
                     <div>
-                        <label>Start Date</label>
+                        <label>Data de Início</label>
                         <input
                             type="date"
                             name="date"
@@ -140,14 +191,14 @@ const AddCourse = () => {
                     </div>
                     <div>
                         <label>
-                            Schedule
+                            Horário
                             <small
                                 style={{
                                     fontSize: "0.6rem",
                                     paddingLeft: "5px",
                                 }}
                             >
-                                (Optional)
+                                (Opcional)
                             </small>
                         </label>
                         <input
@@ -158,22 +209,41 @@ const AddCourse = () => {
                             maxLength={255}
                         />
                     </div>
-                    <button type="submit" disabled={loading}>
-                        {loading ? "Submitting..." : "Submit"}
-                    </button>
+                    <div className="button-group">
+                        <button type="submit" disabled={loading}>
+                            {loading ? "A submeter..." : "Submeter"}
+                        </button>
+                        <button onClick={handleCSVUpload} disabled={loading}>
+                            Upload CSV
+                        </button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: "none" }}
+                            onChange={handleFileChange}
+                            accept=".csv"
+                        />
+                    </div>
                 </form>
 
                 <div className="list">
                     <h2>Existing Courses</h2>
-                    <ul>
-                        {courses.map((course) => (
-                            <li key={course.course_id}>
-                                <>
-                                    {course.name} - {course.abbreviation}
-                                </>
-                            </li>
-                        ))}
-                    </ul>
+                    <table className="form-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Abbreviation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {courses.map((course) => (
+                                <tr key={course.course_id}>
+                                    <td>{course.name}</td>
+                                    <td>{course.abbreviation}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

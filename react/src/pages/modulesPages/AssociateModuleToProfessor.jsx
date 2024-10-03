@@ -4,9 +4,10 @@ import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
 import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
+import customFetch from "../../../scripts/customFetch";
 
 const AssociateProfessorToModule = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [modules, setModules] = useState([]);
     const [professors, setProfessors] = useState([]);
     const [courses, setCourses] = useState([]);
@@ -18,19 +19,21 @@ const AssociateProfessorToModule = () => {
 
     // Fetch professors and courses only once when component mounts
     useEffect(() => {
-        fetch(endpoints.GET_PROFESSORS, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
+        customFetch(
+            endpoints.GET_PROFESSORS,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => setProfessors(data.professors))
             .catch((error) =>
                 alert("Failed to fetch professors: " + error.message)
-            )
-            .finally(() => {});
+            );
 
-        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+        customFetch(
+            endpoints.GET_COURSES_AND_MODULES_OF_PROFESSOR,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
@@ -42,31 +45,22 @@ const AssociateProfessorToModule = () => {
     // Fetch modules and professors-and-modules when a course is selected
     useEffect(() => {
         if (selectedCourse) {
-            fetch(
+            customFetch(
                 `${endpoints.GET_MODULES_BY_COURSE}?course_id=${selectedCourse}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => response.json())
                 .then((data) => setModules(data.modules.reverse()))
                 .catch((error) =>
-                    alert("Failed to fetch modules: " + error.message)
-                )
-                .finally(() => {});
+                    alert("Erro ao procurar módulos: " + error.message)
+                );
 
             // Fetch professors and modules by course (new fetch)
-            fetch(
+            customFetch(
                 `${endpoints.GET_PROFESSORS_IN_CHARGE_OF_MODULES_BY_COURSE}?course_id=${selectedCourse}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => response.json())
                 .then((data) =>
                     setProfessorsAndModules(data.professorsAndModules)
                 )
@@ -75,18 +69,14 @@ const AssociateProfessorToModule = () => {
                         "Failed to fetch professors and modules: " +
                             error.message
                     )
-                )
-                .finally(() => {});
-        } else {
-            setModules([]); // Clear modules if no course is selected
-            setProfessorsAndModules([]); // Clear professors and modules if no course is selected
+                );
         }
     }, [selectedCourse]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (loading) return;
-        setLoading(true); // Start loading
+        setLoading(true);
 
         const associationData = {
             professor_id: selectedProfessor,
@@ -115,9 +105,10 @@ const AssociateProfessorToModule = () => {
                 setSelectedModule("");
                 setSelectedProfessor("");
                 setSelectedCourse("");
+                setProfessorsAndModules([]);
             })
             .catch((error) => alert("Error: " + error.message))
-            .finally(() => setLoading(false)); // End loading
+            .finally(() => setLoading(false));
     };
 
     return (
@@ -125,9 +116,9 @@ const AssociateProfessorToModule = () => {
             <ButtonMenu buttons={modulesMenuButtons} />
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
-                    <h2>Associate Professor to Module</h2>
+                    <h2>Atribuir módulo a professor</h2>
                     <div>
-                        <label>Course</label>
+                        <label>Curso</label>
                         <select
                             name="course"
                             value={selectedCourse}
@@ -135,7 +126,7 @@ const AssociateProfessorToModule = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a course
+                                Selecione um curso
                             </option>
                             {courses && courses.length > 0 ? (
                                 courses.map((course) => (
@@ -147,12 +138,14 @@ const AssociateProfessorToModule = () => {
                                     </option>
                                 ))
                             ) : (
-                                <option disabled>No courses available</option>
+                                <option disabled>
+                                    Nenhum curso disponível
+                                </option>
                             )}
                         </select>
                     </div>
                     <div>
-                        <label>Module</label>
+                        <label>Módulo</label>
                         <select
                             name="module"
                             value={selectedModule}
@@ -161,7 +154,7 @@ const AssociateProfessorToModule = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a module
+                                Selecione um módulo
                             </option>
                             {modules && modules.length > 0 ? (
                                 modules.map((module) => (
@@ -173,7 +166,9 @@ const AssociateProfessorToModule = () => {
                                     </option>
                                 ))
                             ) : (
-                                <option disabled>No modules available</option>
+                                <option disabled>
+                                    Nenhum módulo disponível
+                                </option>
                             )}
                         </select>
                     </div>
@@ -188,7 +183,7 @@ const AssociateProfessorToModule = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a professor
+                                Selecione um professor
                             </option>
                             {professors && professors.length > 0 ? (
                                 professors.map((professor) => (
@@ -201,35 +196,44 @@ const AssociateProfessorToModule = () => {
                                 ))
                             ) : (
                                 <option disabled>
-                                    No professors available
+                                    Nenhum professor disponível
                                 </option>
                             )}
                         </select>
                     </div>
 
                     <button type="submit" disabled={loading}>
-                        {loading ? "Submitting..." : "Submit"}
+                        {loading ? "A submeter..." : "Submeter"}
                     </button>
                 </form>
 
                 {/* Display existing professors and modules */}
                 <div className="list">
-                    <h2>Professors and Modules for the Selected Course</h2>
-                    <ul>
-                        {professorsAndModules &&
-                        professorsAndModules.length > 0 ? (
-                            professorsAndModules.map((item) => (
-                                <li key={item.module.module_id}>
-                                    {item.module.name} -{" "}
-                                    {item.professor
-                                        ? item.professor.name
-                                        : "No professor assigned"}
-                                </li>
-                            ))
-                        ) : (
-                            <li>No data available</li>
-                        )}
-                    </ul>
+                    <h2>Professores encarregados dos módulos</h2>
+                    {professorsAndModules && professorsAndModules.length > 0 ? (
+                        <table className="form-table">
+                            <thead>
+                                <tr>
+                                    <th>Módulo</th>
+                                    <th>Professor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {professorsAndModules.map((item) => (
+                                    <tr key={item.module.module_id}>
+                                        <td>{item.module.name}</td>
+                                        <td>
+                                            {item.professor
+                                                ? item.professor.name
+                                                : "Sem professor designado"}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>Nenhum professor encarregado de módulo</p>
+                    )}
                 </div>
             </div>
         </div>

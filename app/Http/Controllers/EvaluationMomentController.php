@@ -141,25 +141,46 @@ class EvaluationMomentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getProfessorEvaluationMoments()
+    public function getEvaluationMomentsOfProfessor(Request $request)
     {
         try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'course_id' => 'nullable|exists:courses,course_id',
+                'module_id' => 'nullable|exists:modules,module_id',
+                'submodule_id' => 'nullable|exists:submodules,submodule_id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
             // Get the authenticated professor
             $professor = JWTAuth::user();
             if (!$professor) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
-            // Check if the professor is a coordinator
-            if ($professor->is_coordinator == 1) {
-                // Retrieve all evaluation moments
-                $evaluationMoments = EvaluationMoment::with(['course', 'professor', 'module', 'submodule'])->get();
-            } else {
-                // Retrieve evaluation moments for the authenticated professor
-                $evaluationMoments = EvaluationMoment::with(['course', 'professor', 'module', 'submodule'])
-                    ->where('professor_id', $professor->id)
-                    ->get();
+            // Start building the query
+            $query = EvaluationMoment::query();
+            // Apply filters
+            if ($request->has('course_id')) {
+                $query->where('course_id', $request->course_id);
             }
+            if ($request->has('module_id')) {
+                $query->where('module_id', $request->module_id);
+            }
+            if ($request->has('submodule_id')) {
+                $query->where('submodule_id', $request->submodule_id);
+            }
+
+            // Check if the professor is a coordinator
+            if ($professor->is_coordinator != 1) {
+                $query->where('professor_id', $professor->id);
+            }
+
+            // Execute the query
+            $evaluationMoments = $query->get();
 
             return response()->json(['evaluationMoments' => $evaluationMoments], 200);
         } catch (\Exception $e) {

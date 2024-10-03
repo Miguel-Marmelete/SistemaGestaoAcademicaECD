@@ -19,6 +19,10 @@ function AdminPanel() {
             subButtons: coursesMenuButtons,
         },
         {
+            label: "Módulos",
+            subButtons: modulesMenuButtons,
+        },
+        {
             label: "Alunos",
             subButtons: studentsMenuButtons,
         },
@@ -26,10 +30,7 @@ function AdminPanel() {
             label: "Aulas",
             subButtons: lessonsMenuButtons,
         },
-        {
-            label: "Módulos",
-            subButtons: modulesMenuButtons,
-        },
+
         {
             label: "Momentos de Avaliação",
             subButtons: evaluationMomentsMenuButtons,
