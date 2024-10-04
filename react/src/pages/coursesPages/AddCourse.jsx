@@ -48,20 +48,20 @@ const AddCourse = () => {
 
         if (abbreviation.trim() === "" || abbreviation.length > 255) {
             alert(
-                "Abbreviation is required and should not exceed 255 characters."
+                "A abreviação é obrigatória."
             );
             return false;
         }
         if (name.trim() === "" || name.length > 255) {
-            alert("Name is required and should not exceed 255 characters.");
+            alert("O Nome do Curso é obrigatório.");
             return false;
         }
         if (!date || isNaN(new Date(date).getTime())) {
-            alert("Date is required and must be a valid date.");
+            alert("A data de início é obrigatória e deve ser uma data válida.");
             return false;
         }
         if (schedule && schedule.length > 255) {
-            alert("Schedule should not exceed 255 characters.");
+            alert("O horário não deve exceder 255 caracteres.");
             return false;
         }
         return true;
@@ -227,12 +227,12 @@ const AddCourse = () => {
                 </form>
 
                 <div className="list">
-                    <h2>Existing Courses</h2>
+                    <h2>Cursos Existentes</h2>
                     <table className="form-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Abbreviation</th>
+                                <th>Nome</th>
+                                <th>Abreviatura</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -219,7 +219,7 @@ Route::middleware([RenewTokenMiddleware::class, 'auth:api'])->group(function () 
      // Get a specific GradeEvaluationMoment by ID
      Route::get('/getGradeEvaluationMoment/{evaluation_moment_id}/{student_id}', [GradeEvaluationMomentController::class, 'show']);
      // Create a new GradeEvaluationMoment
-     Route::post('/createGradeEvaluationMoment', [GradeEvaluationMomentController::class, 'store']);
+     Route::post('/submitEvaluationMomentGrades', [GradeEvaluationMomentController::class, 'submitEvaluationMomentGrades']);
      // Update an existing GradeEvaluationMoment by ID
      Route::put('/updateGradeEvaluationMoment/{evaluation_moment_id}/{student_id}', [GradeEvaluationMomentController::class, 'update']);
      // Delete a GradeEvaluationMoment by ID

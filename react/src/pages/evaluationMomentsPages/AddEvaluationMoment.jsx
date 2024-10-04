@@ -18,6 +18,7 @@ const AddEvaluationMoment = () => {
         submodule_id: null,
         date: "",
     });
+    const [evaluationMoments, setEvaluationMoments] = useState([]);
 
     // Fetch courses and modules when component mounts
     useEffect(() => {
@@ -28,7 +29,7 @@ const AddEvaluationMoment = () => {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log(data.courseModules);
+                console.log('data.courseModules', data.courseModules);
                 setCourses(data.courseModules.reverse());
             })
             .catch((error) =>
@@ -69,6 +70,23 @@ const AddEvaluationMoment = () => {
             });
         }
     }, [formData.module_id, formData.type, accessTokenData.access_token]);
+
+    // New useEffect hook to fetch evaluation moments
+    useEffect(() => {
+        if (formData.course_id) {
+            fetch(`${endpoints.GET_EVALUATION_MOMENTS_OF_PROFESSOR}?course_id=${formData.course_id}&module_id=${formData.module_id}`, {
+                headers: {
+                    Authorization: `Bearer ${accessTokenData.access_token}`,
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    setEvaluationMoments(data.evaluationMoments);
+                    console.log(data.evaluationMoments);
+                })
+                .catch((error) => console.error("Error fetching evaluation moments:", error));
+        }
+    }, [formData.course_id, formData.module_id, accessTokenData.access_token]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -157,22 +175,7 @@ const AddEvaluationMoment = () => {
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
                     <h2>Add Evaluation Moment</h2>
-                    <div>
-                        <label>Type</label>
-                        <select
-                            name="type"
-                            value={formData.type}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="" disabled>
-                                Select a type
-                            </option>
-                            <option value="Exame">Exame</option>
-                            <option value="Trabalho">Trabalho</option>
-                            <option value="Exame Recurso">Exame Recurso</option>
-                        </select>
-                    </div>
+                    
                     <div>
                         <label>Course</label>
                         <select
@@ -217,6 +220,22 @@ const AddEvaluationMoment = () => {
                                 ))}
                         </select>
                     </div>
+                    <div>
+                        <label>Type</label>
+                        <select
+                            name="type"
+                            value={formData.type}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="" disabled>
+                                Select a type
+                            </option>
+                            <option value="Exame">Exame</option>
+                            <option value="Trabalho">Trabalho</option>
+                            <option value="Exame Recurso">Exame Recurso</option>
+                        </select>
+                    </div>
                     {formData.type === "Trabalho" && (
                         <div>
                             <label>Submodule</label>
@@ -256,7 +275,27 @@ const AddEvaluationMoment = () => {
                         {loading ? "Submitting..." : "Submit"}
                     </button>
                 </form>
-                <div className="list"></div>
+                <div className="list">
+                    <h2>Evaluation Moments</h2>
+                    <table className="form-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {evaluationMoments.map((evaluationMoment) => (
+                                <tr key={evaluationMoment.evaluation_moment_id}>
+                                    <td>{evaluationMoment.type}</td>
+                                    
+                                    <td>{new Date(evaluationMoment.date).toLocaleDateString()}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

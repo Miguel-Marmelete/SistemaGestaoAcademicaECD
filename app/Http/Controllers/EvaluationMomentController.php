@@ -141,7 +141,7 @@ class EvaluationMomentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getEvaluationMomentsOfProfessor(Request $request)
+    public function getProfessorEvaluationMoments(Request $request)
     {
         try {
             // Validate the request
@@ -162,7 +162,7 @@ class EvaluationMomentController extends Controller
             }
 
             // Start building the query
-            $query = EvaluationMoment::query();
+            $query = EvaluationMoment::with(['course', 'module', 'submodule']);
             // Apply filters
             if ($request->has('course_id')) {
                 $query->where('course_id', $request->course_id);
@@ -184,6 +184,7 @@ class EvaluationMomentController extends Controller
 
             return response()->json(['evaluationMoments' => $evaluationMoments], 200);
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
             return response()->json([
                 'error' => 'An error occurred while retrieving evaluation moments',
                 'details' => $e->getMessage()

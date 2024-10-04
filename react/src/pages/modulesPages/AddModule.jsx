@@ -118,7 +118,7 @@ const AddModule = () => {
                             value={formData.ects}
                             onChange={handleChange}
                             required
-                            maxLength={255}
+                            pattern="\d+"
                         />
                     </div>
                     <button type="submit" disabled={loading}>

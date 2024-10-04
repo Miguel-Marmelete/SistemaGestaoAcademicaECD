@@ -22,6 +22,15 @@ class SubmoduleController extends Controller
     public function getSubModules(Request $request)
     {
         try {
+            // Validate the module_id
+            $validator = Validator::make($request->all(), [
+                'module_id' => 'nullable|exists:modules,module_id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
             // Retrieve the authenticated professor
             $professor = JWTAuth::user();
             $moduleId = $request->query('module_id');

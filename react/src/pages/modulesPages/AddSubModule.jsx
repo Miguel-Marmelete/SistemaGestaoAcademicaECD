@@ -43,7 +43,7 @@ const AddSubModule = () => {
                 console.error("Erro ao procurar submódulos:", error);
                 alert(error.message);
             });
-    }, [accessTokenData.access_token, subModuleAdded]); // Re-fetch submodules when subModuleAdded changes
+    }, [accessTokenData.access_token, subModuleAdded]); 
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -74,7 +74,7 @@ const AddSubModule = () => {
                     abbreviation: "",
                     module_id: "",
                 });
-                setSubModuleAdded(true);
+                setSubModuleAdded(!subModuleAdded);
                 alert("Submódulo adicionado com sucesso!");
             })
             .catch((error) => {
@@ -155,13 +155,22 @@ const AddSubModule = () => {
 
                 <div className="list">
                     <h2>Submódulos Existentes</h2>
-                    <ul>
-                        {subModules.map((subModule) => (
-                            <li key={subModule.submodule_id}>
-                                {subModule.name} - {subModule.abbreviation}
-                            </li>
-                        ))}
-                    </ul>
+                    <table className="form-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Abreviatura</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {subModules.map((subModule) => (
+                                <tr key={subModule.submodule_id}>
+                                    <td>{subModule.name}</td>
+                                    <td>{subModule.abbreviation}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

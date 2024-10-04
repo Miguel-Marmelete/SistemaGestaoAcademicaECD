@@ -19,7 +19,7 @@ const endpoints = {
     GET_SUBMODULES: `${API_BASE_URL}/getSubModules`,
     GET_LESSONS: `${API_BASE_URL}/getAllLessons`,
     GET_LESSON_BY_ID: `${API_BASE_URL}/getLessonById`,
-    GET_EVALUATION_MOMENTS_OF_PROFESSOR: `${API_BASE_URL}/getEvaluationMomentsOfProfessor`,
+    GET_EVALUATION_MOMENTS_OF_PROFESSOR: `${API_BASE_URL}/getProfessorEvaluationMoments`,
     GET_PROFESSORS_IN_CHARGE_OF_MODULES: `${API_BASE_URL}/getAllProfessorsInChargeOfModules`,
     GET_SUBMODULES_BY_COURSE: `${API_BASE_URL}/getSubmodulesByCourse`,
     GET_LESSONS_OF_SUBMODULE: `${API_BASE_URL}/getLessonsOfSubmodule`,
@@ -47,6 +47,7 @@ const endpoints = {
     REGIST_ATTENDANCE: `${API_BASE_URL}/createAttendance`,
     ADD_LESSON_AND_ATTENDANCE: `${API_BASE_URL}/addLessonAndAttendance`,
     ADD_AND_ENROLL_STUDENT: `${API_BASE_URL}/addAndEnrollStudent`,
+    SUBMIT_EVALUATION_MOMENT_GRADES: `${API_BASE_URL}/submitEvaluationMomentGrades`,
 
     //DELETE
     DELETE_COURSE: `${API_BASE_URL}/deleteCourse`,

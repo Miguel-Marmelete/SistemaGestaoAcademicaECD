@@ -29,24 +29,35 @@ class GradeEvaluationMomentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function submitEvaluationMomentGrades(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'evaluation_moment_id' => 'required|exists:evaluation_moments,evaluation_moment_id',
-                'student_id' => 'required|exists:students,student_id',
-                'evaluation_moment_grade_value' => 'required|integer|min:0|max:20', // Assuming grades are between 0 and 20
+                'grades' => 'required|array',
+                'grades.*.evaluation_moment_id' => 'required|exists:evaluation_moments,evaluation_moment_id',
+                'grades.*.student_id' => 'required|exists:students,student_id',
+                'grades.*.evaluation_moment_grade_value' => 'required|integer|min:0|max:20', // Assuming grades are between 0 and 20
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            $gradeEvaluationMoment = GradeEvaluationMoment::create($validator->validated());
+            $grades = $request->input('grades');
 
-            return response()->json(['message' => 'Grade evaluation moment created successfully', 'gradeEvaluationMoment' => $gradeEvaluationMoment], 201);
+            $createdRecords = [];
+            foreach ($grades as $grade) {
+                $gradeEvaluationMoment = GradeEvaluationMoment::create([
+                    'evaluation_moment_id' => $grade['evaluation_moment_id'],
+                    'student_id' => $grade['student_id'],
+                    'evaluation_moment_grade_value' => $grade['evaluation_moment_grade_value'],
+                ]);
+                $createdRecords[] = $gradeEvaluationMoment;
+            }
+
+            return response()->json(['message' => 'Grade evaluation moments created successfully', 'gradeEvaluationMoments' => $createdRecords], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while creating the grade evaluation moment', 'details' => $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred while creating the grade evaluation moments', 'details' => $e->getMessage()], 500);
         }
     }
 
