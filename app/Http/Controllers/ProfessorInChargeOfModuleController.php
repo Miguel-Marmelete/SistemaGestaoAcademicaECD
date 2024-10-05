@@ -318,7 +318,8 @@ public function store(Request $request)
         $courseModules = [];
         foreach ($courses as $course) {
             $modules = ProfessorInChargeOfModule::where('course_id', $course->course_id)
-                        ->pluck('module_id');
+            ->where('professor_id', $professor->professor_id)
+            ->pluck('module_id');
             if($professor->is_coordinator == 1){
                 $modules = CourseModule::where('course_id', $course->course_id)
                 ->pluck('module_id');

@@ -3,9 +3,10 @@ import { useAuth } from "../../auth/AuthContext";
 import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { evaluationMomentsMenuButtons } from "../../../scripts/buttonsData";
+import customFetch from "../../../scripts/customFetch";
 
 const EvaluationMomentsGradesList = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [evaluationMoments, setEvaluationMoments] = useState([]);
     const [courses, setCourses] = useState([]);
     const [modules, setModules] = useState([]);
@@ -16,6 +17,7 @@ const EvaluationMomentsGradesList = () => {
     const [selectedEvaluationMoment, setSelectedEvaluationMoment] =
         useState("");
     const [students, setStudents] = useState([]);
+    const [editedGrade, setEditedGrade] = useState({});
 
     useEffect(() => {
         // Fetch all courses
@@ -126,8 +128,66 @@ const EvaluationMomentsGradesList = () => {
                         selectedSubmodule))
     );
 
+    const handleEditClick = (student) => {
+        setEditedGrade(student);
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setEditedGrade({ ...editedGrade, [name]: value });
+    };
+
+    const handleSave = (studentId) => {
+        if (!window.confirm("Are you sure you want to update this grade?")) {
+            return;
+        }
+        customFetch(
+            `${endpoints.UPDATE_STUDENT_GRADE}/${selectedEvaluationMoment}/${studentId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "PUT",
+            { evaluation_moment_grade_value: editedGrade.grade }
+        )
+            .then(() => {
+                setStudents((prevStudents) =>
+                    prevStudents.map((student) =>
+                        student.student_id === studentId
+                            ? { ...student, grade: editedGrade.grade }
+                            : student
+                    )
+                );
+                setEditedGrade({});
+                alert("Grade updated successfully");
+            })
+            .catch((error) => console.error(error));
+    };
+
+    const handleDelete = (studentId) => {
+        if (!window.confirm("Are you sure you want to delete this grade?")) {
+            return;
+        }
+        customFetch(
+            `${endpoints.DELETE_STUDENT_GRADE}/${selectedEvaluationMoment}/${studentId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "DELETE"
+        )
+            .then(() => {
+                setStudents((prevStudents) =>
+                    prevStudents.map((student) =>
+                        student.student_id === studentId
+                            ? { ...student, grade: null }
+                            : student
+                    )
+                );
+                alert("Grade deleted successfully");
+            })
+            .catch((error) => console.error(error));
+    };
+
     return (
         <div className="table-list-container">
+            <ButtonMenu buttons={evaluationMomentsMenuButtons} />
             <header>
                 <h1>Avaliação dos Estudantes</h1>
             </header>
@@ -220,20 +280,65 @@ const EvaluationMomentsGradesList = () => {
             <table className="table-list" border="1" cellPadding="10">
                 <thead>
                     <tr>
-                        <th>Nome </th>
-                        <th>Número </th>
+                        <th>Nome</th>
+                        <th>Número</th>
                         <th>Nota</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {students.length > 0 &&
-                        students.map((student) => (
-                            <tr key={student.student_id}>
-                                <td>{student.student_name}</td>
-                                <td>{student.student_number}</td>
-                                <td>{student.grade}</td>
-                            </tr>
-                        ))}
+                    {students.map((student) => (
+                        <tr key={student.student_id}>
+                            {editedGrade.student_id === student.student_id ? (
+                                <>
+                                    <td>{student.student_name}</td>
+                                    <td>{student.student_number}</td>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            name="grade"
+                                            value={editedGrade.grade}
+                                            onChange={handleChange}
+                                            min="0"
+                                            max="20"
+                                            step="0.01"
+                                        />
+                                    </td>
+                                    <td>
+                                        <button
+                                            onClick={() =>
+                                                handleSave(student.student_id)
+                                            }
+                                        >
+                                            Save
+                                        </button>
+                                    </td>
+                                </>
+                            ) : (
+                                <>
+                                    <td>{student.student_name}</td>
+                                    <td>{student.student_number}</td>
+                                    <td>{student.grade}</td>
+                                    <td>
+                                        <button
+                                            onClick={() =>
+                                                handleEditClick(student)
+                                            }
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(student.student_id)
+                                            }
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </>
+                            )}
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>

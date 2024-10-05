@@ -144,6 +144,7 @@ class EvaluationMomentController extends Controller
     public function getProfessorEvaluationMoments(Request $request)
     {
         try {
+
             // Validate the request
             $validator = Validator::make($request->all(), [
                 'course_id' => 'nullable|exists:courses,course_id',
@@ -176,12 +177,12 @@ class EvaluationMomentController extends Controller
 
             // Check if the professor is a coordinator
             if ($professor->is_coordinator != 1) {
-                $query->where('professor_id', $professor->id);
+                $query->where('professor_id', $professor->professor_id);
             }
 
             // Execute the query
             $evaluationMoments = $query->get();
-
+            Log::info('evaluationMoments', ['evaluationMoments' => $evaluationMoments]);
             return response()->json(['evaluationMoments' => $evaluationMoments], 200);
         } catch (\Exception $e) {
             Log::error($e->getMessage());

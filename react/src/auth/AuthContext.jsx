@@ -25,6 +25,18 @@ export const AuthProvider = ({ children }) => {
         return new Date() > expirationTime;
     };
 
+    // Clear existing timeout and set a new one
+    const setLogoutTimer = (expirationTime) => {
+        if (logoutTimerRef.current) {
+            clearTimeout(logoutTimerRef.current);
+        }
+        const timeUntilExpiration = expirationTime - new Date();
+        logoutTimerRef.current = setTimeout(
+            () => handleLogout(),
+            timeUntilExpiration - 60000
+        ); // 1 minute before expiry
+    };
+
     // Load authentication state from sessionStorage on initial render
     useEffect(() => {
         const tokenData = JSON.parse(sessionStorage.getItem("tokenData"));
@@ -38,46 +50,29 @@ export const AuthProvider = ({ children }) => {
                 setAccessTokenData(tokenData); // Initial token data
                 getProfessor(); // Fetch professor data from server
 
-                // Calculate the remaining time until the token expires
                 const expirationTime = new Date(
                     issued_at * 1000 + expires_in * 1000
                 );
-                const timeUntilExpiration = expirationTime - new Date();
-
-                // Set up the logout timer to log out just before token expires
-                setTimeout(() => handleLogout(), timeUntilExpiration - 60000); // 1 minute before expiry
+                setLogoutTimer(expirationTime);
             }
         }
+        setLoading(false);
     }, []); // Only run this effect once, on component mount
 
     // Sync accessTokenData with sessionStorage whenever it changes
     useEffect(() => {
         if (accessTokenData) {
-            // Update sessionStorage whenever accessTokenData changes
-            console.log("accessTokenData", accessTokenData);
             sessionStorage.setItem(
                 "tokenData",
                 JSON.stringify(accessTokenData)
             );
             getProfessor(); // Fetch professor data from server
 
-            // Clear the previous timeout if it exists
-            if (logoutTimerRef.current) {
-                clearTimeout(logoutTimerRef.current);
-            }
-
-            // Calculate the remaining time until the token expires
             const { issued_at, expires_in } = accessTokenData;
             const expirationTime = new Date(
                 issued_at * 1000 + expires_in * 1000
             );
-            const timeUntilExpiration = expirationTime - new Date();
-
-            // Set up the logout timer to log out just before token expires
-            logoutTimerRef.current = setTimeout(
-                () => handleLogout(),
-                timeUntilExpiration - 60000
-            ); // 1 minute before expiry
+            setLogoutTimer(expirationTime);
         }
     }, [accessTokenData]);
 
@@ -116,9 +111,8 @@ export const AuthProvider = ({ children }) => {
             })
         );
 
-        // Set up the logout timer to log out just before token expires
-        const timeUntilExpiration = expirationTime - new Date();
-        setTimeout(() => handleLogout(), timeUntilExpiration - 300000); // 5 minutes before expiry
+        // Set up the logout timer
+        setLogoutTimer(expirationTime);
     };
 
     const handleLogout = async () => {
@@ -129,7 +123,7 @@ export const AuthProvider = ({ children }) => {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessTokenData.access_token}`, // Adjust according to your token format
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
                     },
                 });
             }
@@ -141,6 +135,12 @@ export const AuthProvider = ({ children }) => {
             setAccessTokenData(null);
             sessionStorage.removeItem("tokenData");
             sessionStorage.removeItem("professorData");
+
+            // Clear the logout timer
+            if (logoutTimerRef.current) {
+                clearTimeout(logoutTimerRef.current);
+                logoutTimerRef.current = null;
+            }
 
             // Redirect to Login page
             navigate("/login");

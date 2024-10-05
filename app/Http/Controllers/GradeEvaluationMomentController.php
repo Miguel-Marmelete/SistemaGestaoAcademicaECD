@@ -146,6 +146,22 @@ class GradeEvaluationMomentController extends Controller
     public function update(Request $request, $evaluation_moment_id, $student_id)
     {
         try {
+            // Validate function arguments
+            $validator = Validator::make(
+                [
+                    'evaluation_moment_id' => $evaluation_moment_id,
+                    'student_id' => $student_id,
+                ],
+                [
+                    'evaluation_moment_id' => 'required|integer|min:1',
+                    'student_id' => 'required|integer|min:1',
+                ]
+            );
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
             // Check if the grade evaluation moment exists
             $gradeEvaluationMoment = GradeEvaluationMoment::where('evaluation_moment_id', $evaluation_moment_id)
                 ->where('student_id', $student_id)
@@ -157,7 +173,7 @@ class GradeEvaluationMomentController extends Controller
 
             // Validate the incoming request data
             $validator = Validator::make($request->all(), [
-                'evaluation_moment_grade_value' => 'sometimes|integer|min:0|max:20', // Assuming grades are between 0 and 100
+                'evaluation_moment_grade_value' => 'required|numeric|min:0|max:20',
             ]);
 
             if ($validator->fails()) {
@@ -165,11 +181,19 @@ class GradeEvaluationMomentController extends Controller
             }
 
             // Update the grade evaluation moment with the validated data
-            $gradeEvaluationMoment->update($validator->validated());
+            $gradeEvaluationMoment->update([
+                'evaluation_moment_grade_value' => $request->evaluation_moment_grade_value
+            ]);
 
-            return response()->json(['message' => 'Grade evaluation moment updated successfully', 'gradeEvaluationMoment' => $gradeEvaluationMoment], 200);
+            return response()->json([
+                'message' => 'Grade evaluation moment updated successfully', 
+                'gradeEvaluationMoment' => $gradeEvaluationMoment
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while updating the grade evaluation moment', 'details' => $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'An error occurred while updating the grade evaluation moment', 
+                'details' => $e->getMessage()
+            ], 500);
         }
     }
 
