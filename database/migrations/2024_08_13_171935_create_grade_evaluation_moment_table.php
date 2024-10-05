@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('grade_evaluation_moment', function (Blueprint $table) {
-            $table->integer('evaluation_moment_grade_value');
+            $table->decimal('evaluation_moment_grade_value', 4, 2)->check('evaluation_moment_grade_value >= 0 and evaluation_moment_grade_value <= 20');
             $table->foreignId('evaluation_moment_id')->constrained('evaluation_moments', 'evaluation_moment_id')->onDelete('cascade');
             $table->foreignId('student_id')->constrained('students', 'student_id')->onDelete('cascade');
             $table->primary(['evaluation_moment_id', 'student_id']);

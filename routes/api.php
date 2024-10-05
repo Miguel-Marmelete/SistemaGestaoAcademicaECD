@@ -14,7 +14,6 @@ use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\ProfessorInChargeOfLessonController;
 use App\Http\Controllers\ProfessorInChargeOfModuleController;
-use App\Http\Middleware\RenewTokenMiddleware;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubmoduleController;
 use App\Http\Middleware\CheckCoordinatorMiddleware;
@@ -34,7 +33,7 @@ use App\Http\Middleware\CheckCoordinatorMiddleware;
 
 
  // Rotas protegidas com o middleware JWT
-Route::middleware([RenewTokenMiddleware::class, 'auth:api'])->group(function () {
+Route::middleware(['auth:api'])->group(function () {
   Route::middleware([CheckCoordinatorMiddleware::class, 'auth:api'])->group(function () {
   
 
@@ -214,8 +213,7 @@ Route::middleware([RenewTokenMiddleware::class, 'auth:api'])->group(function () 
   //---------------------------------------------------------------------
 
   //------------------GRADE EVALUATION MOMENT ROUTES---------------------------------------
-     // Get all GradeEvaluationMoment
-     Route::get('/getAllGradeEvaluationMoment', [GradeEvaluationMomentController::class, 'index']);
+     Route::get('/getStudentsEvaluationMomentGrades/{evaluation_moment_id}', [GradeEvaluationMomentController::class, 'getStudentsEvaluationMomentGrades']);
      // Get a specific GradeEvaluationMoment by ID
      Route::get('/getGradeEvaluationMoment/{evaluation_moment_id}/{student_id}', [GradeEvaluationMomentController::class, 'show']);
      // Create a new GradeEvaluationMoment

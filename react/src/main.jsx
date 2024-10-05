@@ -30,6 +30,7 @@ import EvaluateEvaluationMoments from "./pages/evaluationMomentsPages/evaluateEv
 import AssociateProfessorToModule from "./pages/modulesPages/AssociateModuleToProfessor.jsx";
 import ProfessorsInChargeOfModulesList from "./pages/modulesPages/ProfessorsInChargeOfModulesList.jsx";
 import PrintLesson from "./pages/lessonPages/PrintLesson.jsx";
+import EvaluationMomentsGradesList from "./pages/evaluationMomentsPages/EvaluationMomentsGradesList.jsx";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
         <AuthProvider>
@@ -164,6 +165,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         element={
                             <PrivateRoute>
                                 <EvaluateEvaluationMoments />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/evaluationMomentsGradesList"
+                        element={
+                            <PrivateRoute>
+                                <EvaluationMomentsGradesList />
                             </PrivateRoute>
                         }
                     />

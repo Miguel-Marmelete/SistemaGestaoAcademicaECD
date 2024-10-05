@@ -36,6 +36,10 @@ export const evaluationMomentsMenuButtons = [
         name: "Avaliar Momentos de Avaliação",
         link: "/evaluateEvaluationMoments",
     },
+    {
+        name: "Notas de Momentos de Avaliação",
+        link: "/evaluationMomentsGradesList",
+    },
 ];
 
 export const gradesMenuButtons = [

@@ -4,7 +4,7 @@ import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { evaluationMomentsMenuButtons } from "../../../scripts/buttonsData";
 
-const EvaluateEvaluationMoments = () => {
+const EvaluationMomentsGradesList = () => {
     const { accessTokenData } = useAuth();
     const [evaluationMoments, setEvaluationMoments] = useState([]);
     const [courses, setCourses] = useState([]);
@@ -16,8 +16,7 @@ const EvaluateEvaluationMoments = () => {
     const [selectedEvaluationMoment, setSelectedEvaluationMoment] =
         useState("");
     const [students, setStudents] = useState([]);
-    const [grades, setGrades] = useState({});
-    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         // Fetch all courses
         fetch(endpoints.GET_COURSES, {
@@ -94,89 +93,26 @@ const EvaluateEvaluationMoments = () => {
     }, [selectedCourse, accessTokenData]);
 
     useEffect(() => {
-        if (selectedCourse) {
+        if (selectedEvaluationMoment) {
             // Fetch students for the selected course
-            fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
+            fetch(
+                `${endpoints.GET_STUDENTS_EVALUATION_MOMENT_GRADES}/${selectedEvaluationMoment}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${accessTokenData.access_token}`,
+                    },
+                }
+            )
                 .then((response) => response.json())
                 .then((data) => {
-                    setStudents(data.students);
+                    setStudents(data.students_grades);
                 })
                 .catch((error) => setErrorMessage(error.message));
         } else {
             setStudents([]);
         }
-    }, [selectedCourse, accessTokenData]);
-
-    const handleGradeChange = (studentId, value) => {
-        const grade = Math.max(0, Math.min(20, parseFloat(value) || 0));
-        setGrades({
-            ...grades,
-            [studentId]: grade,
-        });
-    };
-
-    const handleSubmitGrades = () => {
-        if (!selectedEvaluationMoment) {
-            alert("Please select an evaluation moment.");
-            return;
-        }
-        if (loading) {
-            alert("Please wait for the grades to be submitted.");
-            return;
-        }
-        setLoading(true);
-
-        const gradeData = students.map((student) => ({
-            student_id: student.student_id,
-            evaluation_moment_id: selectedEvaluationMoment,
-            evaluation_moment_grade_value: grades[student.student_id] || 0,
-        }));
-
-        // Ensure all grades are provided
-        if (
-            gradeData.some((grade) => grade.evaluation_moment_grade_value === 0)
-        ) {
-            alert("All students must have a grade.");
-            return;
-        }
-
-        console.log("Grades to submit:", gradeData);
-
-        // Submit logic to backend
-        fetch(endpoints.SUBMIT_EVALUATION_MOMENT_GRADES, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify({ grades: gradeData }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to submit grades");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log("Grades submitted successfully:", data);
-                // Clear the grades and reset the selected evaluation moment
-                setGrades({});
-                setSelectedEvaluationMoment("");
-                alert("Grades submitted successfully!");
-            })
-            .catch((error) => {
-                console.error("Error submitting grades:", error);
-                setErrorMessage(error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
+    }, [selectedEvaluationMoment, accessTokenData]);
 
     const filteredEvaluationMoments = evaluationMoments.filter(
         (moment) =>
@@ -286,44 +222,22 @@ const EvaluateEvaluationMoments = () => {
                     <tr>
                         <th>Nome </th>
                         <th>Número </th>
-                        <th>Inserir Nota</th>
+                        <th>Nota</th>
                     </tr>
                 </thead>
                 <tbody>
                     {students.length > 0 &&
                         students.map((student) => (
                             <tr key={student.student_id}>
-                                <td>{student.name}</td>
-                                <td>{student.number}</td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="20"
-                                        step="0.1" // Allow decimal increments
-                                        value={
-                                            grades[student.student_id] !==
-                                            undefined
-                                                ? grades[student.student_id]
-                                                : ""
-                                        }
-                                        onChange={(e) =>
-                                            handleGradeChange(
-                                                student.student_id,
-                                                e.target.value
-                                            )
-                                        }
-                                        required
-                                    />
-                                </td>
+                                <td>{student.student_name}</td>
+                                <td>{student.student_number}</td>
+                                <td>{student.grade}</td>
                             </tr>
                         ))}
                 </tbody>
             </table>
-
-            <button onClick={handleSubmitGrades}>Submeter Notas</button>
         </div>
     );
 };
 
-export default EvaluateEvaluationMoments;
+export default EvaluationMomentsGradesList;
