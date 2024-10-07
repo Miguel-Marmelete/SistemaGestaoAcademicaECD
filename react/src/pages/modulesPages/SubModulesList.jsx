@@ -153,6 +153,7 @@ const SubModulesList = () => {
                                         {isCoordinator && (
                                             <td>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleSave(
                                                             subModule.submodule_id
@@ -173,6 +174,7 @@ const SubModulesList = () => {
                                         {isCoordinator && (
                                             <td>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleEditClick(
                                                             subModule
@@ -182,6 +184,7 @@ const SubModulesList = () => {
                                                     Edit
                                                 </button>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleDelete(
                                                             subModule.submodule_id

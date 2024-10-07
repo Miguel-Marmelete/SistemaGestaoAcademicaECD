@@ -218,6 +218,7 @@ const StudentsList = () => {
                                         {professor.is_coordinator === 1 && (
                                             <td>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleSave(
                                                             student.student_id
@@ -239,6 +240,7 @@ const StudentsList = () => {
                                         {professor.is_coordinator === 1 && (
                                             <td>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleEditClick(student)
                                                     }
@@ -246,6 +248,7 @@ const StudentsList = () => {
                                                     Edit
                                                 </button>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleDelete(
                                                             student.student_id

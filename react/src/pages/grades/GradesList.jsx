@@ -126,7 +126,6 @@ const GradesList = () => {
 
     return (
         <div>
-            <ButtonMenu buttons={gradesMenuButtons} />
             <div className="table-list-container">
                 <header>
                     <h1>Grades List</h1>
@@ -230,9 +229,11 @@ const GradesList = () => {
                     </tbody>
                 </table>
 
-                <button onClick={handleSubmitAllGrades}>
-                    Submit All Grades
-                </button>
+                {students.length > 0 && (
+                    <button className="buttons" onClick={handleSubmitAllGrades}>
+                        Submit All Grades
+                    </button>
+                )}
             </div>
         </div>
     );

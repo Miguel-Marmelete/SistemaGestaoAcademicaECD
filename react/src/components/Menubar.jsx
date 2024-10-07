@@ -48,12 +48,8 @@ function MenuBar() {
                     name: "Avaliar Momentos de Avaliação",
                     path: "/evaluateEvaluationMoments",
                 },
-                { name: "Pauta", path: "/avaliacoes/pauta" },
+                { name: "Pauta", path: "/grades" },
             ],
-        },
-        {
-            name: "Diplomas",
-            subItems: [{ name: "Criar Diploma", path: "/diplomas/criar" }],
         },
     ];
 

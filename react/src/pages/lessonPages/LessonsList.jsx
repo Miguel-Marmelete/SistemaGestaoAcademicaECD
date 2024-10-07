@@ -284,6 +284,7 @@ const LessonsList = () => {
 
                                             <td>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleSave(
                                                             lesson.lesson_id
@@ -293,6 +294,7 @@ const LessonsList = () => {
                                                     Save
                                                 </button>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         setEditedLesson({})
                                                     }
@@ -311,6 +313,7 @@ const LessonsList = () => {
                                                     <>
                                                         {lesson.summary}
                                                         <button
+                                                            className="buttons"
                                                             onClick={() =>
                                                                 toggleSummary(
                                                                     lesson.lesson_id
@@ -332,6 +335,7 @@ const LessonsList = () => {
                                                         {lesson.summary.length >
                                                             100 && (
                                                             <button
+                                                                className="buttons"
                                                                 onClick={() =>
                                                                     toggleSummary(
                                                                         lesson.lesson_id
@@ -360,6 +364,7 @@ const LessonsList = () => {
                                             </td>
                                             <td>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleEditClick(lesson)
                                                     }
@@ -367,6 +372,7 @@ const LessonsList = () => {
                                                     Edit
                                                 </button>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleDelete(
                                                             lesson.lesson_id
@@ -376,6 +382,7 @@ const LessonsList = () => {
                                                     Delete
                                                 </button>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handlePrint(lesson)
                                                     }

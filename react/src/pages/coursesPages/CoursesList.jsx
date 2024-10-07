@@ -145,6 +145,7 @@ const CoursesList = () => {
                                     {isCoordinator && (
                                         <td>
                                             <button
+                                                className="buttons"
                                                 onClick={() =>
                                                     handleEditClick(course)
                                                 }
@@ -152,6 +153,7 @@ const CoursesList = () => {
                                                 Edit
                                             </button>
                                             <button
+                                                className="buttons"
                                                 onClick={() =>
                                                     handleDelete(
                                                         course.course_id

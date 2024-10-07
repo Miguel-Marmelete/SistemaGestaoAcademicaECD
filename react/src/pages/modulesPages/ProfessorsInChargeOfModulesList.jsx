@@ -142,6 +142,7 @@ const ProfessorsInChargeOfModulesList = () => {
                                 <td>{professorInCharge.course.name}</td>
                                 <td>
                                     <button
+                                        className="buttons"
                                         onClick={() =>
                                             handleDelete(
                                                 professorInCharge.module

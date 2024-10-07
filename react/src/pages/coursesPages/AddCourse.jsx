@@ -47,9 +47,7 @@ const AddCourse = () => {
         const { abbreviation, name, date, schedule } = formData;
 
         if (abbreviation.trim() === "" || abbreviation.length > 255) {
-            alert(
-                "A abreviação é obrigatória."
-            );
+            alert("A abreviação é obrigatória.");
             return false;
         }
         if (name.trim() === "" || name.length > 255) {

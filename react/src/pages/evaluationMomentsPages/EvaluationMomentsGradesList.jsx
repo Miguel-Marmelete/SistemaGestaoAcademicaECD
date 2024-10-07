@@ -306,6 +306,7 @@ const EvaluationMomentsGradesList = () => {
                                     </td>
                                     <td>
                                         <button
+                                            className="buttons"
                                             onClick={() =>
                                                 handleSave(student.student_id)
                                             }
@@ -321,6 +322,7 @@ const EvaluationMomentsGradesList = () => {
                                     <td>{student.grade}</td>
                                     <td>
                                         <button
+                                            className="buttons"
                                             onClick={() =>
                                                 handleEditClick(student)
                                             }
@@ -328,6 +330,7 @@ const EvaluationMomentsGradesList = () => {
                                             Edit
                                         </button>
                                         <button
+                                            className="buttons"
                                             onClick={() =>
                                                 handleDelete(student.student_id)
                                             }

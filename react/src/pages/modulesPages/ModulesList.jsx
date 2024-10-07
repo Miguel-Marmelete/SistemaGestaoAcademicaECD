@@ -149,6 +149,7 @@ const ModulesList = () => {
                                         {isCoordinator && (
                                             <td>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleSave(
                                                             module.module_id
@@ -169,6 +170,7 @@ const ModulesList = () => {
                                         {isCoordinator && (
                                             <td>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleEditClick(module)
                                                     }
@@ -176,6 +178,7 @@ const ModulesList = () => {
                                                     Edit
                                                 </button>
                                                 <button
+                                                    className="buttons"
                                                     onClick={() =>
                                                         handleDelete(
                                                             module.module_id

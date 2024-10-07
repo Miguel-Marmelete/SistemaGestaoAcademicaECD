@@ -42,10 +42,4 @@ export const evaluationMomentsMenuButtons = [
     },
 ];
 
-export const gradesMenuButtons = [
-    { name: "Atribuir Notas", link: "/assignGrades" },
-    { name: "Editar Notas", link: "/editGrades" },
-    { name: "Apagar Notas", link: "/deleteGrades" },
-    { name: "Calcular Notas", link: "/calculateGrades" },
-    { name: "Pauta", link: "/gradeSheet" },
-];
+export const gradesMenuButtons = [{ name: "Pauta", link: "/grades" }];

@@ -56,11 +56,13 @@ body {
 .admin_panel_button,
 .logout_button,
 .print_button,
-.request_admin_button {
+.request_admin_button,
+.buttons {
     background-color: #007bff;
     color: white;
     border: none;
     padding: 5px 10px;
+    margin: 4px;
     margin-left: 10px;
     cursor: pointer;
     border-radius: 4px;

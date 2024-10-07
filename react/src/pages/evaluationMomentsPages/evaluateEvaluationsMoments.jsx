@@ -129,7 +129,6 @@ const EvaluateEvaluationMoments = () => {
             alert("Please wait for the grades to be submitted.");
             return;
         }
-        setLoading(true);
 
         const gradeData = students.map((student) => ({
             student_id: student.student_id,
@@ -146,7 +145,7 @@ const EvaluateEvaluationMoments = () => {
         }
 
         console.log("Grades to submit:", gradeData);
-
+        setLoading(true);
         // Submit logic to backend
         fetch(endpoints.SUBMIT_EVALUATION_MOMENT_GRADES, {
             method: "POST",
@@ -321,7 +320,11 @@ const EvaluateEvaluationMoments = () => {
                 </tbody>
             </table>
 
-            <button onClick={handleSubmitGrades}>Submeter Notas</button>
+            {students.length > 0 && (
+                <button className="buttons" onClick={handleSubmitGrades}>
+                    Submeter Notas
+                </button>
+            )}
         </div>
     );
 };
