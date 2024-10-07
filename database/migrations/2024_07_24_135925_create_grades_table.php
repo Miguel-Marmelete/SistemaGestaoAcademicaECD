@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('grade_id');
             $table->foreignId('module_id')->constrained('modules', 'module_id')->onDelete('cascade');
             $table->foreignId('student_id')->constrained('students', 'student_id')->onDelete('cascade');
+            $table->foreignId('course_id')->constrained('courses', 'course_id')->onDelete('cascade');
             $table->integer('grade_value');
             $table->timestamps();
         });

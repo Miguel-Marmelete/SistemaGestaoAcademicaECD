@@ -209,7 +209,9 @@ Route::middleware(['auth:api'])->group(function () {
      // Update an existing Grade by ID
      Route::put('/updateGrade/{id}', [GradeController::class, 'update']);
      // Delete a Grade by ID
-     Route::delete('/deleteGrade/{id}', [GradeController::class, 'destroy']);  
+     Route::delete('/deleteGrade/{id}', [GradeController::class, 'destroy']);
+     Route::get('/getStudentsWithGrades', [GradeController::class, 'getStudentsWithGrades']);
+     Route::post('/submitGrades', [GradeController::class, 'submitGrades']);
   //---------------------------------------------------------------------
 
   //------------------GRADE EVALUATION MOMENT ROUTES---------------------------------------

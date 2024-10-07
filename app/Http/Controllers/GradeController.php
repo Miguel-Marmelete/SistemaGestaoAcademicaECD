@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\Enrollment; // Assuming Student model is used
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Log;
 class GradeController extends Controller
 {
     /**
@@ -124,6 +125,104 @@ class GradeController extends Controller
             return response()->json(['error' => 'Grade record not found'], 404);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while deleting the grade record', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Get students with grades for a specific course and module.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getStudentsWithGrades(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'course_id' => 'required|exists:courses,course_id',
+                'module_id' => 'required|exists:modules,module_id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $courseId = $request->query('course_id');
+            $moduleId = $request->query('module_id');
+
+            // Get all students from the course with a default grade of 0
+            $students = Enrollment::where('course_id', $courseId)
+                ->with('student')
+                ->get()
+                ->map(function ($enrollment) {
+                    return [
+                        'student_id' => $enrollment->student_id,
+                        'student_name' => $enrollment->student->name,
+                        'student_number' => $enrollment->student->number,
+                        'grade_value' => null,
+                    ];
+                })
+                ->keyBy('student_id')
+                ->toArray(); // Convert to array for direct modification
+
+            // Get and update grades for students who have them
+            $grades = Grade::with('student')
+                ->where('module_id', $moduleId)
+                ->where('course_id', $courseId)
+                ->get();
+
+            foreach ($grades as $grade) {
+                if (isset($students[$grade->student->student_id])) {
+                    $students[$grade->student->student_id]['grade_value'] = $grade->grade_value;
+                }
+            }
+
+            return response()->json(['students' => array_values($students)], 200);
+        } catch (\Exception $e) {
+            Log::error('Error retrieving students with grades: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while retrieving students with grades', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Store or update multiple grade records.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function submitGrades(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'grades' => 'required|array',
+                'grades.*.module_id' => 'required|exists:modules,module_id',
+                'grades.*.student_id' => 'required|exists:students,student_id',
+                'grades.*.course_id' => 'required|exists:courses,course_id',
+                'grades.*.grade_value' => 'required|integer|min:0|max:20',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $grades = $request->input('grades');
+            $updatedGrades = [];
+
+            foreach ($grades as $gradeData) {
+                $grade = Grade::updateOrCreate(
+                    [
+                        'module_id' => $gradeData['module_id'],
+                        'student_id' => $gradeData['student_id'],
+                        'course_id' => $gradeData['course_id'],
+                    ],
+                    ['grade_value' => $gradeData['grade_value']]
+                );
+                $updatedGrades[] = $grade;
+            }
+
+            return response()->json(['message' => 'Grades submitted successfully', 'grades' => $updatedGrades], 200);
+        } catch (\Exception $e) {
+            Log::error('Error submitting grades: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while submitting grades', 'details' => $e->getMessage()], 500);
         }
     }
 }

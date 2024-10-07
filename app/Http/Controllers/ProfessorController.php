@@ -183,6 +183,7 @@ class ProfessorController extends Controller
 
             // Send confirmation email to the professor
             Mail::send('emails.confirm_admin', ['token' => $token], function($message) use ($professor) {
+                $message->from('SGAED@sgaed.pt', 'Sistema de Gestão Académica');
                 $message->to('20431@stu.ipbeja.pt');
                 $message->subject('Confirm Admin Status');
             });
