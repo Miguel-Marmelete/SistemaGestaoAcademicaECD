@@ -4,7 +4,7 @@ import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { coursesMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
-
+import { ClipLoader } from "react-spinners";
 const AddCourse = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
     const [loading, setLoading] = useState(false);
@@ -16,29 +16,25 @@ const AddCourse = () => {
         date: "",
         schedule: "",
     });
-    const [editedCourse, setEditedCourse] = useState({});
     const fileInputRef = useRef(null);
+    const [coursesLoading, setCoursesLoading] = useState(true);
 
     useEffect(() => {
+        setCoursesLoading(true);
         customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
-            .catch((error) => console.error(error));
+            .catch((error) => console.error(error))
+            .finally(() => {
+                setCoursesLoading(false);
+            });
     }, [courseAdded]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
             ...formData,
-            [name]: value,
-        });
-    };
-
-    const handleEditChange = (e) => {
-        const { name, value } = e.target;
-        setEditedCourse({
-            ...editedCourse,
             [name]: value,
         });
     };
@@ -68,7 +64,7 @@ const AddCourse = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (loading) return; // Prevent multiple fetches
+        if (loading) return;
         if (!validateForm()) return;
 
         setLoading(true);
@@ -187,29 +183,10 @@ const AddCourse = () => {
                             required
                         />
                     </div>
-                    <div>
-                        <label>
-                            Horário
-                            <small
-                                style={{
-                                    fontSize: "0.6rem",
-                                    paddingLeft: "5px",
-                                }}
-                            >
-                                (Opcional)
-                            </small>
-                        </label>
-                        <input
-                            type="text"
-                            name="schedule"
-                            value={formData.schedule}
-                            onChange={handleChange}
-                            maxLength={255}
-                        />
-                    </div>
+
                     <div className="button-group">
                         <button type="submit" disabled={loading}>
-                            {loading ? "A submeter..." : "Submeter"}
+                            {loading ? <ClipLoader size={15} /> : "Submeter"}
                         </button>
                         <button onClick={handleCSVUpload} disabled={loading}>
                             Upload CSV
@@ -226,22 +203,43 @@ const AddCourse = () => {
 
                 <div className="list">
                     <h2>Cursos Existentes</h2>
-                    <table className="form-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Abreviatura</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {courses.map((course) => (
-                                <tr key={course.course_id}>
-                                    <td>{course.name}</td>
-                                    <td>{course.abbreviation}</td>
+                    {coursesLoading ? (
+                        <table className="form-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Abreviatura</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td
+                                        colSpan="2"
+                                        style={{ textAlign: "center" }}
+                                    >
+                                        Loading... <ClipLoader size={15} />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    ) : (
+                        <table className="form-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Abreviatura</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {courses.map((course) => (
+                                    <tr key={course.course_id}>
+                                        <td>{course.name}</td>
+                                        <td>{course.abbreviation}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
             </div>
         </div>

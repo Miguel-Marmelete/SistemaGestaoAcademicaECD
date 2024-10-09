@@ -21,13 +21,7 @@ const EvaluationMomentsGradesList = () => {
 
     useEffect(() => {
         // Fetch all courses
-        fetch(endpoints.GET_COURSES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
+        customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setCourses(data.courses);
             })
@@ -37,16 +31,11 @@ const EvaluationMomentsGradesList = () => {
     useEffect(() => {
         if (selectedCourse) {
             // Fetch evaluation moments for the selected course
-            fetch(
+            customFetch(
                 `${endpoints.GET_PROFESSOR_EVALUATION_MOMENTS}?course_id=${selectedCourse}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => response.json())
                 .then((data) => {
                     setEvaluationMoments(data.evaluationMoments);
 
@@ -97,16 +86,11 @@ const EvaluationMomentsGradesList = () => {
     useEffect(() => {
         if (selectedEvaluationMoment) {
             // Fetch students for the selected course
-            fetch(
+            customFetch(
                 `${endpoints.GET_STUDENTS_EVALUATION_MOMENT_GRADES}/${selectedEvaluationMoment}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => response.json())
                 .then((data) => {
                     setStudents(data.students_grades);
                 })

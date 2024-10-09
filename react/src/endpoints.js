@@ -50,6 +50,7 @@ const endpoints = {
     ADD_LESSON_AND_ATTENDANCE: `${API_BASE_URL}/addLessonAndAttendance`,
     ADD_AND_ENROLL_STUDENT: `${API_BASE_URL}/addAndEnrollStudent`,
     SUBMIT_EVALUATION_MOMENT_GRADES: `${API_BASE_URL}/submitEvaluationMomentGrades`,
+    ADD_PROFESSOR: `${API_BASE_URL}/addProfessor`,
 
     //DELETE
     DELETE_COURSE: `${API_BASE_URL}/deleteCourse`,

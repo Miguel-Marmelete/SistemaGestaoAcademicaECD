@@ -3,9 +3,11 @@ import { useAuth } from "../../auth/AuthContext";
 import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { evaluationMomentsMenuButtons } from "../../../scripts/buttonsData";
+import { ClipLoader } from "react-spinners";
+import customFetch from "../../../scripts/customFetch";
 
 const EvaluateEvaluationMoments = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [evaluationMoments, setEvaluationMoments] = useState([]);
     const [courses, setCourses] = useState([]);
     const [modules, setModules] = useState([]);
@@ -18,15 +20,9 @@ const EvaluateEvaluationMoments = () => {
     const [students, setStudents] = useState([]);
     const [grades, setGrades] = useState({});
     const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        // Fetch all courses
-        fetch(endpoints.GET_COURSES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
+        customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setCourses(data.courses);
             })
@@ -35,21 +31,14 @@ const EvaluateEvaluationMoments = () => {
 
     useEffect(() => {
         if (selectedCourse) {
-            // Fetch evaluation moments for the selected course
-            fetch(
+            customFetch(
                 `${endpoints.GET_PROFESSOR_EVALUATION_MOMENTS}?course_id=${selectedCourse}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => response.json())
                 .then((data) => {
                     setEvaluationMoments(data.evaluationMoments);
 
-                    // Extract unique modules and submodules
                     const uniqueModules = [
                         ...new Set(
                             data.evaluationMoments.map(
@@ -95,18 +84,17 @@ const EvaluateEvaluationMoments = () => {
 
     useEffect(() => {
         if (selectedCourse) {
-            // Fetch students for the selected course
-            fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
-                .then((response) => response.json())
+            setLoading(true);
+            customFetch(
+                `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
+                accessTokenData,
+                setAccessTokenData
+            )
                 .then((data) => {
                     setStudents(data.students);
                 })
-                .catch((error) => setErrorMessage(error.message));
+                .catch((error) => setErrorMessage(error.message))
+                .finally(() => setLoading(false));
         } else {
             setStudents([]);
         }
@@ -136,7 +124,6 @@ const EvaluateEvaluationMoments = () => {
             evaluation_moment_grade_value: grades[student.student_id] || 0,
         }));
 
-        // Ensure all grades are provided
         if (
             gradeData.some((grade) => grade.evaluation_moment_grade_value === 0)
         ) {
@@ -144,26 +131,16 @@ const EvaluateEvaluationMoments = () => {
             return;
         }
 
-        console.log("Grades to submit:", gradeData);
         setLoading(true);
-        // Submit logic to backend
-        fetch(endpoints.SUBMIT_EVALUATION_MOMENT_GRADES, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify({ grades: gradeData }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to submit grades");
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.SUBMIT_EVALUATION_MOMENT_GRADES,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            { grades: gradeData }
+        )
             .then((data) => {
                 console.log("Grades submitted successfully:", data);
-                // Clear the grades and reset the selected evaluation moment
                 setGrades({});
                 setSelectedEvaluationMoment("");
                 alert("Grades submitted successfully!");
@@ -191,8 +168,9 @@ const EvaluateEvaluationMoments = () => {
 
     return (
         <div className="table-list-container">
+            <ButtonMenu buttons={evaluationMomentsMenuButtons} />
             <header>
-                <h1>Avaliação dos Estudantes</h1>
+                <h1>Avaliações dos Alunos</h1>
             </header>
 
             <div className="filters">
@@ -202,8 +180,8 @@ const EvaluateEvaluationMoments = () => {
                         value={selectedCourse}
                         onChange={(e) => {
                             setSelectedCourse(e.target.value);
-                            setSelectedModule(""); // Reset module when selecting a new course
-                            setSelectedSubmodule(""); // Reset submodule
+                            setSelectedModule("");
+                            setSelectedSubmodule("");
                         }}
                     >
                         <option value="">Todos os Cursos</option>
@@ -279,7 +257,7 @@ const EvaluateEvaluationMoments = () => {
                 </label>
             </div>
 
-            <h2>Estudantes</h2>
+            <h2>Alunos</h2>
             <table className="table-list" border="1" cellPadding="10">
                 <thead>
                     <tr>
@@ -299,7 +277,7 @@ const EvaluateEvaluationMoments = () => {
                                         type="number"
                                         min="0"
                                         max="20"
-                                        step="0.1" // Allow decimal increments
+                                        step="0.1"
                                         value={
                                             grades[student.student_id] !==
                                             undefined
@@ -319,6 +297,16 @@ const EvaluateEvaluationMoments = () => {
                         ))}
                 </tbody>
             </table>
+
+            {loading && (
+                <p>
+                    Loading... <ClipLoader size={15} />
+                </p>
+            )}
+
+            {!loading && students.length === 0 && (
+                <p>Nenhum aluno inscrito no curso selecionado</p>
+            )}
 
             {students.length > 0 && (
                 <button className="buttons" onClick={handleSubmitGrades}>

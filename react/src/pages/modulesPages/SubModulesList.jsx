@@ -97,7 +97,15 @@ const SubModulesList = () => {
                 alert(error.message);
             });
     };
-
+    if (!professor) {
+        return (
+            <div>
+                <h2>
+                    Loading <ClipLoader size={15} />
+                </h2>
+            </div>
+        );
+    }
     return (
         <div>
             <ButtonMenu buttons={modulesMenuButtons} />

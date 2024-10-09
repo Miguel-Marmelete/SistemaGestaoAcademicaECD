@@ -3,9 +3,10 @@ import { useAuth } from "../../auth/AuthContext";
 import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { lessonsMenuButtons } from "../../../scripts/buttonsData";
+import customFetch from "../../../scripts/customFetch";
 
 const AddAttendance = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [courses, setCourses] = useState([]);
     const [submodules, setSubmodules] = useState([]);
     const [lessons, setLessons] = useState([]);
@@ -17,16 +18,7 @@ const AddAttendance = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        fetch(endpoints.GET_COURSES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) throw new Error("Failed to fetch courses");
-                return response.json();
-            })
+        customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
@@ -37,21 +29,11 @@ const AddAttendance = () => {
 
     useEffect(() => {
         if (selectedCourse) {
-            fetch(
+            customFetch(
                 `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch submodules");
-                    }
-                    return response.json();
-                })
                 .then((submodulesData) => {
                     setSubmodules(submodulesData.submodules);
                 })
@@ -63,21 +45,13 @@ const AddAttendance = () => {
 
     useEffect(() => {
         if (selectedCourse) {
-            fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch students");
-                    }
-                    return response.json();
-                })
+            customFetch(
+                `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
+                accessTokenData,
+                setAccessTokenData
+            )
                 .then((studentsData) => {
                     console.log(studentsData.students);
-
                     setStudents(studentsData.students);
                 })
                 .catch((error) => {
@@ -89,20 +63,11 @@ const AddAttendance = () => {
     useEffect(() => {
         if (selectedCourse && selectedSubmodule) {
             setLoading(true);
-            fetch(
+            customFetch(
                 `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}&submodule_id=${selectedSubmodule}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => {
-                    if (!response.ok)
-                        throw new Error("Failed to fetch lessons");
-                    return response.json();
-                })
                 .then((data) => {
                     setLessons(data.lessons);
                 })
@@ -145,24 +110,18 @@ const AddAttendance = () => {
         if (loading) {
             return;
         }
-        setLoading(true); // Set loading to true when submitting
+        setLoading(true);
 
-        fetch(endpoints.REGIST_ATTENDANCE, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify({
+        customFetch(
+            endpoints.REGIST_ATTENDANCE,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            {
                 lesson_id: selectedLesson,
                 student_ids: selectedStudents,
-            }),
-        })
-            .then((response) => {
-                if (!response.ok)
-                    throw new Error("Failed to register attendance");
-                return response.json();
-            })
+            }
+        )
             .then(() => {
                 alert("Attendance registered successfully.");
                 resetForm();

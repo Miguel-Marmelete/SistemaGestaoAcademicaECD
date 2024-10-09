@@ -42,4 +42,9 @@ export const evaluationMomentsMenuButtons = [
     },
 ];
 
+export const professorsMenuButtons = [
+    { name: "Listar Professores", link: "/professors" },
+    { name: "Adicionar Professores", link: "/addProfessor" },
+];
+
 export const gradesMenuButtons = [{ name: "Pauta", link: "/grades" }];

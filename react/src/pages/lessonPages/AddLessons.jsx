@@ -3,9 +3,11 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { lessonsMenuButtons } from "../../../scripts/buttonsData";
-import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
+import customFetch from "../../../scripts/customFetch";
+import { ClipLoader } from "react-spinners";
+
 const AddLesson = () => {
-    const { accessTokenData, professor } = useAuth();
+    const { accessTokenData, professor, setAccessTokenData } = useAuth();
     const [submodules, setSubmodules] = useState([]);
     const [courses, setCourses] = useState([]);
     const [professors, setProfessors] = useState([]);
@@ -36,7 +38,11 @@ const AddLesson = () => {
     }, [professor]);
 
     useEffect(() => {
-        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+        customFetch(
+            endpoints.GET_COURSES_AND_MODULES_OF_PROFESSOR,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
@@ -44,19 +50,11 @@ const AddLesson = () => {
                 alert("Error fetching courses: " + error.message);
             });
 
-        fetch(endpoints.GET_PROFESSORS, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((professorResponse) => {
-                if (professorResponse.ok) {
-                    return professorResponse.json();
-                } else {
-                    throw new Error("Failed to fetch professors");
-                }
-            })
+        customFetch(
+            endpoints.GET_PROFESSORS,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((professorData) => {
                 setProfessors(professorData.professors);
             })
@@ -68,22 +66,11 @@ const AddLesson = () => {
 
     useEffect(() => {
         if (selectedCourse) {
-            fetch(
+            customFetch(
                 `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error("Failed to fetch submodules");
-                    }
-                })
                 .then((data) => {
                     console.log("submodulos", data.submodules);
                     setSubmodules(data.submodules);
@@ -93,25 +80,18 @@ const AddLesson = () => {
                     alert(error.message);
                 });
 
-            fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch students");
-                    }
-                    return response.json();
-                })
+            customFetch(
+                `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
+                accessTokenData,
+                setAccessTokenData
+            )
                 .then((studentsData) => {
-                    console.log(studentsData.students);
-
                     setStudents(studentsData.students.reverse());
                     setLoading(false);
                 })
                 .catch((error) => {
+                    console.error("Error:", error);
+                    alert(error.message);
                     setLoading(false);
                 });
         } else {
@@ -126,18 +106,7 @@ const AddLesson = () => {
                 url += `&submodule_id=${selectedSubmodule}`;
             }
 
-            fetch(url, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch lessons");
-                    }
-                    return response.json();
-                })
+            customFetch(url, accessTokenData, setAccessTokenData)
                 .then((data) => {
                     setLessons(data.lessons);
                 })
@@ -219,31 +188,16 @@ const AddLesson = () => {
             ...formData,
             date: adjustedDate,
             course_id: formData.course_id,
-            student_ids: formData.student_ids, // Include attendance data in the same payload
+            student_ids: formData.student_ids,
         };
 
-        fetch(endpoints.ADD_LESSON_AND_ATTENDANCE, {
-            // Adjust endpoint accordingly
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(payload),
-        })
-            .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    return response.json().then((errorData) => {
-                        throw new Error(
-                            `Failed to add lesson and record attendance: ${JSON.stringify(
-                                errorData.errors
-                            )}`
-                        );
-                    });
-                }
-            })
+        customFetch(
+            endpoints.ADD_LESSON_AND_ATTENDANCE,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            payload
+        )
             .then(() => {
                 alert("Lesson added and attendance recorded successfully!");
                 setFormData({
@@ -267,6 +221,16 @@ const AddLesson = () => {
             });
     };
 
+    if (!professor) {
+        return (
+            <div>
+                <h2>
+                    Loading <ClipLoader size={15} />
+                </h2>
+            </div>
+        );
+    }
+
     return (
         <div>
             <ButtonMenu buttons={lessonsMenuButtons} />
@@ -274,44 +238,6 @@ const AddLesson = () => {
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
                     <h2>Add Lesson</h2>
-                    <div>
-                        <label>Title</label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            required
-                            maxLength={255}
-                        />
-                    </div>
-                    <div>
-                        <label>Type</label>
-                        <select
-                            name="type"
-                            value={formData.type}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="" disabled>
-                                Select a type
-                            </option>
-                            <option value="Teórica">Teórica</option>
-                            <option value="Laboratorial">Laboratorial</option>
-                            <option value="Teórica-Prática">
-                                Teórica-Prática
-                            </option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Summary</label>
-                        <textarea
-                            name="summary"
-                            value={formData.summary}
-                            onChange={handleChange}
-                            required
-                        ></textarea>
-                    </div>
                     <div>
                         <label>Course</label>
                         <select
@@ -360,6 +286,44 @@ const AddLesson = () => {
                                 </option>
                             ))}
                         </select>
+                    </div>
+                    <div>
+                        <label>Title</label>
+                        <input
+                            type="text"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleChange}
+                            required
+                            maxLength={255}
+                        />
+                    </div>
+                    <div>
+                        <label>Type</label>
+                        <select
+                            name="type"
+                            value={formData.type}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="" disabled>
+                                Select a type
+                            </option>
+                            <option value="Teórica">Teórica</option>
+                            <option value="Laboratorial">Laboratorial</option>
+                            <option value="Teórica-Prática">
+                                Teórica-Prática
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Summary</label>
+                        <textarea
+                            name="summary"
+                            value={formData.summary}
+                            onChange={handleChange}
+                            required
+                        ></textarea>
                     </div>
                     <div>
                         <label>Professors</label>
@@ -462,18 +426,27 @@ const AddLesson = () => {
                     </div>
 
                     <button type="submit" disabled={loading}>
-                        {loading ? "Submitting..." : "Submit"}
+                        {loading ? <ClipLoader size={15} /> : "Submit"}
                     </button>
                 </form>
                 <div className="list">
                     <h2>Existing Lessons</h2>
-                    <ul>
-                        {lessons.map((lesson) => (
-                            <li key={lesson.lesson_id}>
-                                {lesson.title} - {lesson.date}
-                            </li>
-                        ))}
-                    </ul>
+                    <table className="form-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {lessons.map((lesson) => (
+                                <tr key={lesson.lesson_id}>
+                                    <td>{lesson.title}</td>
+                                    <td>{lesson.date}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

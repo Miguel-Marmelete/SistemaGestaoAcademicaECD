@@ -12,7 +12,7 @@ const LessonsList = () => {
     const [submodules, setSubmodules] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState("");
     const [selectedSubmodule, setSelectedSubmodule] = useState("");
-    const { accessTokenData, setAccessTokenData, professor } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [expandedLessonId, setExpandedLessonId] = useState(null);
     const [editedLesson, setEditedLesson] = useState({});
 

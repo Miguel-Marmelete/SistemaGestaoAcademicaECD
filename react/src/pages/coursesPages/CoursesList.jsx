@@ -4,12 +4,14 @@ import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { coursesMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
 
 const CoursesList = () => {
     const [courses, setCourses] = useState([]);
     const [editedCourse, setEditedCourse] = useState({});
     const { accessTokenData, setAccessTokenData, professor } = useAuth();
     const [isCoordinator, setIsCoordinator] = useState(false);
+    const [loading, setLoading] = useState(true); // Add loading state
 
     useEffect(() => {
         if (professor) {
@@ -22,8 +24,10 @@ const CoursesList = () => {
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
-            .catch((error) => console.error(error));
+            .catch((error) => console.error(error))
+            .finally(() => setLoading(false));
     }, []);
+
     const handleDelete = (courseId) => {
         if (!window.confirm("Are you sure you want to delete this course?")) {
             return;
@@ -79,7 +83,15 @@ const CoursesList = () => {
             })
             .catch((error) => console.error(error));
     };
-
+    if (!professor) {
+        return (
+            <div>
+                <h2>
+                    Loading <ClipLoader size={15} />
+                </h2>
+            </div>
+        );
+    }
     return (
         <div className="table-list-container">
             <ButtonMenu buttons={coursesMenuButtons} />
@@ -170,6 +182,14 @@ const CoursesList = () => {
                     ))}
                 </tbody>
             </table>
+
+            {loading && (
+                <div className="loading-container">
+                    <p>
+                        Loading courses... <ClipLoader size={15} />
+                    </p>
+                </div>
+            )}
         </div>
     );
 };

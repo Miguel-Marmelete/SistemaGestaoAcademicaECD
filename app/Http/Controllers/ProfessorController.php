@@ -55,7 +55,7 @@ class ProfessorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function addProfessor(Request $request)
     {
         try {
             // Validate the request
@@ -65,14 +65,14 @@ class ProfessorController extends Controller
                 'cc_expire_date' => 'nullable|date',
                 'mobile' => 'nullable|integer',
                 'email' => 'required|string|email|max:255|unique:professors,email',
-                'is_coordinator' => 'boolean',
-                'password' => 'required|confirmed|string|min:8',
-                'profile_picture' => 'nullable|string|max:255',
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 400);
             }
+
+            // Generate a random password
+            $password = $this->generateRandomPassword();
 
             // Create the professor
             $professor = Professor::create([
@@ -81,12 +81,19 @@ class ProfessorController extends Controller
                 'cc_expire_date' => $request->cc_expire_date,
                 'mobile' => $request->mobile,
                 'email' => $request->email,
-                'is_coordinator' => $request->is_coordinator ?? false,
-                'password' => Hash::make($request->password),
-                'profile_picture' => $request->profile_picture,
+                'is_coordinator' => false,
+                'password' => Hash::make($password),
             ]);
 
-            return response()->json(['message' => 'Professor created successfully', 'professor' => $professor], 201);
+            // Send password to professor's email
+            Mail::send('emails.professor_password', ['professor' => $professor, 'password' => $password], function ($message) use ($professor) {
+                $message->from('SGAED@sgaed.pt', 'Sistema de Gestão Académica');
+                $message->to($professor->email, $professor->name)
+                ->subject('Your Account Password');
+            });
+
+            return response()->json([
+                'message' => 'Professor created successfully. Password sent to email.'], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred while creating the professor', 'details' => $e->getMessage()], 500);
         }
@@ -221,5 +228,21 @@ class ProfessorController extends Controller
             Log::error('Error during admin confirmation: ' . $e->getMessage());
             return response()->json(['message' => 'Admin confirmation failed'], 500);
         }
+    }
+
+    private function generateRandomPassword()
+    {
+        $length = 12;
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*(),.?":{}|<>';
+        $password = '';
+
+        do {
+            $password = '';
+            for ($i = 0; $i < $length; $i++) {
+                $password .= $characters[random_int(0, strlen($characters) - 1)];
+            }
+        } while (!preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password));
+
+        return $password;
     }
 }

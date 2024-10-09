@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthContext.jsx";
 import endpoints from "../endpoints.js";
 import ipbejaLogo from "../assets/ipbejaLogo.png";
+import { ClipLoader } from "react-spinners";
 function Navbar() {
     const { accessTokenData, professor, logout, loading } = useAuth();
 
@@ -34,13 +35,9 @@ function Navbar() {
                 <img
                     src={ipbejaLogo}
                     className="logo"
-                    style={{ width: "12%", height: "15%" }}
+                    style={{ width: "15%", height: "15%" }}
                 />
-                <img
-                    src={ipbejaLogo}
-                    className="logo"
-                    style={{ width: "12%", height: "15%" }}
-                />
+
                 <h3>
                     <Link
                         to="/"
@@ -53,7 +50,11 @@ function Navbar() {
             </div>
 
             <div className="navbar-right">
-                {professor ? (
+                {loading ? (
+                    <div>
+                        Loading... <ClipLoader size={15} />
+                    </div>
+                ) : professor ? (
                     <div className="navbar-info">
                         <span>{professor.name}</span>
                         {professor.is_coordinator == 1 ? (
@@ -83,14 +84,12 @@ function Navbar() {
                     </div>
                 ) : (
                     <div className="auth-buttons">
-                        <>
-                            <Link to={`/Login`}>
-                                <button>Login</button>
-                            </Link>
-                            <Link to={`/SignUp`}>
-                                <button>SignUp</button>
-                            </Link>
-                        </>
+                        <Link to={`/Login`}>
+                            <button>Login</button>
+                        </Link>
+                        <Link to={`/SignUp`}>
+                            <button>SignUp</button>
+                        </Link>
                     </div>
                 )}
             </div>

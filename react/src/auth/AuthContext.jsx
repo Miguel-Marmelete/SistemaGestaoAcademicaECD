@@ -8,6 +8,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import endpoints from "../endpoints";
 import customFetch from "../../scripts/customFetch";
+import { ClipLoader } from "react-spinners";
 
 const AuthContext = createContext();
 
@@ -15,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     const [professor, setProfessor] = useState(null);
     const [accessTokenData, setAccessTokenData] = useState(null);
     const logoutTimerRef = useRef(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -31,6 +32,14 @@ export const AuthProvider = ({ children }) => {
             clearTimeout(logoutTimerRef.current);
         }
         const timeUntilExpiration = expirationTime - new Date();
+
+        // Set timer for 10 minutes before expiry
+        setTimeout(() => {
+            alert(
+                "A sua sessão irá expirar em menos de 10 minutos. Por favor, guarde o seu trabalho."
+            );
+        }, timeUntilExpiration - 600000); // 10 minutes = 600000 milliseconds
+
         logoutTimerRef.current = setTimeout(
             () => handleLogout(),
             timeUntilExpiration - 60000
@@ -39,6 +48,7 @@ export const AuthProvider = ({ children }) => {
 
     // Load authentication state from sessionStorage on initial render
     useEffect(() => {
+        setLoading(true);
         const tokenData = JSON.parse(sessionStorage.getItem("tokenData"));
 
         if (tokenData) {
@@ -61,6 +71,7 @@ export const AuthProvider = ({ children }) => {
 
     // Sync accessTokenData with sessionStorage whenever it changes
     useEffect(() => {
+        setLoading(true);
         if (accessTokenData) {
             sessionStorage.setItem(
                 "tokenData",
@@ -74,17 +85,16 @@ export const AuthProvider = ({ children }) => {
             );
             setLogoutTimer(expirationTime);
         }
+        setLoading(false);
     }, [accessTokenData]);
 
     const getProfessor = () => {
-        setLoading(true);
         customFetch(endpoints.ME, accessTokenData, setAccessTokenData)
             .then((data) => {
                 console.log(data);
                 setProfessor(data.professor);
             })
-            .catch((error) => console.error(error))
-            .finally(() => setLoading(false));
+            .catch((error) => console.error(error));
     };
 
     const login = (professorData, tokenData) => {

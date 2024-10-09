@@ -11,26 +11,30 @@ const EvaluationMomentsList = () => {
     const [selectedModule, setSelectedModule] = useState("");
     const [coursesModules, setCoursesModules] = useState([]);
     const [modules, setModules] = useState([]);
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
 
     useEffect(() => {
-        fetch(endpoints.GET_MODULES_OF_COURSE_OF_PROFESSOR, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
+        customFetch(
+            endpoints.GET_MODULES_OF_COURSE_OF_PROFESSOR,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
                 setCoursesModules(data.courseModules);
+            })
+            .catch((error) => {
+                console.error("Error fetching courses and modules:", error);
             });
-    }, [accessTokenData.access_token]);
+    }, [accessTokenData]);
 
     useEffect(() => {
         if (selectedCourse) {
             const selectedCourseModules = coursesModules.find(
                 (course) => course.course.course_id === parseInt(selectedCourse)
             );
-            setModules(selectedCourseModules ? selectedCourseModules.modules : []);
+            setModules(
+                selectedCourseModules ? selectedCourseModules.modules : []
+            );
         } else {
             setModules([]);
         }
@@ -38,23 +42,22 @@ const EvaluationMomentsList = () => {
 
     useEffect(() => {
         if (selectedCourse && selectedModule) {
-            fetch(`${endpoints.GET_PROFESSOR_EVALUATION_MOMENTS}?course_id=${selectedCourse}&module_id=${selectedModule}`, {
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
-                .then((response) => response.json())
+            customFetch(
+                `${endpoints.GET_PROFESSOR_EVALUATION_MOMENTS}?course_id=${selectedCourse}&module_id=${selectedModule}`,
+                accessTokenData,
+                setAccessTokenData
+            )
                 .then((data) => {
                     setEvaluationMoments(data.evaluationMoments);
                 })
-                .catch(error => {
-                    console.error('Error fetching evaluation moments:', error);
+                .catch((error) => {
+                    console.error("Error fetching evaluation moments:", error);
                     setEvaluationMoments([]);
                 });
         } else {
             setEvaluationMoments([]);
         }
-    }, [selectedCourse, selectedModule, accessTokenData.access_token]);
+    }, [selectedCourse, selectedModule, accessTokenData]);
 
     const handleCourseChange = (e) => {
         const courseId = e.target.value;
@@ -65,7 +68,9 @@ const EvaluationMomentsList = () => {
             const selectedCourseModules = coursesModules.find(
                 (course) => course.course.course_id === parseInt(courseId)
             );
-            setModules(selectedCourseModules ? selectedCourseModules.modules : []);
+            setModules(
+                selectedCourseModules ? selectedCourseModules.modules : []
+            );
         } else {
             setModules([]);
         }
@@ -139,8 +144,14 @@ const EvaluationMomentsList = () => {
                                     <td>{moment.type}</td>
                                     <td>{moment.course?.name}</td>
                                     <td>{moment.module?.name}</td>
-                                    <td>{moment.submodule?.name || 'N/A'}</td>
-                                    <td>{moment.date ? new Date(moment.date).toLocaleDateString() : 'N/A'}</td>
+                                    <td>{moment.submodule?.name || "N/A"}</td>
+                                    <td>
+                                        {moment.date
+                                            ? new Date(
+                                                  moment.date
+                                              ).toLocaleDateString()
+                                            : "N/A"}
+                                    </td>
                                 </tr>
                             ))
                         ) : (

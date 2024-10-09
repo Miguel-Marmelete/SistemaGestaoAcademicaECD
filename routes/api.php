@@ -36,7 +36,7 @@ use App\Http\Middleware\CheckCoordinatorMiddleware;
 Route::middleware(['auth:api'])->group(function () {
   Route::middleware([CheckCoordinatorMiddleware::class, 'auth:api'])->group(function () {
   
-
+  Route::post('/addProfessor', [ProfessorController::class, 'addProfessor']);
     
   //------------------COURSE ROUTES----------------------------------------
      // Create a new course

@@ -130,7 +130,15 @@ const StudentsList = () => {
                 alert("Error deleting student: " + error.message);
             });
     };
-
+    if (!professor) {
+        return (
+            <div>
+                <h2>
+                    Loading <ClipLoader size={15} />
+                </h2>
+            </div>
+        );
+    }
     return (
         <div className="table-list-container">
             <ButtonMenu buttons={studentsMenuButtons} />

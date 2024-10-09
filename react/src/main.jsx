@@ -32,6 +32,8 @@ import ProfessorsInChargeOfModulesList from "./pages/modulesPages/ProfessorsInCh
 import PrintLesson from "./pages/lessonPages/PrintLesson.jsx";
 import EvaluationMomentsGradesList from "./pages/evaluationMomentsPages/EvaluationMomentsGradesList.jsx";
 import GradesList from "./pages/grades/GradesList.jsx";
+import AddProfessor from "./pages/professorPages/AddProfessor.jsx";
+import ProfessorsList from "./pages/professorPages/ProfessorsList.jsx";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
         <AuthProvider>
@@ -202,8 +204,38 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         }
                     />
                     <Route path="/verify-email" element={<VerifyEmail />} />
-                    <Route path="/print-lesson" element={<PrintLesson />} />
-                    <Route path="/grades" element={<GradesList />} />
+                    <Route
+                        path="/print-lesson"
+                        element={
+                            <PrivateRoute>
+                                <PrintLesson />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/grades"
+                        element={
+                            <PrivateRoute>
+                                <GradesList />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/addProfessor"
+                        element={
+                            <PrivateRoute>
+                                <AddProfessor />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/professors"
+                        element={
+                            <PrivateRoute>
+                                <ProfessorsList />
+                            </PrivateRoute>
+                        }
+                    />
                 </Route>
             </Routes>
         </AuthProvider>

@@ -6,7 +6,7 @@ import { gradesMenuButtons } from "../../../scripts/buttonsData";
 import endpoints from "../../endpoints";
 
 const GradesList = () => {
-    const { accessTokenData, setAccessTokenData, professor } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [courses, setCourses] = useState([]);
     const [modules, setModules] = useState([]);
     const [students, setStudents] = useState([]); // Initialize as empty array

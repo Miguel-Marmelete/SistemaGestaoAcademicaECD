@@ -3,9 +3,13 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { evaluationMomentsMenuButtons } from "../../../scripts/buttonsData";
+import customFetch from "../../../scripts/customFetch";
+
+import { ClipLoader } from "react-spinners";
 
 const AddEvaluationMoment = () => {
-    const { accessTokenData, professor } = useAuth();
+    const { accessTokenData, professor, setAccessTokenData } = useAuth();
+
     const [courses, setCourses] = useState([]); // Store courses and modules array
     const [modules, setModules] = useState([]); // Modules of selected course
     const [submodules, setSubmodules] = useState([]);
@@ -13,23 +17,24 @@ const AddEvaluationMoment = () => {
     const [formData, setFormData] = useState({
         type: "",
         course_id: "",
-        professor_id: professor.professor_id,
+        professor_id: "", // Initialize as an empty string
         module_id: "",
         submodule_id: null,
         date: "",
     });
     const [evaluationMoments, setEvaluationMoments] = useState([]);
+    const [loadingEvaluationMoments, setLoadingEvaluationMoments] =
+        useState(false); // New state for loading evaluation moments
 
     // Fetch courses and modules when component mounts
     useEffect(() => {
-        fetch(endpoints.GET_MODULES_OF_COURSE_OF_PROFESSOR, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
+        customFetch(
+            endpoints.GET_MODULES_OF_COURSE_OF_PROFESSOR,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
-                console.log('data.courseModules', data.courseModules);
+                console.log("data.courseModules", data.courseModules);
                 setCourses(data.courseModules.reverse());
             })
             .catch((error) =>
@@ -40,21 +45,11 @@ const AddEvaluationMoment = () => {
     // Fetch submodules when a module is selected and the type is "Trabalho"
     useEffect(() => {
         if (formData.module_id && formData.type === "Trabalho") {
-            fetch(
+            customFetch(
                 `${endpoints.GET_SUBMODULES}?module_id=${formData.module_id}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch submodules");
-                    }
-                    return response.json();
-                })
                 .then((data) => {
                     setSubmodules(data.submodules.reverse());
                 })
@@ -73,20 +68,36 @@ const AddEvaluationMoment = () => {
 
     // New useEffect hook to fetch evaluation moments
     useEffect(() => {
-        if (formData.course_id) {
-            fetch(`${endpoints.GET_EVALUATION_MOMENTS_OF_PROFESSOR}?course_id=${formData.course_id}&module_id=${formData.module_id}`, {
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
-                .then((response) => response.json())
+        if (formData.course_id && formData.module_id) {
+            setLoadingEvaluationMoments(true); // Set loading to true
+            customFetch(
+                `${endpoints.GET_EVALUATION_MOMENTS_OF_PROFESSOR}?course_id=${formData.course_id}&module_id=${formData.module_id}`,
+                accessTokenData,
+                setAccessTokenData
+            )
                 .then((data) => {
                     setEvaluationMoments(data.evaluationMoments);
-                    console.log(data.evaluationMoments);
                 })
-                .catch((error) => console.error("Error fetching evaluation moments:", error));
+                .catch((error) =>
+                    alert(
+                        "Failed to fetch evaluation moments: " + error.message
+                    )
+                )
+                .finally(() => {
+                    setLoadingEvaluationMoments(false); // Set loading to false
+                });
         }
     }, [formData.course_id, formData.module_id, accessTokenData.access_token]);
+
+    // Update professor_id in formData when professor data is available
+    useEffect(() => {
+        if (professor) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                professor_id: professor.professor_id,
+            }));
+        }
+    }, [professor]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -129,26 +140,19 @@ const AddEvaluationMoment = () => {
 
         setLoading(true); // Set loading to true
 
-        fetch(endpoints.ADD_EVALUATION_MOMENT, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(formData),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(
-                            `Failed to add evaluation moment: ${JSON.stringify(
-                                errorData.errors
-                            )}`
-                        );
-                    });
-                }
-                return response.json();
-            })
+        // Update professor_id with the one from useAuth before submitting
+        const updatedFormData = {
+            ...formData,
+            professor_id: professor?.professor_id || "",
+        };
+
+        customFetch(
+            endpoints.ADD_EVALUATION_MOMENT,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            updatedFormData
+        )
             .then(() => {
                 alert("Evaluation Moment added successfully!");
                 setFormData({
@@ -158,16 +162,25 @@ const AddEvaluationMoment = () => {
                     submodule_id: null,
                     date: "",
                 });
+                setEvaluationMoments([]); // Clear evaluation moments
             })
             .catch((error) => {
                 console.error("Error:", error);
                 alert(error.message);
             })
             .finally(() => {
-                setLoading(false); // Set loading to false
+                setLoading(false);
             });
     };
-
+    if (!professor) {
+        return (
+            <div>
+                <h2>
+                    Loading <ClipLoader size={15} />
+                </h2>
+            </div>
+        );
+    }
     return (
         <div>
             <ButtonMenu buttons={evaluationMomentsMenuButtons} />
@@ -175,7 +188,7 @@ const AddEvaluationMoment = () => {
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
                     <h2>Add Evaluation Moment</h2>
-                    
+
                     <div>
                         <label>Course</label>
                         <select
@@ -272,7 +285,7 @@ const AddEvaluationMoment = () => {
                         />
                     </div>
                     <button type="submit" disabled={loading}>
-                        {loading ? "Submitting..." : "Submit"}
+                        {loading ? <ClipLoader size={15} /> : "Submit"}
                     </button>
                 </form>
                 <div className="list">
@@ -281,7 +294,7 @@ const AddEvaluationMoment = () => {
                         <thead>
                             <tr>
                                 <th>Type</th>
-                                
+
                                 <th>Date</th>
                             </tr>
                         </thead>
@@ -289,12 +302,21 @@ const AddEvaluationMoment = () => {
                             {evaluationMoments.map((evaluationMoment) => (
                                 <tr key={evaluationMoment.evaluation_moment_id}>
                                     <td>{evaluationMoment.type}</td>
-                                    
-                                    <td>{new Date(evaluationMoment.date).toLocaleDateString()}</td>
+
+                                    <td>
+                                        {new Date(
+                                            evaluationMoment.date
+                                        ).toLocaleDateString()}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+                    {loadingEvaluationMoments && (
+                        <p>
+                            Loading <ClipLoader size={15} />
+                        </p>
+                    )}
                 </div>
             </div>
         </div>
