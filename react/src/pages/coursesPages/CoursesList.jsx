@@ -24,7 +24,10 @@ const CoursesList = () => {
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
-            .catch((error) => console.error(error))
+            .catch((error) => {
+                console.error(error);
+                alert(error);
+            })
             .finally(() => setLoading(false));
     }, []);
 

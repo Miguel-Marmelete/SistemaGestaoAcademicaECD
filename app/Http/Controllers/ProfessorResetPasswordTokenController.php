@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ProfessorResetPasswordToken;
+use Illuminate\Support\Facades\Log;
 
 class ProfessorResetPasswordTokenController extends Controller
 {
@@ -24,14 +25,16 @@ class ProfessorResetPasswordTokenController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['message' => $validator->errors()], 422);
             }
 
             $token = ProfessorResetPasswordToken::create($validator->validated());
 
             return response()->json(['message' => 'Token created successfully', 'token' => $token], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while creating the token', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while creating the token: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while creating the token', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -49,9 +52,11 @@ class ProfessorResetPasswordTokenController extends Controller
 
             return response()->json(['message' => 'Token deleted successfully'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Token not found'], 404);
+            Log::error('Token not found: ' . $e->getMessage());
+            return response()->json(['message' => 'Token not found'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while deleting the token', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while deleting the token: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while deleting the token', 'details' => $e->getMessage()], 500);
         }
     }
 }

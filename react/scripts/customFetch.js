@@ -1,5 +1,3 @@
-// customFetch.js
-
 const customFetch = async (
     endpoint,
     accessTokenData,
@@ -42,16 +40,24 @@ const customFetch = async (
             );
         }
 
+        // Check if the response is not okay (i.e., status code is not 2xx)
         if (!response.ok) {
-            throw new Error(`Error: ${response.statusText}`);
+            // Attempt to parse the response as JSON
+            const errorResponse = await response.json().catch(() => null);
+            const errorMessage = errorResponse?.message || response.statusText;
+            const errorDetails = errorResponse?.details || "";
+
+            throw new Error(
+                `Error: ${response.status}\nMessage: ${errorMessage}\nDetails: ${errorDetails}`
+            );
         }
 
-        const data = await response.json(); // Assuming the response is JSON
+        // Assuming the response is JSON
+        const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Fetch error:", error);
-        throw error;
+        // Return the error so it can be handled where customFetch is called
+        return Promise.reject(error.message);
     }
 };
-
 export default customFetch;

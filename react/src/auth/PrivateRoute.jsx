@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "./AuthContext.jsx";
+import { ClipLoader } from "react-spinners";
 
 const PrivateRoute = ({ children }) => {
     const { professor, loading, accessTokenData } = useAuth(); // Assume loading is managed in the AuthContext
@@ -17,7 +18,13 @@ const PrivateRoute = ({ children }) => {
     }, [professor]);
 
     if (isAuthenticating || loading) {
-        return <div>Loading...</div>;
+        return (
+            <div>
+                <h2>
+                    Loading <ClipLoader size={15} />
+                </h2>
+            </div>
+        );
     }
 
     if (!professor && !loading && !accessTokenData) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ProfessorInChargeOfLesson;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProfessorInChargeOfLessonController extends Controller
 {
@@ -13,7 +14,8 @@ class ProfessorInChargeOfLessonController extends Controller
             $assignments = ProfessorInChargeOfLesson::all();
             return response()->json(['message' => 'Assignments retrieved successfully', 'assignments' => $assignments], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to fetch records', 'error' => $e->getMessage()], 500);
+            Log::error('An error occurred while retrieving assignments: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to fetch records', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -28,7 +30,8 @@ class ProfessorInChargeOfLessonController extends Controller
             $assignment = ProfessorInChargeOfLesson::create($validatedData);
             return response()->json(['message' => 'Assignment created successfully', 'assignment' => $assignment], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to create record', 'error' => $e->getMessage()], 500);
+            Log::error('An error occurred while creating the assignment: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to create record', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -40,16 +43,17 @@ class ProfessorInChargeOfLessonController extends Controller
                 ->firstOrFail();
             return response()->json(['message' => 'Assignment retrieved successfully', 'assignment' => $assignment], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Record not found', 'error' => $e->getMessage()], 404);
+            Log::error('An error occurred while retrieving the assignment: ' . $e->getMessage());
+            return response()->json(['message' => 'Record not found', 'details' => $e->getMessage()], 404);
         }
     }
 
     public function update(Request $request, $professor_id, $lesson_id)
 {
-    try {
-        // Validate the incoming data
-        $validatedData = $request->validate([
-            'professor_id' => 'required|exists:professors,professor_id',
+        try {
+            // Validate the incoming data
+            $validatedData = $request->validate([
+                'professor_id' => 'required|exists:professors,professor_id',
             'lesson_id' => 'required|exists:lessons,lesson_id',
         ]);
 
@@ -64,10 +68,11 @@ class ProfessorInChargeOfLessonController extends Controller
 
         // Update the assignment
         $assignment->update($validatedData);
-        return response()->json(['message' => 'Assignment updated successfully', 'assignment' => $assignment], 200);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Failed to update record', 'error' => $e->getMessage()], 500);
-    }
+            return response()->json(['message' => 'Assignment updated successfully', 'assignment' => $assignment], 200);
+        } catch (\Exception $e) {
+            Log::error('An error occurred while updating the assignment: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to update record', 'details' => $e->getMessage()], 500);
+        }
 }
 
 
@@ -81,7 +86,8 @@ class ProfessorInChargeOfLessonController extends Controller
             $assignment->delete();
             return response()->json(['message' => 'Assignment deleted successfully'], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to delete record', 'error' => $e->getMessage()], 500);
+            Log::error('An error occurred while deleting the assignment: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to delete record', 'details' => $e->getMessage()], 500);
         }
     }
 }

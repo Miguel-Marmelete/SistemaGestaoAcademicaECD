@@ -28,7 +28,7 @@ class CourseController extends Controller
             }
             return response()->json(['courses' => $courses], 200);
         } catch (\Exception $e) {
-            Log::error('Error fetching courses:', ['message' => $e->getMessage()]);
+            Log::error('Error listing courses: ' . $e->getMessage());
             return response()->json(['message' => 'Erro ao listar os cursos', 'details' => $e->getMessage()], 500);
         }
      }
@@ -47,13 +47,15 @@ class CourseController extends Controller
             ]);
     
             if ($validator->fails()) {
-                return response()->json(['error' => 'Erro de validação', 'messages' => $validator->errors()], 400);
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['message' => $validator->errors()], 400);
             }
  
          
              $course = Course::create($request->all());
              return response()->json(['message' => 'Curso criado com sucesso', 'course' => $course], 201);
          } catch (\Exception $e) {
+             Log::error('Error creating course: ' . $e->getMessage());
              return response()->json(['message' => 'Erro ao criar o curso', 'details' => $e->getMessage()], 500);
          }
      }
@@ -65,6 +67,7 @@ class CourseController extends Controller
              $course = Course::findOrFail($id);
              return response()->json(['course' => $course], 200);
          } catch (\Exception $e) {
+             Log::error('Error finding course: ' . $e->getMessage());
              return response()->json(['message' => 'Erro ao encontrar o curso', 'details' => $e->getMessage()], 404);
          }
      }
@@ -86,8 +89,8 @@ class CourseController extends Controller
      
              // Se a validação falhar, retorna erros de validação
              if ($validator->fails()) {
-                 Log::error('Erro de validação:', ['message' => $validator->errors()]);
-                 return response()->json(['error' => 'Erro de validação', 'messages' => $validator->errors()], 400);
+                 Log::error('Validation failed: ' . $validator->errors());
+                 return response()->json(['message' => $validator->errors()], 400);
              }
      
              // Não há necessidade de conversão se o formato já é Y-m-d
@@ -97,10 +100,11 @@ class CourseController extends Controller
      
          } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
              // Tratamento específico para quando o curso não é encontrado
-             return response()->json(['error' => 'Curso não encontrado'], 404);
+             return response()->json(['message' => 'Curso não encontrado', 'details' => $e->getMessage()], 404);
          } catch (\Exception $e) {
              // Tratamento para outros tipos de exceções
-             return response()->json(['error' => 'Erro ao atualizar o curso', 'message' => $e->getMessage()], 500);
+             Log::error('Error updating course: ' . $e->getMessage());
+             return response()->json(['message' => 'Erro ao atualizar o curso', 'details' => $e->getMessage()], 500);
          }
      }
      
@@ -116,7 +120,8 @@ class CourseController extends Controller
              $course->delete();
              return response()->json(['message' => 'Curso apagado com sucesso'], 200);
          } catch (\Exception $e) {
-             return response()->json(['error' => 'Erro ao apagar o curso', 'message' => $e->getMessage()], 500);
+            Log::error('Error deleting course: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar o curso', 'details' => $e->getMessage()], 500);
          }
      }
 }

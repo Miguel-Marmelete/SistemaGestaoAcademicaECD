@@ -20,7 +20,8 @@ class GradeController extends Controller
             $grades = Grade::with(['module', 'student'])->get();
             return response()->json(['grades' => $grades], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while retrieving grades', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while retrieving grades: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while retrieving grades', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -40,7 +41,8 @@ class GradeController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['message' => $validator->errors()], 422);
             }
 
         
@@ -48,7 +50,8 @@ class GradeController extends Controller
 
             return response()->json(['message' => 'Grade created successfully', 'grade' => $grade], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while creating the grade', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while creating the grade: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while creating the grade', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -65,9 +68,10 @@ class GradeController extends Controller
 
             return response()->json(['grade' => $grade], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Grade record not found'], 404);
+            return response()->json(['message' => 'Grade record not found'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while retrieving the grade record', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while retrieving the grade record: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while retrieving the grade record', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -85,7 +89,7 @@ class GradeController extends Controller
             $grade = Grade::find($id);
 
             if (!$grade) {
-                return response()->json(['error' => 'Grade record not found'], 404);
+                return response()->json(['message' => 'Grade record not found'], 404);
             }
 
             // Validate the incoming request data
@@ -96,7 +100,8 @@ class GradeController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['message' => $validator->errors()], 422);
             }
 
             // Update the grade record with the validated data
@@ -104,7 +109,8 @@ class GradeController extends Controller
 
             return response()->json(['message' => 'Grade updated successfully', 'grade' => $grade], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while updating the grade record', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while updating the grade record: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while updating the grade record', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -122,9 +128,10 @@ class GradeController extends Controller
 
             return response()->json(['message' => 'Grade deleted successfully'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Grade record not found'], 404);
+            return response()->json(['message' => 'Grade record not found'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while deleting the grade record', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while deleting the grade record: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while deleting the grade record', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -143,7 +150,8 @@ class GradeController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['message' => $validator->errors()], 422);
             }
 
             $courseId = $request->query('course_id');
@@ -178,8 +186,8 @@ class GradeController extends Controller
 
             return response()->json(['students' => array_values($students)], 200);
         } catch (\Exception $e) {
-            Log::error('Error retrieving students with grades: ' . $e->getMessage());
-            return response()->json(['error' => 'An error occurred while retrieving students with grades', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while retrieving students with grades: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while retrieving students with grades', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -201,7 +209,8 @@ class GradeController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json(['message' => $validator->errors()], 422);
             }
 
             $grades = $request->input('grades');
@@ -221,8 +230,8 @@ class GradeController extends Controller
 
             return response()->json(['message' => 'Grades submitted successfully', 'grades' => $updatedGrades], 200);
         } catch (\Exception $e) {
-            Log::error('Error submitting grades: ' . $e->getMessage());
-            return response()->json(['error' => 'An error occurred while submitting grades', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while submitting grades: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while submitting grades', 'details' => $e->getMessage()], 500);
         }
     }
 }

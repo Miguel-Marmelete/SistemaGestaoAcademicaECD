@@ -68,7 +68,7 @@ class AuthController extends Controller
     } catch (\Exception $e) {
         // Log the error and return error response
         Log::error('Error during registration: ' . $e->getMessage());
-        return response()->json(['message' => 'Registration failed'], 500);
+        return response()->json(['message' => 'Registration failed', 'details' => $e->getMessage()], 500);
     }
 }
 
@@ -108,7 +108,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             // Log the error and return error response
             Log::error('Error during email verification: ' . $e->getMessage());
-            return response()->json(['message' => 'Email verification failed'], 500);
+            return response()->json(['message' => 'Email verification failed', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -145,7 +145,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             // Log the error and return error response
             Log::error('Error during professor approval: ' . $e->getMessage());
-            return response()->json(['message' => 'Professor approval failed'], 500);
+            return response()->json(['message' => 'Professor approval failed', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -196,7 +196,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             // Log the error and return error response
             Log::error('Error during login: ' . $e->getMessage());
-            return response()->json(['message' => 'Login failed'], 500);
+            return response()->json(['message' => 'Login failed', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -214,7 +214,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             // Log the error and return error response
             Log::error('Error fetching authenticated professor: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to fetch authenticated professor'], 500);
+            return response()->json(['message' => 'Failed to fetch authenticated professor', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -235,7 +235,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             // Log the error and return error response
             Log::error('Error during logout: ' . $e->getMessage());
-            return response()->json(['message' => 'Logout failed'], 500);
+            return response()->json(['message' => 'Logout failed', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -256,7 +256,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             // Log the error and return error response
             Log::error('Error refreshing token: ' . $e->getMessage());
-            return response()->json(['message' => 'Token refresh failed'], 500);
+            return response()->json(['message' => 'Token refresh failed', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -267,11 +267,16 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     protected function respondWithToken($token)
-    {
+    { try {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
+    } catch (\Exception $e) {
+        // Log the error and return error response
+        Log::error('Error responding with token: ' . $e->getMessage());
+        return response()->json(['message' => 'Failed to respond with token', 'details' => $e->getMessage()], 500);
     }
+}
 }

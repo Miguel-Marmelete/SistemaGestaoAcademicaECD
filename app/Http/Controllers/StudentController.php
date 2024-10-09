@@ -43,7 +43,7 @@ class StudentController extends Controller
     
             // Return a JSON response with the error message
             return response()->json([
-                'error' => 'An unexpected error occurred.',
+                'message' => 'An unexpected error occurred.',
                 'details' => $e->getMessage()
             ], 500);
         }
@@ -61,9 +61,11 @@ class StudentController extends Controller
             $student = Student::findOrFail($id);
             return response()->json(['student' => $student], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Student not found'], 404);
+            Log::error('Student not found: ' . $e->getMessage());
+            return response()->json(['message' => 'Student not found'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while retrieving the student', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while retrieving the student: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while retrieving the student', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -93,7 +95,7 @@ class StudentController extends Controller
 
             if ($validator->fails()) {
                 Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['details' => $validator->errors()], 400);
+                return response()->json(['message' => $validator->errors()], 400);
             }
 
             $student = Student::create($validator->validated());
@@ -136,7 +138,7 @@ class StudentController extends Controller
 
             if ($validator->fails()) {
                 Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['details' => $validator->errors()], 400);
+                return response()->json(['message' => $validator->errors()], 400);
             }
 
             // Update the student with the provided data
@@ -147,9 +149,11 @@ class StudentController extends Controller
 
             return response()->json(['message' => 'Student updated successfully', 'student' => $student], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Student not found'], 404);
+            Log::error('Student not found: ' . $e->getMessage());
+            return response()->json(['message' => 'Student not found'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while updating the student', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while updating the student: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while updating the student', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -167,9 +171,10 @@ class StudentController extends Controller
 
             return response()->json(['message' => 'Student deleted successfully'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Student not found'], 404);
+            return response()->json(['message' => 'Student not found'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while deleting the student', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while deleting the student: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while deleting the student', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -198,7 +203,7 @@ class StudentController extends Controller
 
             if ($validator->fails()) {
                 Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['details' => $validator->errors()], 400);
+                return response()->json(['message' => $validator->errors()], 400);
             }
 
             // Create the student without course_id

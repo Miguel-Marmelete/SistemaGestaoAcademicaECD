@@ -13,7 +13,7 @@ const ButtonMenu = ({ buttons }) => {
     }, [professor]);
 
     if (!isCoordinator) {
-        return null; // Return nothing if not a coordinator
+        return null;
     }
 
     return (

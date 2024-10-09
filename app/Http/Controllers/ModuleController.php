@@ -24,7 +24,8 @@ class ModuleController extends Controller
             $modules = Module::all();
             return response()->json(['modules' => $modules], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while retrieving modules', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while retrieving modules: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while retrieving modules', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -41,9 +42,10 @@ class ModuleController extends Controller
             $module = Module::findOrFail($id);
             return response()->json(['module' => $module], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Module not found'], 404);
+            return response()->json(['message' => 'Module not found'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while retrieving the module', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while retrieving the module: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while retrieving the module', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -66,7 +68,8 @@ class ModuleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            Log::error('Validation failed: ' . $validator->errors());
+            return response()->json(['message' => $validator->errors()], 400);
         }
 
         // Create the Module
@@ -74,8 +77,8 @@ class ModuleController extends Controller
         
         return response()->json(['message' => 'Module created successfully', 'module' => $module], 201);
     } catch (\Exception $e) {
-        Log::error('Error while creating module', ['error' => $e->getMessage()]);
-        return response()->json(['error' => 'An error occurred while creating the module', 'details' => $e->getMessage()], 500);
+        Log::error('An error occurred while creating the module: ' . $e->getMessage());
+        return response()->json(['message' => 'An error occurred while creating the module', 'details' => $e->getMessage()], 500);
     }
 }
 
@@ -101,7 +104,7 @@ class ModuleController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 400);
+                return response()->json(['message' => $validator->errors()], 400);
             }
 
             // Update the module with the provided data
@@ -109,9 +112,11 @@ class ModuleController extends Controller
 
             return response()->json(['message' => 'Module updated successfully', 'module' => $module], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Module not found'], 404);
+            Log::error('Module not found: ' . $e->getMessage());
+            return response()->json(['message' => 'Module not found'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while updating the module', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while updating the module: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while updating the module', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -130,9 +135,10 @@ class ModuleController extends Controller
 
             return response()->json(['message' => 'Module deleted successfully'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Module not found'], 404);
+            return response()->json(['message' => 'Module not found'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while deleting the module', 'details' => $e->getMessage()], 500);
+            Log::error('An error occurred while deleting the module: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while deleting the module', 'details' => $e->getMessage()], 500);
         }
     }
 }
