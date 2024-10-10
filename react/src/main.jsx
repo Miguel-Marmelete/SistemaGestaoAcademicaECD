@@ -34,6 +34,7 @@ import EvaluationMomentsGradesList from "./pages/evaluationMomentsPages/Evaluati
 import GradesList from "./pages/grades/GradesList.jsx";
 import AddProfessor from "./pages/professorPages/AddProfessor.jsx";
 import ProfessorsList from "./pages/professorPages/ProfessorsList.jsx";
+import ReviewCourses from "./pages/CSV/ReviewCourses.jsx";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
         <AuthProvider>
@@ -233,6 +234,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         element={
                             <PrivateRoute>
                                 <ProfessorsList />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/reviewCourses"
+                        element={
+                            <PrivateRoute>
+                                <ReviewCourses />
                             </PrivateRoute>
                         }
                     />

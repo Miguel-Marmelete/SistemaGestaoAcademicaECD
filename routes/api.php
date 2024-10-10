@@ -38,6 +38,11 @@ Route::middleware(['auth:api'])->group(function () {
   
   Route::post('/addProfessor', [ProfessorController::class, 'addProfessor']);
     
+  //------------------CSV ROUTES----------------------------------------
+     // Create new courses
+     Route::post('/addCoursesCSV', [CourseController::class, 'storeCoursesCSV']);
+  //---------------------------------------------------------------------
+
   //------------------COURSE ROUTES----------------------------------------
      // Create a new course
      Route::post('/addCourses', [CourseController::class, 'store']);

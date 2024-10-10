@@ -4,9 +4,10 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import { studentsMenuButtons } from "../../../scripts/buttonsData";
 import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
+import customFetch from "../../../scripts/customFetch";
 
 const AddStudents = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [students, setStudents] = useState([]);
     const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState("");
@@ -36,25 +37,15 @@ const AddStudents = () => {
     }, []);
 
     useEffect(() => {
-        `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`;
-
-        fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
-                return response.json();
-            })
-            .then((data) => setStudents(data.students.reverse()))
-            .catch((error) => alert(error.message))
-            .finally(() => {});
+        if (selectedCourse) {
+            customFetch(
+                `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
+                accessTokenData,
+                setAccessTokenData
+            )
+                .then((data) => setStudents(data.students.reverse()))
+                .catch((error) => alert(error.message));
+        }
     }, [selectedCourse]);
 
     const handleChange = (e) => {
@@ -116,30 +107,16 @@ const AddStudents = () => {
 
         setLoading(true);
 
-        // Send a single request to create the student and enroll them
-        fetch(endpoints.ADD_AND_ENROLL_STUDENT, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify({
+        customFetch(
+            endpoints.ADD_AND_ENROLL_STUDENT,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            {
                 ...formData, // Student data
                 course_id: selectedCourse, // Enrollment data
-            }),
-        })
-            .then((response) => {
-                // Handle errors if the request failed
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(
-                            errorData.details ||
-                                "Error creating and enrolling student."
-                        );
-                    });
-                }
-                return response.json(); // Return response JSON
-            })
+            }
+        )
             .then((result) => {
                 alert(result.message); // Show success message
 

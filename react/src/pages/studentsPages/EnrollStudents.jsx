@@ -4,9 +4,10 @@ import { useAuth } from "../../auth/AuthContext";
 import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 import ButtonMenu from "../../components/ButtonMenu";
 import { studentsMenuButtons } from "../../../scripts/buttonsData";
+import customFetch from "../../../scripts/customFetch";
 
 const EnrollStudents = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [courses, setCourses] = useState([]);
     const [students, setStudents] = useState([]);
     const [enrolledStudents, setEnrolledStudents] = useState([]);
@@ -28,41 +29,23 @@ const EnrollStudents = () => {
 
     // Fetch all students on component mount
     useEffect(() => {
-        fetch(endpoints.GET_STUDENTS, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch students");
-                }
-                return response.json();
-            })
+        customFetch(endpoints.GET_STUDENTS, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setStudents(data.students.reverse());
             })
             .catch((error) => {
                 console.error("Error fetching students:", error);
             });
-    }, [accessTokenData.access_token]);
+    }, [accessTokenData]);
 
     // Fetch enrolled students whenever the selected course changes
     useEffect(() => {
         if (selectedCourse) {
-            fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch enrolled students");
-                    }
-                    return response.json();
-                })
+            customFetch(
+                `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
+                accessTokenData,
+                setAccessTokenData
+            )
                 .then((data) => {
                     setEnrolledStudents(data.students.reverse());
                 })
@@ -72,7 +55,7 @@ const EnrollStudents = () => {
         } else {
             setEnrolledStudents([]); // Reset if no course is selected
         }
-    }, [selectedCourse, accessTokenData.access_token]);
+    }, [selectedCourse, accessTokenData]);
 
     const handleCourseChange = (e) => {
         setSelectedCourse(e.target.value);
@@ -97,20 +80,13 @@ const EnrollStudents = () => {
             student_ids: selectedStudents,
         };
 
-        fetch(endpoints.ENROLL_STUDENTS, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(enrollmentData),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to enroll students");
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.ENROLL_STUDENTS,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            enrollmentData
+        )
             .then(() => {
                 alert("Students enrolled successfully!");
                 // Reset form

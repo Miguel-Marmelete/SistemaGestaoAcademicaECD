@@ -827,8 +827,6 @@ form small {
     margin-bottom: 20px;
 }
 .form-table thead {
-    position: sticky;
-    top: 0;
     background-color: #f8f8f8;
     z-index: 1;
 }
@@ -869,4 +867,36 @@ form small {
 
 .checkbox-group input[type="checkbox"] {
     margin-right: 8px;
+}
+/*------------------CSV QUESTION MARK CSS------------------*/
+/* Add this CSS to your stylesheet */
+/* Add this CSS to your stylesheet */
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-tooltip {
+    visibility: hidden;
+    width: auto;
+    background-color: #f9f9f9;
+    color: #333;
+    text-align: left;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position the tooltip above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0s; /* No delay */
+    font-family: monospace;
+    white-space: pre;
+}
+
+.tooltip-container:hover .custom-tooltip {
+    visibility: visible;
+    opacity: 1;
 }

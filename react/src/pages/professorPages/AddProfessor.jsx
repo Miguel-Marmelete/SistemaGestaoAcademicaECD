@@ -6,7 +6,7 @@ import { professorsMenuButtons } from "../../../scripts/buttonsData";
 import { ClipLoader } from "react-spinners";
 
 const AddProfessor = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [professors, setProfessors] = useState([]);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -45,25 +45,14 @@ const AddProfessor = () => {
         if (loading) return;
         setLoading(true);
 
-        fetch(endpoints.ADD_PROFESSOR, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(formData),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((data) => {
-                        throw new Error(
-                            data.message || "Failed to add professor"
-                        );
-                    });
-                }
-                return response.json();
-            })
-            .then((data) => {
+        customFetch(
+            endpoints.ADD_PROFESSOR,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            formData
+        )
+            .then(() => {
                 alert("Professor added successfully!");
                 setFormData({
                     name: "",
@@ -73,13 +62,12 @@ const AddProfessor = () => {
                     mobile: "",
                 });
                 // Fetch professors again after adding a new one
-                return fetch(endpoints.GET_PROFESSORS, {
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                });
+                return customFetch(
+                    endpoints.GET_PROFESSORS,
+                    accessTokenData,
+                    setAccessTokenData
+                );
             })
-            .then((response) => response.json())
             .then((data) => setProfessors(data.professors.reverse()))
             .catch((error) => {
                 alert(error.message);

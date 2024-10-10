@@ -20,13 +20,7 @@ const AttendanceList = () => {
     });
 
     useEffect(() => {
-        fetch(endpoints.GET_COURSES, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
+        customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => setCourses(data.courses.reverse()))
             .catch((error) =>
                 alert("Failed to fetch courses: " + error.message)
@@ -35,16 +29,11 @@ const AttendanceList = () => {
 
     useEffect(() => {
         if (selectedCourse) {
-            fetch(
+            customFetch(
                 `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => response.json())
                 .then((data) => setSubmodules(data.submodules))
                 .catch((error) =>
                     alert("Failed to fetch submodules: " + error.message)
@@ -56,16 +45,11 @@ const AttendanceList = () => {
 
     useEffect(() => {
         if (selectedCourse && selectedSubmodule) {
-            fetch(
+            customFetch(
                 `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}&submodule_id=${selectedSubmodule}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessTokenData.access_token}`,
-                    },
-                }
+                accessTokenData,
+                setAccessTokenData
             )
-                .then((response) => response.json())
                 .then((data) => setLessons(data.lessons))
                 .catch((error) =>
                     alert("Failed to fetch lessons: " + error.message)
@@ -77,13 +61,11 @@ const AttendanceList = () => {
 
     useEffect(() => {
         if (selectedLesson) {
-            fetch(`${endpoints.GET_ATTENDANCE}?lesson_id=${selectedLesson}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
-                .then((response) => response.json())
+            customFetch(
+                `${endpoints.GET_ATTENDANCE}?lesson_id=${selectedLesson}`,
+                accessTokenData,
+                setAccessTokenData
+            )
                 .then((data) => {
                     setUpdatedAttendance({
                         present: data.presentStudents,

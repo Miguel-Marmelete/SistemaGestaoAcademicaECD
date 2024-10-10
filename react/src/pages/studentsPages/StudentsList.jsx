@@ -5,6 +5,7 @@ import { useAuth } from "../../auth/AuthContext";
 import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 import { studentsMenuButtons } from "../../../scripts/buttonsData";
 import ButtonMenu from "../../components/ButtonMenu";
+import customFetch from "../../../scripts/customFetch";
 
 const StudentsList = () => {
     const [courses, setCourses] = useState([]);
@@ -12,11 +13,15 @@ const StudentsList = () => {
     const [students, setStudents] = useState([]);
     const [editedStudent, setEditedStudent] = useState({});
     const navigate = useNavigate();
-    const { accessTokenData, professor } = useAuth();
+    const { accessTokenData, professor, setAccessTokenData } = useAuth();
 
     // Fetch courses from API
     useEffect(() => {
-        fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
+        customFetch(
+            endpoints.GET_COURSES_AND_MODULES_OF_PROFESSOR,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
@@ -27,19 +32,11 @@ const StudentsList = () => {
 
     // Fetch students when the selected course changes
     useEffect(() => {
-        fetch(`${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
-                return response.json();
-            })
+        customFetch(
+            `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
                 setStudents(data.students.reverse());
             })
@@ -70,22 +67,13 @@ const StudentsList = () => {
             return;
         }
 
-        fetch(`${endpoints.UPDATE_STUDENT}/${studentId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(editedStudent),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
-                return response.json();
-            })
+        customFetch(
+            `${endpoints.UPDATE_STUDENT}/${studentId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "PUT",
+            editedStudent
+        )
             .then(() => {
                 setStudents((prevStudents) =>
                     prevStudents.map((student) =>
@@ -107,18 +95,13 @@ const StudentsList = () => {
             return;
         }
 
-        fetch(`${endpoints.DELETE_STUDENT}/${studentId}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
+        customFetch(
+            `${endpoints.DELETE_STUDENT}/${studentId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "DELETE"
+        )
+            .then(() => {
                 setStudents((prevStudents) =>
                     prevStudents.filter(
                         (student) => student.student_id !== studentId
@@ -127,7 +110,7 @@ const StudentsList = () => {
                 alert("Student deleted successfully");
             })
             .catch((error) => {
-                alert("Error deleting student: " + error.message);
+                alert(error);
             });
     };
     if (!professor) {

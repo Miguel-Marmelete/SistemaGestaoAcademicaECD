@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
@@ -18,6 +19,7 @@ const AddCourse = () => {
     });
     const fileInputRef = useRef(null);
     const [coursesLoading, setCoursesLoading] = useState(true);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         setCoursesLoading(true);
@@ -87,8 +89,7 @@ const AddCourse = () => {
                 setCourseAdded((prev) => !prev);
             })
             .catch((error) => {
-                console.error("Error:", error.message);
-                alert(error.message);
+                alert(error);
             })
             .finally(() => {
                 setLoading(false);
@@ -115,34 +116,14 @@ const AddCourse = () => {
 
     const processAndUploadCSV = (csvData) => {
         const rows = csvData.split("\n").map((row) => row.split(","));
-        const courses = rows.slice(1).map((row) => ({
+        const parsedCourses = rows.slice(1).map((row) => ({
             name: row[0],
             abbreviation: row[1],
             date: row[2],
-            schedule: row[3] || "",
         }));
-        console.log(courses);
-        /*
-        setLoading(true);
-        customFetch(
-            endpoints.ADD_MULTIPLE_COURSES,
-            accessTokenData,
-            setAccessTokenData,
-            "POST",
-            { courses }
-        )
-            .then(() => {
-                alert("Courses added successfully!");
-                setCourseAdded((prev) => !prev);
-            })
-            .catch((error) => {
-                console.error("Error:", error.message);
-                alert(error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-*/
+
+        // Navigate to the review page with the parsed courses
+        navigate("/reviewCourses", { state: { courses: parsedCourses } });
     };
 
     return (
@@ -187,10 +168,24 @@ const AddCourse = () => {
                     <div className="button-group">
                         <button type="submit" disabled={loading}>
                             {loading ? <ClipLoader size={15} /> : "Submeter"}
-                        </button>
-                        <button onClick={handleCSVUpload} disabled={loading}>
-                            Upload CSV
-                        </button>
+                        </button>{" "}
+                        <div className="tooltip-container">
+                            <button
+                                onClick={handleCSVUpload}
+                                disabled={loading}
+                            >
+                                CSV
+                            </button>
+                            <div className="custom-tooltip">
+                                <pre>
+                                    Formato do CSV:
+                                    <br />
+                                    Nome,Abreviatura,Data
+                                    <br />
+                                    CursoX,CX,2023-01-01
+                                </pre>
+                            </div>
+                        </div>
                         <input
                             type="file"
                             ref={fileInputRef}

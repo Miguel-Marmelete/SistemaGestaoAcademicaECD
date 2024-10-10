@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Enrollment;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Student;
-use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Facades\Log;
+use PhpParser\Node\Expr\Throw_;
+
 class StudentController extends Controller
 {
 

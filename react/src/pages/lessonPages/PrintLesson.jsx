@@ -3,11 +3,12 @@ import { useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
+import customFetch from "../../../scripts/customFetch"; // Import customFetch
 
 function PrintLesson() {
     const location = useLocation();
     const { lesson } = location.state;
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth(); // Add setAccessTokenData
     const [attendance, setAttendance] = useState({
         presentStudents: [],
         absentStudents: [],
@@ -21,13 +22,11 @@ function PrintLesson() {
 
     useEffect(() => {
         if (lesson) {
-            fetch(`${endpoints.GET_ATTENDANCE}?lesson_id=${lesson.lesson_id}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            })
-                .then((response) => response.json())
+            customFetch(
+                `${endpoints.GET_ATTENDANCE}?lesson_id=${lesson.lesson_id}`,
+                accessTokenData,
+                setAccessTokenData
+            )
                 .then((data) => {
                     console.log(data);
                     setAttendance(data);

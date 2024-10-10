@@ -124,4 +124,38 @@ class CourseController extends Controller
             return response()->json(['message' => 'Erro ao apagar o curso', 'details' => $e->getMessage()], 500);
          }
      }
+
+
+     public function storeCoursesCSV(Request $request)
+     {
+         try {
+             $courses = $request->all();
+             $errors = [];
+
+             foreach ($courses as $index => $course) {
+                 $validator = Validator::make($course, [
+                     'abbreviation' => 'required|string|max:255',
+                     'name' => 'required|string|max:255',
+                     'date' => 'required|date',
+                     'schedule' => 'nullable|string|max:255',
+                 ]);
+
+                 if ($validator->fails()) {
+                     $errors[$index] = $validator->errors();
+                     continue;
+                 }
+
+                 Course::create($course);
+             }
+
+             if (!empty($errors)) {
+                 return response()->json(['message' => 'Validation errors', 'errors' => $errors], 400);
+             }
+
+             return response()->json(['message' => 'Courses created successfully'], 201);
+         } catch (\Exception $e) {
+             Log::error('Error creating courses: ' . $e->getMessage());
+             return response()->json(['message' => 'Erro ao criar os cursos', 'details' => $e->getMessage()], 500);
+         }
+     }
 }

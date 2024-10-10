@@ -140,18 +140,13 @@ const LessonsList = () => {
             return;
         }
 
-        fetch(`${endpoints.DELETE_LESSON}/${lessonId}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((errorData) => {
-                        throw new Error(errorData.details);
-                    });
-                }
+        customFetch(
+            `${endpoints.DELETE_LESSON}/${lessonId}`,
+            accessTokenData,
+            setAccessTokenData,
+            "DELETE"
+        )
+            .then(() => {
                 setFilteredLessons((prevLessons) =>
                     prevLessons.filter(
                         (lesson) => lesson.lesson_id !== lessonId
