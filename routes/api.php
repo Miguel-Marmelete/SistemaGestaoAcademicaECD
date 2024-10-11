@@ -68,7 +68,9 @@ Route::middleware(['auth:api'])->group(function () {
      // Update an existing course by ID
      Route::put('/updateModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'update']);
      // Delete a Enrollment by ID
-     Route::delete('/deleteModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'destroy']);  
+     Route::delete('/deleteModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'destroy']);
+     // Delete a Module from Course
+     Route::delete('/deleteModuleFromCourse', [CourseModuleController::class, 'deleteModuleFromCourse']);
     //---------------------------------------------------------------------
 
 

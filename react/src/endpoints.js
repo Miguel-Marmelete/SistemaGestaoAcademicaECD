@@ -63,6 +63,7 @@ const endpoints = {
     DELETE_STUDENT: `${API_BASE_URL}/deleteStudent`,
     DELETE_PROFESSOR_IN_CHARGE_OF_MODULE: `${API_BASE_URL}/deleteProfessorInChargeOfModule`,
     DELETE_STUDENT_GRADE: `${API_BASE_URL}/deleteGradeEvaluationMoment`,
+    DELETE_MODULE_FROM_COURSE: `${API_BASE_URL}/deleteModuleFromCourse`,
 
     //UPDATE
     UPDATE_COURSE: `${API_BASE_URL}/updateCourse`,

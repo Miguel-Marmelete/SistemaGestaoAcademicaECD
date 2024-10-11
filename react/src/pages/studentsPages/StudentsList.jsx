@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
-import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 import { studentsMenuButtons } from "../../../scripts/buttonsData";
 import ButtonMenu from "../../components/ButtonMenu";
 import customFetch from "../../../scripts/customFetch";
+import { ClipLoader } from "react-spinners";
 
 const StudentsList = () => {
     const [courses, setCourses] = useState([]);

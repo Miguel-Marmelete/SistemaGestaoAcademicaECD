@@ -4,11 +4,13 @@ import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
+import { ClipLoader } from "react-spinners";
 const ModulesList = () => {
     const [modules, setModules] = useState([]);
     const [editedModule, setEditedModule] = useState({});
     const { accessTokenData, setAccessTokenData, professor } = useAuth();
     const [isCoordinator, setIsCoordinator] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (professor) {
@@ -18,6 +20,7 @@ const ModulesList = () => {
 
     // Fetch modules from API
     useEffect(() => {
+        setIsLoading(true); // Set loading to true when starting the fetch
         customFetch(
             endpoints.GET_COURSES_AND_MODULES_OF_PROFESSOR,
             accessTokenData,
@@ -26,9 +29,14 @@ const ModulesList = () => {
             .then((data) => {
                 console.log(data.modules);
                 setModules(data.modules.reverse());
+                setIsLoading(false); // Set loading to false after data is fetched
             })
             .catch((error) => {
                 alert(error.message);
+                setIsLoading(false); // Set loading to false if there's an error
+            })
+            .finally(() => {
+                setIsLoading(false); // Set loading to false after the fetch is complete
             });
     }, []);
 
@@ -114,93 +122,112 @@ const ModulesList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {modules.map((module) => (
-                            <tr key={module.module_id}>
-                                {editedModule.module_id === module.module_id ? (
-                                    <>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value={editedModule.name}
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="abbreviation"
-                                                value={
-                                                    editedModule.abbreviation
-                                                }
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="number"
-                                                name="ects"
-                                                value={editedModule.ects}
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="number"
-                                                name="contact_hours"
-                                                value={
-                                                    editedModule.contact_hours
-                                                }
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        {isCoordinator && (
-                                            <td>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={() =>
-                                                        handleSave(
-                                                            module.module_id
-                                                        )
-                                                    }
-                                                >
-                                                    Save
-                                                </button>
-                                            </td>
-                                        )}
-                                    </>
-                                ) : (
-                                    <>
-                                        <td>{module.name}</td>
-                                        <td>{module.abbreviation}</td>
-                                        <td>{module.ects}</td>
-                                        <td>{module.contact_hours}</td>
-                                        {isCoordinator && (
-                                            <td>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={() =>
-                                                        handleEditClick(module)
-                                                    }
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={() =>
-                                                        handleDelete(
-                                                            module.module_id
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        )}
-                                    </>
-                                )}
+                        {isLoading ? (
+                            <tr>
+                                <td colSpan={isCoordinator ? 5 : 4}>
+                                    Loading <ClipLoader size={15} />
+                                </td>
                             </tr>
-                        ))}
+                        ) : (
+                            modules.map((module) => (
+                                <tr key={module.module_id}>
+                                    {editedModule.module_id ===
+                                    module.module_id ? (
+                                        <>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    value={editedModule.name}
+                                                    onChange={handleChange}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    name="abbreviation"
+                                                    value={
+                                                        editedModule.abbreviation
+                                                    }
+                                                    onChange={handleChange}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    name="ects"
+                                                    value={editedModule.ects}
+                                                    onChange={handleChange}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    name="contact_hours"
+                                                    value={
+                                                        editedModule.contact_hours
+                                                    }
+                                                    onChange={handleChange}
+                                                />
+                                            </td>
+                                            {isCoordinator && (
+                                                <td>
+                                                    <button
+                                                        className="buttons"
+                                                        onClick={() =>
+                                                            handleSave(
+                                                                module.module_id
+                                                            )
+                                                        }
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        className="buttons"
+                                                        onClick={() =>
+                                                            setEditedModule({})
+                                                        }
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </td>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <td>{module.name}</td>
+                                            <td>{module.abbreviation}</td>
+                                            <td>{module.ects}</td>
+                                            <td>{module.contact_hours}</td>
+                                            {isCoordinator && (
+                                                <td>
+                                                    <button
+                                                        className="buttons"
+                                                        onClick={() =>
+                                                            handleEditClick(
+                                                                module
+                                                            )
+                                                        }
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        className="buttons"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                module.module_id
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            )}
+                                        </>
+                                    )}
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>

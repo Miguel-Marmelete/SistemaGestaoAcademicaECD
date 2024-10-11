@@ -3,8 +3,8 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
-import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 import customFetch from "../../../scripts/customFetch";
+import { ClipLoader } from "react-spinners";
 
 const AssociateProfessorToModule = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
@@ -15,7 +15,8 @@ const AssociateProfessorToModule = () => {
     const [selectedModule, setSelectedModule] = useState("");
     const [selectedProfessor, setSelectedProfessor] = useState("");
     const [selectedCourse, setSelectedCourse] = useState("");
-    const [loading, setLoading] = useState(false); // New loading state
+    const [loadingSubmit, setLoadingSubmit] = useState(false); // Loading state for submission
+    const [loadingTable, setLoadingTable] = useState(false); // Loading state for table data
 
     // Fetch professors and courses only once when component mounts
     useEffect(() => {
@@ -25,9 +26,7 @@ const AssociateProfessorToModule = () => {
             setAccessTokenData
         )
             .then((data) => setProfessors(data.professors))
-            .catch((error) =>
-                alert("Failed to fetch professors: " + error.message)
-            );
+            .catch((error) => alert(error));
 
         customFetch(
             endpoints.GET_COURSES_AND_MODULES_OF_PROFESSOR,
@@ -38,22 +37,21 @@ const AssociateProfessorToModule = () => {
                 setCourses(data.courses.reverse());
             })
             .catch((error) => {
-                alert("Failed to fetch courses and modules: " + error.message);
+                alert(error);
             });
     }, [accessTokenData.access_token]);
 
     // Fetch modules and professors-and-modules when a course is selected
     useEffect(() => {
         if (selectedCourse) {
+            setLoadingTable(true); // Start loading for table data
             customFetch(
                 `${endpoints.GET_MODULES_BY_COURSE}?course_id=${selectedCourse}`,
                 accessTokenData,
                 setAccessTokenData
             )
                 .then((data) => setModules(data.modules.reverse()))
-                .catch((error) =>
-                    alert("Erro ao procurar módulos: " + error.message)
-                );
+                .catch((error) => alert(error));
 
             // Fetch professors and modules by course (new fetch)
             customFetch(
@@ -65,18 +63,16 @@ const AssociateProfessorToModule = () => {
                     setProfessorsAndModules(data.professorsAndModules)
                 )
                 .catch((error) =>
-                    alert(
-                        "Failed to fetch professors and modules: " +
-                            error.message
-                    )
-                );
+                    alert("Failed to fetch professors and modules: " + error)
+                )
+                .finally(() => setLoadingTable(false)); // End loading for table data
         }
     }, [selectedCourse]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (loading) return;
-        setLoading(true);
+        if (loadingSubmit) return;
+        setLoadingSubmit(true);
 
         const associationData = {
             professor_id: selectedProfessor,
@@ -84,22 +80,13 @@ const AssociateProfessorToModule = () => {
             course_id: selectedCourse,
         };
 
-        fetch(endpoints.ASSOCIATE_PROFESSOR_TO_MODULE, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-            body: JSON.stringify(associationData),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((error) => {
-                        throw new Error(error.message || "Unknown error");
-                    });
-                }
-                return response.json();
-            })
+        customFetch(
+            endpoints.ASSOCIATE_PROFESSOR_TO_MODULE,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            associationData
+        )
             .then(() => {
                 alert("Professor associated to module successfully!");
                 setSelectedModule("");
@@ -108,7 +95,7 @@ const AssociateProfessorToModule = () => {
                 setProfessorsAndModules([]);
             })
             .catch((error) => alert("Error: " + error.message))
-            .finally(() => setLoading(false));
+            .finally(() => setLoadingSubmit(false));
     };
 
     return (
@@ -202,24 +189,30 @@ const AssociateProfessorToModule = () => {
                         </select>
                     </div>
 
-                    <button type="submit" disabled={loading}>
-                        {loading ? "A submeter..." : "Submeter"}
+                    <button type="submit" disabled={loadingSubmit}>
+                        {loadingSubmit ? <ClipLoader size={15} /> : "Submeter"}
                     </button>
                 </form>
 
                 {/* Display existing professors and modules */}
                 <div className="list">
                     <h2>Professores encarregados dos módulos</h2>
-                    {professorsAndModules && professorsAndModules.length > 0 ? (
-                        <table className="form-table">
-                            <thead>
+                    <table className="form-table">
+                        <thead>
+                            <tr>
+                                <th>Módulo</th>
+                                <th>Professor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loadingTable ? (
                                 <tr>
-                                    <th>Módulo</th>
-                                    <th>Professor</th>
+                                    <td colSpan="2">
+                                        Loading <ClipLoader size={15} />
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {professorsAndModules.map((item) => (
+                            ) : professorsAndModules.length > 0 ? (
+                                professorsAndModules.map((item) => (
                                     <tr key={item.module.module_id}>
                                         <td>{item.module.name}</td>
                                         <td>
@@ -228,12 +221,19 @@ const AssociateProfessorToModule = () => {
                                                 : "Sem professor designado"}
                                         </td>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <p>Nenhum professor encarregado de módulo</p>
-                    )}
+                                ))
+                            ) : (
+                                <tr>
+                                    <td
+                                        colSpan="2"
+                                        style={{ textAlign: "center" }}
+                                    >
+                                        Nenhum professor encarregado do módulo
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

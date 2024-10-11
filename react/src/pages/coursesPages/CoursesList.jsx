@@ -86,6 +86,11 @@ const CoursesList = () => {
             })
             .catch((error) => console.error(error));
     };
+
+    const handleCancelEdit = () => {
+        setEditedCourse({});
+    };
+
     if (!professor) {
         return (
             <div>
@@ -143,11 +148,18 @@ const CoursesList = () => {
                                     {isCoordinator && (
                                         <td>
                                             <button
+                                                className="buttons"
                                                 onClick={() =>
                                                     handleSave(course.course_id)
                                                 }
                                             >
                                                 Save
+                                            </button>
+                                            <button
+                                                className="buttons"
+                                                onClick={handleCancelEdit}
+                                            >
+                                                Cancel
                                             </button>
                                         </td>
                                     )}

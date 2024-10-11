@@ -4,6 +4,8 @@ import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
+
 const AddSubModule = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
     const [modules, setModules] = useState([]);
@@ -16,6 +18,7 @@ const AddSubModule = () => {
         abbreviation: "",
         module_id: "",
     });
+    const [subModulesLoading, setSubModulesLoading] = useState(true); // For fetching submodules
 
     // Fetch modules on component mount
     useEffect(() => {
@@ -31,6 +34,7 @@ const AddSubModule = () => {
 
     // Fetch submodules on component mount and when a submodule is added
     useEffect(() => {
+        setSubModulesLoading(true); // Start loading before fetching submodules
         customFetch(
             endpoints.GET_SUBMODULES,
             accessTokenData,
@@ -42,8 +46,11 @@ const AddSubModule = () => {
             .catch((error) => {
                 console.error("Erro ao procurar submódulos:", error);
                 alert(error.message);
+            })
+            .finally(() => {
+                setSubModulesLoading(false); // Stop loading after fetching submodules
             });
-    }, [accessTokenData.access_token, subModuleAdded]); 
+    }, [accessTokenData.access_token, subModuleAdded]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -149,7 +156,7 @@ const AddSubModule = () => {
                     </div>
 
                     <button type="submit" disabled={loading}>
-                        {loading ? "A submeter..." : "Submeter"}
+                        {loading ? <ClipLoader size={15} /> : "Submeter"}
                     </button>
                 </form>
 
@@ -163,12 +170,20 @@ const AddSubModule = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {subModules.map((subModule) => (
-                                <tr key={subModule.submodule_id}>
-                                    <td>{subModule.name}</td>
-                                    <td>{subModule.abbreviation}</td>
+                            {subModulesLoading ? (
+                                <tr>
+                                    <td colSpan="2">
+                                        Loading <ClipLoader size={15} />
+                                    </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                subModules.map((subModule) => (
+                                    <tr key={subModule.submodule_id}>
+                                        <td>{subModule.name}</td>
+                                        <td>{subModule.abbreviation}</td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

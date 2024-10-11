@@ -4,12 +4,14 @@ import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
+import { ClipLoader } from "react-spinners"; // Add this import
 
 const SubModulesList = () => {
     const [subModules, setSubModules] = useState([]);
     const [editedSubModule, setEditedSubModule] = useState({});
     const { accessTokenData, setAccessTokenData, professor } = useAuth();
     const [isCoordinator, setIsCoordinator] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // Add loading state
 
     useEffect(() => {
         if (professor) {
@@ -19,6 +21,7 @@ const SubModulesList = () => {
 
     // Fetch submodules from API
     useEffect(() => {
+        setIsLoading(true); // Set loading to true when starting the fetch
         customFetch(
             endpoints.GET_SUBMODULES,
             accessTokenData,
@@ -31,6 +34,9 @@ const SubModulesList = () => {
             .catch((error) => {
                 console.error("Error fetching submodules:", error);
                 alert(error.message);
+            })
+            .finally(() => {
+                setIsLoading(false); // Set loading to false after the fetch is complete
             });
     }, [accessTokenData.access_token]);
 
@@ -124,89 +130,107 @@ const SubModulesList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {subModules.map((subModule) => (
-                            <tr key={subModule.submodule_id}>
-                                {editedSubModule.submodule_id ===
-                                subModule.submodule_id ? (
-                                    <>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value={editedSubModule.name}
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="abbreviation"
-                                                value={
-                                                    editedSubModule.abbreviation
-                                                }
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="number"
-                                                name="contact_hours"
-                                                value={
-                                                    editedSubModule.contact_hours
-                                                }
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        <td>{subModule.module.name}</td>
-                                        {isCoordinator && (
-                                            <td>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={() =>
-                                                        handleSave(
-                                                            subModule.submodule_id
-                                                        )
-                                                    }
-                                                >
-                                                    Save
-                                                </button>
-                                            </td>
-                                        )}
-                                    </>
-                                ) : (
-                                    <>
-                                        <td>{subModule.name}</td>
-                                        <td>{subModule.abbreviation}</td>
-                                        <td>{subModule.contact_hours}</td>
-                                        <td>{subModule.module.name}</td>
-                                        {isCoordinator && (
-                                            <td>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={() =>
-                                                        handleEditClick(
-                                                            subModule
-                                                        )
-                                                    }
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={() =>
-                                                        handleDelete(
-                                                            subModule.submodule_id
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        )}
-                                    </>
-                                )}
+                        {isLoading ? (
+                            <tr>
+                                <td colSpan={isCoordinator ? 5 : 4}>
+                                    Loading <ClipLoader size={15} />
+                                </td>
                             </tr>
-                        ))}
+                        ) : (
+                            subModules.map((subModule) => (
+                                <tr key={subModule.submodule_id}>
+                                    {editedSubModule.submodule_id ===
+                                    subModule.submodule_id ? (
+                                        <>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    value={editedSubModule.name}
+                                                    onChange={handleChange}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    name="abbreviation"
+                                                    value={
+                                                        editedSubModule.abbreviation
+                                                    }
+                                                    onChange={handleChange}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    name="contact_hours"
+                                                    value={
+                                                        editedSubModule.contact_hours
+                                                    }
+                                                    onChange={handleChange}
+                                                />
+                                            </td>
+                                            <td>{subModule.module.name}</td>
+                                            {isCoordinator && (
+                                                <td>
+                                                    <button
+                                                        className="buttons"
+                                                        onClick={() =>
+                                                            handleSave(
+                                                                subModule.submodule_id
+                                                            )
+                                                        }
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        className="buttons"
+                                                        onClick={() =>
+                                                            setEditedSubModule(
+                                                                {}
+                                                            )
+                                                        }
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </td>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <td>{subModule.name}</td>
+                                            <td>{subModule.abbreviation}</td>
+                                            <td>{subModule.contact_hours}</td>
+                                            <td>{subModule.module.name}</td>
+                                            {isCoordinator && (
+                                                <td>
+                                                    <button
+                                                        className="buttons"
+                                                        onClick={() =>
+                                                            handleEditClick(
+                                                                subModule
+                                                            )
+                                                        }
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        className="buttons"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                subModule.submodule_id
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            )}
+                                        </>
+                                    )}
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>

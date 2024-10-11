@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
@@ -12,9 +13,12 @@ const AssociateModulesToCourse = () => {
     const [selectedCourse, setSelectedCourse] = useState("");
     const [selectedModules, setSelectedModules] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [loadingModules, setLoadingModules] = useState(false); // New state for modules loading
+    const [loadingModulesInCourse, setLoadingModulesInCourse] = useState(false); // New state for modules in course loading
+    const [deletingModuleId, setDeletingModuleId] = useState(null); // New state for tracking deleting module
     const { accessTokenData, setAccessTokenData } = useAuth();
 
-    // Fetch courses from API
+    // Fetch courses and modules from API
     useEffect(() => {
         customFetch(
             endpoints.GET_COURSES_AND_MODULES_OF_PROFESSOR,
@@ -28,17 +32,20 @@ const AssociateModulesToCourse = () => {
                 alert(error);
             });
 
+        setLoadingModules(true); // Start loading modules
         customFetch(endpoints.GET_MODULES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setModules(data.modules.reverse());
             })
             .catch((error) => {
                 alert(error);
-            });
+            })
+            .finally(() => setLoadingModules(false)); // End loading modules
     }, []);
 
     useEffect(() => {
         if (selectedCourse) {
+            setLoadingModulesInCourse(true); // Start loading modules in course
             customFetch(
                 `${endpoints.GET_MODULES_BY_COURSE}?course_id=${selectedCourse}`,
                 accessTokenData,
@@ -49,7 +56,8 @@ const AssociateModulesToCourse = () => {
                 })
                 .catch((error) => {
                     alert(error);
-                });
+                })
+                .finally(() => setLoadingModulesInCourse(false)); // End loading modules in course
         }
     }, [selectedCourse]);
 
@@ -107,6 +115,46 @@ const AssociateModulesToCourse = () => {
             .finally(() => setLoading(false));
     };
 
+    // Add this function to handle module deletion
+    const handleDeleteAssociation = (moduleId) => {
+        if (!selectedCourse) {
+            alert("No course selected.");
+            return;
+        }
+
+        const deleteData = {
+            course_id: selectedCourse,
+            module_id: moduleId,
+        };
+
+        setLoading(true);
+        setDeletingModuleId(moduleId); // Set the module being deleted
+
+        customFetch(
+            endpoints.DELETE_MODULE_FROM_COURSE,
+            accessTokenData,
+            setAccessTokenData,
+            "DELETE",
+            deleteData
+        )
+            .then(() => {
+                alert("Módulo removido do curso com sucesso!");
+                setModulesInCourse((prevModules) =>
+                    prevModules.filter(
+                        (module) => module.module_id !== moduleId
+                    )
+                );
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert(error.message);
+            })
+            .finally(() => {
+                setLoading(false);
+                setDeletingModuleId(null); // Reset the deleting module
+            });
+    };
+
     return (
         <div>
             <ButtonMenu buttons={modulesMenuButtons} />
@@ -139,16 +187,22 @@ const AssociateModulesToCourse = () => {
                     <div>
                         <label>Módulos</label>
                         <div className="form-table-responsive">
-                            {modules.length > 0 ? (
-                                <table className="form-table">
-                                    <thead>
+                            <table className="form-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Selecione</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loadingModules ? (
                                         <tr>
-                                            <th>Nome</th>
-                                            <th>Selecione</th>
+                                            <td colSpan="2">
+                                                Loading <ClipLoader size={15} />
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {modules.map((module) => (
+                                    ) : modules.length > 0 ? (
+                                        modules.map((module) => (
                                             <tr key={module.module_id}>
                                                 <td>{module.name}</td>
                                                 <td>
@@ -165,39 +219,75 @@ const AssociateModulesToCourse = () => {
                                                     />
                                                 </td>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            ) : (
-                                <p>Não há módulos disponíveis</p>
-                            )}
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="2">
+                                                Não há módulos disponíveis
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
                     <button type="submit" disabled={loading}>
-                        {loading ? "A submeter..." : "Submeter"}
+                        {loading ? <ClipLoader size={15} /> : "Submeter"}
                     </button>
                 </form>
                 <div className="list">
                     <h2>Módulos Associados ao Curso </h2>
-                    {modulesInCourse.length > 0 ? (
-                        <table className="form-table">
-                            <thead>
+                    <table className="form-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loadingModulesInCourse ? (
                                 <tr>
-                                    <th>Nome</th>
+                                    <td colSpan="3">
+                                        Loading <ClipLoader size={15} />
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {modulesInCourse.map((module) => (
+                            ) : modulesInCourse.length > 0 ? (
+                                modulesInCourse.map((module) => (
                                     <tr key={module.module_id}>
                                         <td>{module.name}</td>
+                                        <td>
+                                            <button
+                                                className="buttons"
+                                                onClick={() =>
+                                                    handleDeleteAssociation(
+                                                        module.module_id
+                                                    )
+                                                }
+                                                disabled={
+                                                    deletingModuleId ===
+                                                    module.module_id
+                                                } // Disable button if deleting
+                                            >
+                                                {deletingModuleId ===
+                                                module.module_id ? (
+                                                    <ClipLoader size={15} />
+                                                ) : (
+                                                    "Delete"
+                                                )}
+                                            </button>
+                                        </td>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <p>Não há módulos associados a este curso</p>
-                    )}
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="2">
+                                        Não há módulos associados a este curso
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

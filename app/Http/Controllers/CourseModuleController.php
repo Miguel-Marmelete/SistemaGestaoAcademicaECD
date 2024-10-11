@@ -177,15 +177,34 @@ class CourseModuleController extends Controller
      * @param  int  $course_id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($module_id, $course_id)
+    public function deleteModuleFromCourse(Request $request)
     {
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'course_id' => 'required|exists:courses,course_id',
+            'module_id' => 'required|exists:modules,module_id',
+        ]);
+
+        if ($validator->fails()) {
+            Log::error('Validation failed: ' . $validator->errors());
+            return response()->json(['message' => $validator->errors()], 422);
+        }
+
         try {
-            $courseModule = CourseModule::where('module_id', $module_id)
-                ->where('course_id', $course_id)
+            // Retrieve the validated data
+            $validatedData = $validator->validated();
+            $course_id = $validatedData['course_id'];
+            $module_id = $validatedData['module_id'];
+
+            // Find the course-module relationship
+            $courseModule = CourseModule::where('course_id', $course_id)
+                ->where('module_id', $module_id)
                 ->firstOrFail();
+
+            // Delete the relationship
             $courseModule->delete();
 
-            return response()->json(['message' => 'Course-Module relationship deleted successfully'], 200);
+            return response()->json(['message' => 'Module removed from course successfully.'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error('Course-Module relationship not found: ' . $e->getMessage());
             return response()->json(['message' => 'Course-Module relationship not found'], 404);

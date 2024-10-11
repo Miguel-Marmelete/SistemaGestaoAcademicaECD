@@ -19,7 +19,7 @@ const AddCourse = () => {
     });
     const fileInputRef = useRef(null);
     const [coursesLoading, setCoursesLoading] = useState(true);
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
 
     useEffect(() => {
         setCoursesLoading(true);
@@ -27,7 +27,10 @@ const AddCourse = () => {
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
-            .catch((error) => console.error(error))
+            .catch((error) => {
+                console.error(error);
+                alert(error);
+            })
             .finally(() => {
                 setCoursesLoading(false);
             });
@@ -89,6 +92,7 @@ const AddCourse = () => {
                 setCourseAdded((prev) => !prev);
             })
             .catch((error) => {
+                console.error(error);
                 alert(error);
             })
             .finally(() => {
@@ -122,7 +126,6 @@ const AddCourse = () => {
             date: row[2],
         }));
 
-        // Navigate to the review page with the parsed courses
         navigate("/reviewCourses", { state: { courses: parsedCourses } });
     };
 

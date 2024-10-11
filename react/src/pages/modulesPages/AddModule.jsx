@@ -4,10 +4,12 @@ import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
 
 const AddModule = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // For form submission
+    const [modulesLoading, setModulesLoading] = useState(true); // For fetching modules
     const [modules, setModules] = useState([]); // State for fetched modules
     const [moduleAdded, setModuleAdded] = useState(false); // State to track if a module was added
 
@@ -19,15 +21,19 @@ const AddModule = () => {
     });
 
     useEffect(() => {
+        setModulesLoading(true); // Start loading before fetching modules
         customFetch(endpoints.GET_MODULES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setModules(data.modules.reverse());
             })
             .catch((error) => {
-                console.error("Error fetching modules:", error);
-                alert(error.message);
+                console.error(error);
+                alert(error);
+            })
+            .finally(() => {
+                setModulesLoading(false); // Stop loading after fetching modules
             });
-    }, [moduleAdded]); // Trigger fetch when a module is added
+    }, [moduleAdded]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -122,7 +128,7 @@ const AddModule = () => {
                         />
                     </div>
                     <button type="submit" disabled={loading}>
-                        {loading ? "A submeter..." : "Submeter"}
+                        {loading ? <ClipLoader size={15} /> : "Submeter"}
                     </button>
                 </form>
 
@@ -136,12 +142,20 @@ const AddModule = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {modules.map((module) => (
-                                <tr key={module.module_id}>
-                                    <td>{module.name}</td>
-                                    <td>{module.abbreviation}</td>
+                            {modulesLoading ? (
+                                <tr>
+                                    <td colSpan="2">
+                                        Loading <ClipLoader size={15} />
+                                    </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                modules.map((module) => (
+                                    <tr key={module.module_id}>
+                                        <td>{module.name}</td>
+                                        <td>{module.abbreviation}</td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

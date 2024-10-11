@@ -3,43 +3,42 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import ButtonMenu from "../../components/ButtonMenu";
 import { modulesMenuButtons } from "../../../scripts/buttonsData";
+import { ClipLoader } from "react-spinners";
+import customFetch from "../../../scripts/customFetch"; // Import customFetch
 
 const ProfessorsInChargeOfModulesList = () => {
-    const { accessTokenData } = useAuth();
+    const { accessTokenData, setAccessTokenData } = useAuth();
     const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState("");
     const [professorsInCharge, setProfessorsInCharge] = useState([]);
     const [filteredProfessorsInCharge, setFilteredProfessorsInCharge] =
         useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(endpoints.GET_COURSES, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
+        setLoading(true);
+        customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => setCourses(data.courses.reverse()))
-            .catch((error) =>
-                alert("Failed to fetch courses: " + error.message)
-            );
-    }, [accessTokenData.access_token]);
+            .catch((error) => alert(error))
+            .finally(() => setLoading(false));
+    }, [accessTokenData]);
 
     useEffect(() => {
-        fetch(endpoints.GET_PROFESSORS_IN_CHARGE_OF_MODULES, {
-            headers: {
-                Authorization: `Bearer ${accessTokenData.access_token}`,
-            },
-        })
-            .then((response) => response.json())
+        setLoading(true);
+        customFetch(
+            endpoints.GET_PROFESSORS_IN_CHARGE_OF_MODULES,
+            accessTokenData,
+            setAccessTokenData
+        )
             .then((data) => {
                 setProfessorsInCharge(data.professorsInCharge);
                 setFilteredProfessorsInCharge(data.professorsInCharge);
             })
             .catch((error) =>
-                alert("Failed to fetch professors in charge: " + error.message)
-            );
-    }, [accessTokenData.access_token]);
+                alert("Failed to fetch professors in charge: " + error)
+            )
+            .finally(() => setLoading(false));
+    }, [accessTokenData]);
 
     useEffect(() => {
         if (selectedCourse) {
@@ -65,19 +64,13 @@ const ProfessorsInChargeOfModulesList = () => {
             return;
         }
 
-        fetch(
+        customFetch(
             `${endpoints.DELETE_PROFESSOR_IN_CHARGE_OF_MODULE}/${professor_id}/${module_id}/${course_id}`,
-            {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${accessTokenData.access_token}`,
-                },
-            }
+            accessTokenData,
+            setAccessTokenData,
+            "DELETE"
         )
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to delete professor from module");
-                }
+            .then(() => {
                 setFilteredProfessorsInCharge((prevProfessorsInCharge) =>
                     prevProfessorsInCharge.filter(
                         (professorInCharge) =>
@@ -93,7 +86,7 @@ const ProfessorsInChargeOfModulesList = () => {
                 alert("Professor removed successfully from the module");
             })
             .catch((error) => {
-                alert(error.message);
+                alert(error);
             });
     };
 
@@ -133,32 +126,45 @@ const ProfessorsInChargeOfModulesList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredProfessorsInCharge.map((professorInCharge) => (
-                            <tr
-                                key={`${professorInCharge.module.module_id}-${professorInCharge.professor.professor_id}-${professorInCharge.course.course_id}`}
-                            >
-                                <td>{professorInCharge.module.name}</td>
-                                <td>{professorInCharge.professor.name}</td>
-                                <td>{professorInCharge.course.name}</td>
-                                <td>
-                                    <button
-                                        className="buttons"
-                                        onClick={() =>
-                                            handleDelete(
-                                                professorInCharge.module
-                                                    .module_id,
-                                                professorInCharge.professor
-                                                    .professor_id,
-                                                professorInCharge.course
-                                                    .course_id
-                                            )
-                                        }
-                                    >
-                                        Delete
-                                    </button>
+                        {loading ? (
+                            <tr>
+                                <td colSpan="4">
+                                    Loading <ClipLoader size={15} />
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            filteredProfessorsInCharge.map(
+                                (professorInCharge) => (
+                                    <tr
+                                        key={`${professorInCharge.module.module_id}-${professorInCharge.professor.professor_id}-${professorInCharge.course.course_id}`}
+                                    >
+                                        <td>{professorInCharge.module.name}</td>
+                                        <td>
+                                            {professorInCharge.professor.name}
+                                        </td>
+                                        <td>{professorInCharge.course.name}</td>
+                                        <td>
+                                            <button
+                                                className="buttons"
+                                                onClick={() =>
+                                                    handleDelete(
+                                                        professorInCharge.module
+                                                            .module_id,
+                                                        professorInCharge
+                                                            .professor
+                                                            .professor_id,
+                                                        professorInCharge.course
+                                                            .course_id
+                                                    )
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )
+                            )
+                        )}
                     </tbody>
                 </table>
             </div>
