@@ -52,6 +52,7 @@ const endpoints = {
     SUBMIT_EVALUATION_MOMENT_GRADES: `${API_BASE_URL}/submitEvaluationMomentGrades`,
     ADD_PROFESSOR: `${API_BASE_URL}/addProfessor`,
     ADD_COURSES_CSV: `${API_BASE_URL}/addCoursesCSV`,
+    ADD_AND_ENROLL_STUDENTS_CSV: `${API_BASE_URL}/addAndEnrollStudentsCSV`,
     //DELETE
     DELETE_COURSE: `${API_BASE_URL}/deleteCourse`,
     DELETE_MODULE: `${API_BASE_URL}/deleteModule`,

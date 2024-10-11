@@ -870,7 +870,6 @@ form small {
 }
 /*------------------CSV QUESTION MARK CSS------------------*/
 /* Add this CSS to your stylesheet */
-/* Add this CSS to your stylesheet */
 .tooltip-container {
     position: relative;
     display: inline-block;
@@ -878,25 +877,48 @@ form small {
 
 .custom-tooltip {
     visibility: hidden;
-    width: auto;
     background-color: #f9f9f9;
     color: #333;
+    width: auto;
+    max-width: auto;
     text-align: left;
     border: 1px solid #ccc;
     border-radius: 5px;
-    padding: 10px;
+    padding: 8px;
     position: absolute;
     z-index: 1;
-    bottom: 125%; /* Position the tooltip above the button */
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 125%;
+    left: 20px; /* Adjust this value to move the tooltip more to the right */
     opacity: 0;
-    transition: opacity 0s; /* No delay */
+    transition: opacity 0.3s;
     font-family: monospace;
-    white-space: pre;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    box-sizing: border-box;
 }
 
 .tooltip-container:hover .custom-tooltip {
     visibility: visible;
     opacity: 1;
+}
+
+/* Arrow below the tooltip */
+.custom-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 10px; /* Align arrow with the left side of the tooltip */
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #f9f9f9 transparent transparent transparent;
+}
+
+/* Media query for smaller screens */
+@media screen and (max-width: 600px) {
+    .custom-tooltip {
+        left: 0;
+        max-width: calc(100vw - 40px);
+    }
 }

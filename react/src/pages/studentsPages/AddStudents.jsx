@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ButtonMenu from "../../components/ButtonMenu";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import { studentsMenuButtons } from "../../../scripts/buttonsData";
 import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 import customFetch from "../../../scripts/customFetch";
+import { useNavigate } from "react-router-dom"; // Add this import
 
 const AddStudents = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
@@ -25,6 +26,8 @@ const AddStudents = () => {
         personal_email: "",
         nim: "",
     });
+    const fileInputRef = useRef(null);
+    const navigate = useNavigate(); // Add this line
 
     useEffect(() => {
         fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
@@ -144,6 +147,50 @@ const AddStudents = () => {
                 // Always stop the loading spinner after the process
                 setLoading(false);
             });
+    };
+
+    const handleCSVUpload = (e) => {
+        e.preventDefault();
+        if (!selectedCourse) {
+            alert("Please select a course before uploading a CSV file.");
+            return;
+        }
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const csvData = event.target.result;
+                processAndUploadCSV(csvData);
+            };
+            reader.readAsText(file);
+        }
+    };
+
+    const processAndUploadCSV = (csvData) => {
+        const rows = csvData.split("\n").map((row) => row.split(","));
+        const parsedStudents = rows.slice(1).map((row) => ({
+            name: row[0],
+            ipbeja_email: row[1],
+            number: row[2],
+            birthday: row[3],
+            address: row[4],
+            city: row[5],
+            mobile: row[6],
+            classe: row[7],
+            posto: row[8],
+            personal_email: row[9],
+            nim: row[10],
+            course_id: selectedCourse, // Ensure course_id is included
+        }));
+
+        // Navigate to the review page with the parsed students and selected course
+        navigate("/reviewStudents", {
+            state: { students: parsedStudents, course: selectedCourse },
+        });
     };
 
     return (
@@ -295,9 +342,35 @@ const AddStudents = () => {
                             maxLength={255}
                         />
                     </div>
-                    <button type="submit" disabled={loading}>
-                        {loading ? "Submitting..." : "Submeter"}
-                    </button>
+
+                    <div className="button-group">
+                        <button type="submit" disabled={loading}>
+                            {loading ? "Submitting..." : "Submeter"}
+                        </button>{" "}
+                        <div className="tooltip-container">
+                            <button onClick={handleCSVUpload}>CSV</button>
+                            <div className="custom-tooltip">
+                                <pre>
+                                    Formato do CSV:
+                                    <br />
+                                    Nome,Email IPBEJA,Número,Data de
+                                    Nascimento,Morada,Cidade,Telemóvel,Classe,Posto,Email
+                                    Pessoal,NIM
+                                    <br />
+                                    AlunoX,email@ipbeja.pt,12345,2000-01-01,Rua
+                                    X,Cidade Y,912345678,Classe A,Posto
+                                    B,email@pessoal.pt,67890
+                                </pre>
+                            </div>
+                        </div>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: "none" }}
+                            onChange={handleFileChange}
+                            accept=".csv"
+                        />
+                    </div>
                 </form>
 
                 <div className="list">

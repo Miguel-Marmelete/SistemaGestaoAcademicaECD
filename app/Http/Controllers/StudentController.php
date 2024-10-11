@@ -205,7 +205,10 @@ class StudentController extends Controller
 
             if ($validator->fails()) {
                 Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 400);
+                return response()->json([
+                    'message' => 'Validation failed. Please check the input fields for errors.',
+                    'details' => implode(', ', $validator->errors()->all())
+                ], 400);
             }
 
             // Create the student without course_id
@@ -226,8 +229,55 @@ class StudentController extends Controller
         }
     }
 
+    public function addAndEnrollStudentsCSV(Request $request)
+    {
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'students' => 'required|array',
+                'students.*.name' => 'required|string|max:255',
+                'students.*.ipbeja_email' => 'required|string|email|max:255|unique:students,ipbeja_email',
+                'students.*.number' => 'required|integer|unique:students,number',
+                'students.*.birthday' => 'required|date',
+                'students.*.address' => 'required|string|max:255',
+                'students.*.city' => 'required|string|max:255',
+                'students.*.mobile' => 'required|integer',
+                'students.*.posto' => 'required|string|max:255',
+                'students.*.nim' => 'required|integer',
+                'students.*.classe' => 'required|string|max:255',
+                'students.*.personal_email' => 'required|string|email|max:255|unique:students,personal_email',
+                'course_id' => 'required|integer|exists:courses,course_id',
+            ]);
+
+            if ($validator->fails()) {
+                Log::error('Validation failed: ' . $validator->errors());
+                return response()->json([
+                    'message' => 'Validation failed. Please check the input fields for errors.',
+                    'details' => implode(', ', $validator->errors()->all())
+                ], 400);
+            }
+
+            $studentsData = $request->input('students');
+            $courseId = $request->input('course_id');
+
+            foreach ($studentsData as $studentData) {
+                // Remove course_id from student data
+                unset($studentData['course_id']);
+                
+                // Create the student
+                $student = Student::firstOrCreate($studentData);
+
+                // Enroll the student in the course
+                Enrollment::firstOrCreate([
+                    'student_id' => $student->student_id,
+                    'course_id' => $courseId,
+                ]);
+            }
+
+            return response()->json(['message' => 'Students added and enrolled successfully'], 201);
+        } catch (\Exception $e) {
+            Log::error('An error occurred while adding and enrolling students: ' . $e->getMessage());
+            return response()->json(['message' => 'An error occurred while adding and enrolling students', 'details' => $e->getMessage()], 500);
+        }
+    }
 }
-
- 
-    
-

@@ -41,6 +41,7 @@ Route::middleware(['auth:api'])->group(function () {
   //------------------CSV ROUTES----------------------------------------
      // Create new courses
      Route::post('/addCoursesCSV', [CourseController::class, 'storeCoursesCSV']);
+     Route::post('/addAndEnrollStudentsCSV', [StudentController::class, 'addAndEnrollStudentsCSV']);
   //---------------------------------------------------------------------
 
   //------------------COURSE ROUTES----------------------------------------

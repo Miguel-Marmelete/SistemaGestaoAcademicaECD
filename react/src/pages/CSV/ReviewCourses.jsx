@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import customFetch from "../../../scripts/customFetch";
 import { useAuth } from "../../auth/AuthContext";
@@ -10,6 +10,7 @@ function ReviewCourses() {
     const { accessTokenData, setAccessTokenData } = useAuth();
     const { courses } = location.state || { courses: [] };
     const [editableCourses, setEditableCourses] = useState(courses);
+    const [editMode, setEditMode] = useState(false);
 
     const handleInputChange = (index, field, value) => {
         const updatedCourses = [...editableCourses];
@@ -34,6 +35,10 @@ function ReviewCourses() {
             });
     };
 
+    const toggleEditMode = () => {
+        setEditMode(!editMode);
+    };
+
     return (
         <div className="table-list-container">
             <header>
@@ -51,51 +56,68 @@ function ReviewCourses() {
                     {editableCourses.map((course, index) => (
                         <tr key={index}>
                             <td>
-                                <input
-                                    type="text"
-                                    value={course.name}
-                                    onChange={(e) =>
-                                        handleInputChange(
-                                            index,
-                                            "name",
-                                            e.target.value
-                                        )
-                                    }
-                                />
+                                {editMode ? (
+                                    <input
+                                        type="text"
+                                        value={course.name}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                index,
+                                                "name",
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                ) : (
+                                    course.name
+                                )}
                             </td>
                             <td>
-                                <input
-                                    type="text"
-                                    value={course.abbreviation}
-                                    onChange={(e) =>
-                                        handleInputChange(
-                                            index,
-                                            "abbreviation",
-                                            e.target.value
-                                        )
-                                    }
-                                />
+                                {editMode ? (
+                                    <input
+                                        type="text"
+                                        value={course.abbreviation}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                index,
+                                                "abbreviation",
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                ) : (
+                                    course.abbreviation
+                                )}
                             </td>
                             <td>
-                                <input
-                                    type="text"
-                                    value={course.date}
-                                    onChange={(e) =>
-                                        handleInputChange(
-                                            index,
-                                            "date",
-                                            e.target.value
-                                        )
-                                    }
-                                />
+                                {editMode ? (
+                                    <input
+                                        type="text"
+                                        value={course.date}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                index,
+                                                "date",
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                ) : (
+                                    course.date
+                                )}
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-            <button className="buttons" onClick={handleConfirm}>
-                Confirm
-            </button>
+            <div className="button-group">
+                <button className="buttons" onClick={handleConfirm}>
+                    Confirm
+                </button>
+                <button className="buttons" onClick={toggleEditMode}>
+                    {editMode ? "Save" : "Edit"}
+                </button>
+            </div>
         </div>
     );
 }
