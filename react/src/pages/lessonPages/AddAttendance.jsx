@@ -4,6 +4,7 @@ import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { lessonsMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
+import { ClipLoader } from "react-spinners"; // Import ClipLoader
 
 const AddAttendance = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
@@ -16,6 +17,7 @@ const AddAttendance = () => {
     const [selectedLesson, setSelectedLesson] = useState("");
     const [selectedStudents, setSelectedStudents] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [loadingStudents, setLoadingStudents] = useState(false); // New state for loading students
 
     useEffect(() => {
         customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
@@ -23,9 +25,54 @@ const AddAttendance = () => {
                 setCourses(data.courses.reverse());
             })
             .catch((error) => {
-                setError("Failed to fetch courses: " + error.message);
+                console.error(error);
+                alert(error);
             });
     }, []);
+
+    useEffect(() => {
+        if (selectedCourse && selectedSubmodule) {
+            setLoadingLessons(true);
+            customFetch(
+                `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}&submodule_id=${selectedSubmodule}`,
+                accessTokenData,
+                setAccessTokenData
+            )
+                .then((data) => {
+                    setLessons(data.lessons);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    alert(error);
+                })
+                .finally(() => {
+                    setLoadingLessons(false);
+                });
+        } else {
+            setLessons([]);
+        }
+    }, [selectedCourse, selectedSubmodule, accessTokenData.access_token]);
+
+    useEffect(() => {
+        if (selectedCourse) {
+            setLoadingStudents(true); // Start loading students
+            customFetch(
+                `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
+                accessTokenData,
+                setAccessTokenData
+            )
+                .then((studentsData) => {
+                    console.log(studentsData.students);
+                    setStudents(studentsData.students);
+                })
+                .catch((error) => {
+                    alert(error);
+                })
+                .finally(() => {
+                    setLoadingStudents(false); // Stop loading students
+                });
+        }
+    }, [selectedCourse]);
 
     useEffect(() => {
         if (selectedCourse) {
@@ -38,50 +85,10 @@ const AddAttendance = () => {
                     setSubmodules(submodulesData.submodules);
                 })
                 .catch((error) => {
-                    setError("Failed to fetch submodules: " + error.message);
+                    alert(error);
                 });
         }
     }, [selectedCourse]);
-
-    useEffect(() => {
-        if (selectedCourse) {
-            customFetch(
-                `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
-                accessTokenData,
-                setAccessTokenData
-            )
-                .then((studentsData) => {
-                    console.log(studentsData.students);
-                    setStudents(studentsData.students);
-                })
-                .catch((error) => {
-                    alert("Failed to fetch students: " + error.message);
-                });
-        }
-    }, [selectedCourse]);
-
-    useEffect(() => {
-        if (selectedCourse && selectedSubmodule) {
-            setLoading(true);
-            customFetch(
-                `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}&submodule_id=${selectedSubmodule}`,
-                accessTokenData,
-                setAccessTokenData
-            )
-                .then((data) => {
-                    setLessons(data.lessons);
-                })
-                .catch((error) => {
-                    console.error("Failed to fetch lessons:", error);
-                    alert("Failed to fetch lessons: " + error.message);
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-        } else {
-            setLessons([]);
-        }
-    }, [selectedCourse, selectedSubmodule, accessTokenData.access_token]);
 
     useEffect(() => {
         setSelectedSubmodule("");
@@ -152,17 +159,17 @@ const AddAttendance = () => {
             <ButtonMenu buttons={lessonsMenuButtons} />
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
-                    <h2>Add Attendance</h2>
+                    <h2>Adicionar Presenças</h2>
 
                     <div>
-                        <label>Course</label>
+                        <label>Curso</label>
                         <select
                             value={selectedCourse}
                             onChange={handleCourseChange}
                             required
                         >
                             <option value="" disabled>
-                                Select a Course
+                                Selecione um Curso
                             </option>
                             {courses.map((course) => (
                                 <option
@@ -175,7 +182,7 @@ const AddAttendance = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Submodule</label>
+                        <label>Submódulo</label>
                         <select
                             value={selectedSubmodule}
                             onChange={(e) =>
@@ -185,7 +192,7 @@ const AddAttendance = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a Submodule
+                                Selecione um Submódulo
                             </option>
                             {submodules.map((submodule) => (
                                 <option
@@ -198,19 +205,17 @@ const AddAttendance = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Lesson</label>
+                        <label>Aula</label>
                         <select
                             value={selectedLesson}
                             onChange={(e) => setSelectedLesson(e.target.value)}
-                            disabled={!selectedSubmodule || loading}
+                            disabled={!selectedSubmodule}
                             required
                         >
                             <option value="" disabled>
-                                {loading
-                                    ? "Loading lessons..."
-                                    : lessons.length === 0
-                                    ? "No lessons found"
-                                    : "Select a Lesson"}
+                                {lessons.length === 0
+                                    ? "Nenhuma aula encontrada"
+                                    : "Selecione uma Aula"}
                             </option>
                             {lessons.map((lesson) => (
                                 <option
@@ -223,19 +228,31 @@ const AddAttendance = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Students</label>
+                        <label>Alunos</label>
                         <div className="form-table-responsive">
-                            {students.length > 0 ? (
-                                <table className="form-table">
-                                    <thead>
+                            <table className="form-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Número</th>
+                                        <th>Selecionar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loadingStudents ? (
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Number</th>
-                                            <th>Select</th>
+                                            <td
+                                                colSpan="3"
+                                                className="loading-container"
+                                            >
+                                                <p>
+                                                    Loading
+                                                    <ClipLoader size={15} />
+                                                </p>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {students.map((student) => (
+                                    ) : students.length > 0 ? (
+                                        students.map((student) => (
                                             <tr key={student.student_id}>
                                                 <td>{student.name}</td>
                                                 <td>{student.number}</td>
@@ -254,16 +271,20 @@ const AddAttendance = () => {
                                                     />
                                                 </td>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            ) : (
-                                <p>No students available</p>
-                            )}
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="3">
+                                                Nenhum aluno inscrito no curso
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <button type="submit" disabled={loading}>
-                        {loading ? "Submitting..." : "Submit"}
+                        {loading ? <ClipLoader size={15} /> : "Submeter"}
                     </button>
                 </form>
             </div>

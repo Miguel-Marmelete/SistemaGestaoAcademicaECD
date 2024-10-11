@@ -5,6 +5,7 @@ import ButtonMenu from "../../components/ButtonMenu";
 import { lessonsMenuButtons } from "../../../scripts/buttonsData";
 import { useNavigate } from "react-router-dom";
 import customFetch from "../../../scripts/customFetch";
+import { ClipLoader } from "react-spinners"; // Import ClipLoader
 
 const LessonsList = () => {
     const [filteredLessons, setFilteredLessons] = useState([]);
@@ -15,21 +16,26 @@ const LessonsList = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
     const [expandedLessonId, setExpandedLessonId] = useState(null);
     const [editedLesson, setEditedLesson] = useState({});
+    const [loading, setLoading] = useState(false); // Add loading state
 
     const navigate = useNavigate();
 
     const handlePrint = (lesson) => {
         navigate("/print-lesson", { state: { lesson } });
     };
+
     // Fetch courses on mount
     useEffect(() => {
+        setLoading(true); // Start loading
         customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
                 setCourses(data.courses.reverse());
             })
             .catch((error) => {
-                alert("Error fetching courses: " + error.message);
-            });
+                console.log(error);
+                alert(error);
+            })
+            .finally(() => setLoading(false)); // Stop loading
     }, [accessTokenData, setAccessTokenData]);
 
     // Fetch submodules when course changes
@@ -39,6 +45,7 @@ const LessonsList = () => {
             return;
         }
 
+        setLoading(true); // Start loading
         customFetch(
             `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`,
             accessTokenData,
@@ -48,8 +55,9 @@ const LessonsList = () => {
                 setSubmodules(data.submodules);
             })
             .catch((error) => {
-                alert("Error fetching submodules: " + error.message);
-            });
+                alert(error);
+            })
+            .finally(() => setLoading(false)); // Stop loading
     }, [selectedCourse, accessTokenData, setAccessTokenData]);
 
     // Fetch lessons when course or submodule is selected
@@ -58,6 +66,7 @@ const LessonsList = () => {
             return;
         }
 
+        setLoading(true); // Start loading
         let url = `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}`;
         if (selectedSubmodule) {
             url += `&submodule_id=${selectedSubmodule}`;
@@ -67,8 +76,9 @@ const LessonsList = () => {
                 setFilteredLessons(data.lessons.reverse());
             })
             .catch((error) => {
-                alert("Error fetching lessons: " + error.message);
-            });
+                alert(error);
+            })
+            .finally(() => setLoading(false)); // Stop loading
     }, [
         selectedCourse,
         selectedSubmodule,
@@ -95,7 +105,9 @@ const LessonsList = () => {
     };
 
     const handleSave = (lessonId) => {
-        if (!window.confirm("Are you sure you want to save the changes?")) {
+        if (
+            !window.confirm("Tem certeza de que deseja guardar as alterações?")
+        ) {
             return;
         }
 
@@ -128,15 +140,15 @@ const LessonsList = () => {
                     )
                 );
                 setEditedLesson({});
-                alert("Lesson updated successfully");
+                alert("Aula atualizada com sucesso");
             })
             .catch((error) => {
-                alert("Error updating lesson: " + error.message);
+                alert(error);
             });
     };
 
     const handleDelete = (lessonId) => {
-        if (!window.confirm("Are you sure you want to delete this lesson?")) {
+        if (!window.confirm("Tem certeza de que deseja excluir esta aula?")) {
             return;
         }
 
@@ -152,10 +164,10 @@ const LessonsList = () => {
                         (lesson) => lesson.lesson_id !== lessonId
                     )
                 );
-                alert("Lesson deleted successfully");
+                alert("Aula excluída com sucesso");
             })
             .catch((error) => {
-                alert("Error deleting lesson: " + error.message);
+                alert(error);
             });
     };
 
@@ -164,7 +176,6 @@ const LessonsList = () => {
             <ButtonMenu buttons={lessonsMenuButtons} />
             <div className="table-list-container">
                 <h1>Lessons</h1>
-
                 <div className="filters">
                     <label>
                         Curso:
@@ -172,7 +183,7 @@ const LessonsList = () => {
                             value={selectedCourse}
                             onChange={(e) => setSelectedCourse(e.target.value)}
                         >
-                            <option value="">Courses</option>
+                            <option value="">Cursos</option>
                             {courses.map((course) => (
                                 <option
                                     key={course.course_id}
@@ -185,15 +196,15 @@ const LessonsList = () => {
                     </label>
 
                     <label>
-                        Submodulo:
+                        Submódulo:
                         <select
                             value={selectedSubmodule}
                             onChange={(e) =>
                                 setSelectedSubmodule(e.target.value)
                             }
-                            disabled={!selectedCourse} // Disable submodule dropdown until a course is selected
+                            disabled={!selectedCourse}
                         >
-                            <option value="">Submodules</option>
+                            <option value="">Submódulos</option>
                             {submodules.map((submodule) => (
                                 <option
                                     key={submodule.submodule_id}
@@ -206,24 +217,32 @@ const LessonsList = () => {
                     </label>
                 </div>
 
-                {filteredLessons.length === 0 ? (
-                    <p>No lessons available</p>
-                ) : (
-                    <table className="table-list" border="1" cellPadding="10">
-                        <thead>
+                <table className="table-list" border="1" cellPadding="10">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Resumo</th>
+                            <th>Submodulo</th>
+                            <th>Curso</th>
+                            <th>Data</th>
+                            <th>Professores</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {loading ? (
                             <tr>
-                                <th>Title</th>
-                                <th>Type</th>
-                                <th>Summary</th>
-                                <th>Submodule</th>
-                                <th>Course</th>
-                                <th>Date</th>
-                                <th>Professors</th>
-                                <th>Actions</th>
+                                <td colSpan="8">
+                                    Loading... <ClipLoader size={15} />
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {filteredLessons.map((lesson) => (
+                        ) : filteredLessons.length === 0 ? (
+                            <tr>
+                                <td colSpan="8">Nenhuma aula encontrada</td>
+                            </tr>
+                        ) : (
+                            filteredLessons.map((lesson) => (
                                 <tr key={lesson.lesson_id}>
                                     {editedLesson.lesson_id ===
                                     lesson.lesson_id ? (
@@ -276,7 +295,6 @@ const LessonsList = () => {
                                                     .map((prof) => prof.name)
                                                     .join(", ")}
                                             </td>
-
                                             <td>
                                                 <button
                                                     className="buttons"
@@ -286,7 +304,7 @@ const LessonsList = () => {
                                                         )
                                                     }
                                                 >
-                                                    Save
+                                                    Guardar
                                                 </button>
                                                 <button
                                                     className="buttons"
@@ -294,7 +312,7 @@ const LessonsList = () => {
                                                         setEditedLesson({})
                                                     }
                                                 >
-                                                    Cancel
+                                                    Cancelar
                                                 </button>
                                             </td>
                                         </>
@@ -364,7 +382,7 @@ const LessonsList = () => {
                                                         handleEditClick(lesson)
                                                     }
                                                 >
-                                                    Edit
+                                                    Editar
                                                 </button>
                                                 <button
                                                     className="buttons"
@@ -374,7 +392,7 @@ const LessonsList = () => {
                                                         )
                                                     }
                                                 >
-                                                    Delete
+                                                    Apagar
                                                 </button>
                                                 <button
                                                     className="buttons"
@@ -382,16 +400,16 @@ const LessonsList = () => {
                                                         handlePrint(lesson)
                                                     }
                                                 >
-                                                    Print
+                                                    Imprimir
                                                 </button>
                                             </td>
                                         </>
                                     )}
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
+                            ))
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
     );

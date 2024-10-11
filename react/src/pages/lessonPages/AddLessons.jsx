@@ -14,7 +14,6 @@ const AddLesson = () => {
     const [students, setStudents] = useState([]);
     const [lessons, setLessons] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [lessonAdded, setLessonAdded] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState("");
     const [selectedSubmodule, setSelectedSubmodule] = useState("");
     const [formData, setFormData] = useState({
@@ -27,6 +26,8 @@ const AddLesson = () => {
         professor_ids: [],
         student_ids: [],
     });
+    const [loadingStudents, setLoadingStudents] = useState(false);
+    const [loadingLessons, setLoadingLessons] = useState(false);
 
     useEffect(() => {
         if (professor) {
@@ -66,6 +67,27 @@ const AddLesson = () => {
 
     useEffect(() => {
         if (selectedCourse) {
+            setLoadingStudents(true);
+            customFetch(
+                `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
+                accessTokenData,
+                setAccessTokenData
+            )
+                .then((studentsData) => {
+                    setStudents(studentsData.students.reverse());
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert(error.message);
+                })
+                .finally(() => setLoadingStudents(false));
+        } else {
+            setStudents([]);
+        }
+    }, [selectedCourse]);
+
+    useEffect(() => {
+        if (selectedCourse) {
             customFetch(
                 `${endpoints.GET_SUBMODULES_OF_PROFESSOR}?course_id=${selectedCourse}`,
                 accessTokenData,
@@ -79,21 +101,6 @@ const AddLesson = () => {
                     console.error("Error:", error);
                     alert(error.message);
                 });
-
-            customFetch(
-                `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
-                accessTokenData,
-                setAccessTokenData
-            )
-                .then((studentsData) => {
-                    setStudents(studentsData.students.reverse());
-                    setLoading(false);
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    alert(error.message);
-                    setLoading(false);
-                });
         } else {
             setSubmodules([]);
         }
@@ -106,15 +113,17 @@ const AddLesson = () => {
                 url += `&submodule_id=${selectedSubmodule}`;
             }
 
+            setLoadingLessons(true);
             customFetch(url, accessTokenData, setAccessTokenData)
                 .then((data) => {
                     setLessons(data.lessons);
                 })
                 .catch((error) => {
                     alert(error.message);
-                });
+                })
+                .finally(() => setLoadingLessons(false));
         }
-    }, [selectedCourse, selectedSubmodule, lessonAdded]);
+    }, [selectedCourse, selectedSubmodule]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -210,7 +219,8 @@ const AddLesson = () => {
                     professor_ids: [],
                     student_ids: [],
                 });
-                setLessonAdded((prev) => !prev);
+                setLessons([]); // Clear the lessons table
+                setSelectedCourse(""); // Clear the selected course
             })
             .catch((error) => {
                 console.error("Error:", error);
@@ -237,9 +247,9 @@ const AddLesson = () => {
 
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
-                    <h2>Add Lesson</h2>
+                    <h2>Adicionar Aula</h2>
                     <div>
-                        <label>Course</label>
+                        <label>Curso</label>
                         <select
                             name="course_id"
                             value={formData.course_id}
@@ -250,7 +260,7 @@ const AddLesson = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a course
+                                Selecione um curso
                             </option>
                             {courses.map((course) => (
                                 <option
@@ -263,7 +273,7 @@ const AddLesson = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Submodule</label>
+                        <label>Submódulo</label>
                         <select
                             name="submodule_id"
                             value={formData.submodule_id}
@@ -275,7 +285,7 @@ const AddLesson = () => {
                             disabled={!formData.course_id}
                         >
                             <option value="" disabled>
-                                Select a submodule
+                                Selecione um submódulo
                             </option>
                             {submodules.map((submodule) => (
                                 <option
@@ -288,7 +298,7 @@ const AddLesson = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Title</label>
+                        <label>Título</label>
                         <input
                             type="text"
                             name="title"
@@ -299,7 +309,7 @@ const AddLesson = () => {
                         />
                     </div>
                     <div>
-                        <label>Type</label>
+                        <label>Tipo</label>
                         <select
                             name="type"
                             value={formData.type}
@@ -307,7 +317,7 @@ const AddLesson = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a type
+                                Selecione um tipo
                             </option>
                             <option value="Teórica">Teórica</option>
                             <option value="Laboratorial">Laboratorial</option>
@@ -317,7 +327,7 @@ const AddLesson = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Summary</label>
+                        <label>Sumário</label>
                         <textarea
                             name="summary"
                             value={formData.summary}
@@ -326,22 +336,20 @@ const AddLesson = () => {
                         ></textarea>
                     </div>
                     <div>
-                        <label>Professors</label>
+                        <label>Professores</label>
                         <div className="form-table-responsive">
                             {professors.length > 0 ? (
                                 <table className="form-table">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Professor ID</th>
-                                            <th>Select</th>
+                                            <th>Nome</th>
+                                            <th>Selecionar</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {professors.map((prof) => (
                                             <tr key={prof.professor_id}>
                                                 <td>{prof.name}</td>
-                                                <td>{prof.professor_id}</td>
                                                 <td>
                                                     <input
                                                         type="checkbox"
@@ -366,26 +374,33 @@ const AddLesson = () => {
                                     </tbody>
                                 </table>
                             ) : (
-                                <p>No professors found</p>
+                                <p>Nenhum professor encontrado</p>
                             )}
                         </div>
                     </div>
 
                     {selectedCourse && (
                         <div>
-                            <label>Students</label>
+                            <label>Alunos</label>
                             <div className="form-table-responsive">
-                                {students.length > 0 ? (
-                                    <table className="form-table">
-                                        <thead>
+                                <table className="form-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Número</th>
+                                            <th>Selecionar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {loadingStudents ? (
                                             <tr>
-                                                <th>Name</th>
-                                                <th>Number</th>
-                                                <th>Select</th>
+                                                <td colSpan="3">
+                                                    Loading{" "}
+                                                    <ClipLoader size={15} />
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {students.map((student) => (
+                                        ) : students.length > 0 ? (
+                                            students.map((student) => (
                                                 <tr key={student.student_id}>
                                                     <td>{student.name}</td>
                                                     <td>{student.number}</td>
@@ -405,17 +420,22 @@ const AddLesson = () => {
                                                         />
                                                     </td>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                ) : (
-                                    <p>No students enrolled in course</p>
-                                )}
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="3">
+                                                    Nenhum aluno inscrito no
+                                                    curso
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     )}
                     <div>
-                        <label>Date</label>
+                        <label>Data</label>
                         <input
                             type="datetime-local"
                             name="date"
@@ -430,21 +450,33 @@ const AddLesson = () => {
                     </button>
                 </form>
                 <div className="list">
-                    <h2>Existing Lessons</h2>
+                    <h2>Aulas Existentes</h2>
                     <table className="form-table">
                         <thead>
                             <tr>
-                                <th>Title</th>
-                                <th>Date</th>
+                                <th>Título</th>
+                                <th>Data</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {lessons.map((lesson) => (
-                                <tr key={lesson.lesson_id}>
-                                    <td>{lesson.title}</td>
-                                    <td>{lesson.date}</td>
+                            {loadingLessons ? (
+                                <tr>
+                                    <td colSpan="2">
+                                        Loading <ClipLoader size={15} />
+                                    </td>
                                 </tr>
-                            ))}
+                            ) : lessons.length > 0 ? (
+                                lessons.map((lesson) => (
+                                    <tr key={lesson.lesson_id}>
+                                        <td>{lesson.title}</td>
+                                        <td>{lesson.date}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="2">Nenhuma aula encontrada</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

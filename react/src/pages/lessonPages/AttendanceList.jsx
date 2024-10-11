@@ -119,16 +119,16 @@ const AttendanceList = () => {
         <div>
             <ButtonMenu buttons={lessonsMenuButtons} />
             <div className="table-list-container">
-                <h1>Attendance</h1>
+                <h1>Presenças</h1>
 
                 <div className="filters">
                     <label>
-                        Course:
+                        Curso:
                         <select
                             value={selectedCourse}
                             onChange={(e) => setSelectedCourse(e.target.value)}
                         >
-                            <option value="">Select a course</option>
+                            <option value="">Selecione um curso</option>
                             {courses.map((course) => (
                                 <option
                                     key={course.course_id}
@@ -140,7 +140,7 @@ const AttendanceList = () => {
                         </select>
                     </label>
                     <label>
-                        Submodule:
+                        Submódulo:
                         <select
                             value={selectedSubmodule}
                             onChange={(e) =>
@@ -148,7 +148,7 @@ const AttendanceList = () => {
                             }
                             disabled={!selectedCourse}
                         >
-                            <option value="">Select a submodule</option>
+                            <option value="">Selecione um submódulo</option>
                             {submodules.map((submodule) => (
                                 <option
                                     key={submodule.submodule_id}
@@ -160,13 +160,13 @@ const AttendanceList = () => {
                         </select>
                     </label>
                     <label>
-                        Lesson:
+                        Aula:
                         <select
                             value={selectedLesson}
                             onChange={(e) => setSelectedLesson(e.target.value)}
                             disabled={!selectedSubmodule}
                         >
-                            <option value="">Select a lesson</option>
+                            <option value="">Selecione uma aula</option>
                             {lessons.map((lesson) => (
                                 <option
                                     key={lesson.lesson_id}
@@ -180,13 +180,14 @@ const AttendanceList = () => {
                 </div>
                 <div className="container">
                     <div className="list">
-                        <h2>Students Present</h2>
+                        <h2>Alunos Presentes</h2>
                         <ul>
                             {(updatedAttendance.present || []).map(
                                 (student) => (
                                     <li key={student.student_id}>
                                         {student.name}
                                         <button
+                                            className="buttons"
                                             onClick={() =>
                                                 moveStudent(
                                                     student,
@@ -203,12 +204,12 @@ const AttendanceList = () => {
                         </ul>
                     </div>
                     <div className="list">
-                        <h2>Students Absent</h2>
+                        <h2>Alunos Ausentes</h2>
                         <ul>
                             {(updatedAttendance.absent || []).map((student) => (
                                 <li key={student.student_id}>
-                                    {student.name}
                                     <button
+                                        className="buttons"
                                         onClick={() =>
                                             moveStudent(
                                                 student,
@@ -219,12 +220,15 @@ const AttendanceList = () => {
                                     >
                                         ←
                                     </button>
+                                    {student.name}
                                 </li>
                             ))}
                         </ul>
                     </div>
                 </div>
-                <button onClick={handleSubmit}>Submit</button>
+                <button className="buttons" onClick={handleSubmit}>
+                    Submeter
+                </button>
             </div>
         </div>
     );
