@@ -4,6 +4,7 @@ import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { lessonsMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
 
 const AttendanceList = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
@@ -13,6 +14,7 @@ const AttendanceList = () => {
     const [selectedCourse, setSelectedCourse] = useState("");
     const [selectedSubmodule, setSelectedSubmodule] = useState("");
     const [selectedLesson, setSelectedLesson] = useState("");
+    const [loading, setLoading] = useState(false); // Add loading state
 
     const [updatedAttendance, setUpdatedAttendance] = useState({
         present: [],
@@ -61,6 +63,7 @@ const AttendanceList = () => {
 
     useEffect(() => {
         if (selectedLesson) {
+            setLoading(true); // Set loading to true when fetching starts
             customFetch(
                 `${endpoints.GET_ATTENDANCE}?lesson_id=${selectedLesson}`,
                 accessTokenData,
@@ -74,7 +77,8 @@ const AttendanceList = () => {
                 })
                 .catch((error) =>
                     alert("Failed to fetch attendance: " + error.message)
-                );
+                )
+                .finally(() => setLoading(false)); // Set loading to false when fetching ends
         } else {
             setUpdatedAttendance({ present: [], absent: [] });
         }
@@ -181,49 +185,63 @@ const AttendanceList = () => {
                 <div className="container">
                     <div className="list">
                         <h2>Alunos Presentes</h2>
-                        <ul>
-                            {(updatedAttendance.present || []).map(
-                                (student) => (
-                                    <li key={student.student_id}>
-                                        {student.name}
-                                        <button
-                                            className="buttons"
-                                            onClick={() =>
-                                                moveStudent(
-                                                    student,
-                                                    "present",
-                                                    "absent"
-                                                )
-                                            }
-                                        >
-                                            →
-                                        </button>
-                                    </li>
-                                )
-                            )}
-                        </ul>
+                        {loading ? (
+                            <>
+                                Loading <ClipLoader size={15} />
+                            </>
+                        ) : (
+                            <ul>
+                                {(updatedAttendance.present || []).map(
+                                    (student) => (
+                                        <li key={student.student_id}>
+                                            {student.name}
+                                            <button
+                                                className="buttons"
+                                                onClick={() =>
+                                                    moveStudent(
+                                                        student,
+                                                        "present",
+                                                        "absent"
+                                                    )
+                                                }
+                                            >
+                                                →
+                                            </button>
+                                        </li>
+                                    )
+                                )}
+                            </ul>
+                        )}
                     </div>
                     <div className="list">
                         <h2>Alunos Ausentes</h2>
-                        <ul>
-                            {(updatedAttendance.absent || []).map((student) => (
-                                <li key={student.student_id}>
-                                    <button
-                                        className="buttons"
-                                        onClick={() =>
-                                            moveStudent(
-                                                student,
-                                                "absent",
-                                                "present"
-                                            )
-                                        }
-                                    >
-                                        ←
-                                    </button>
-                                    {student.name}
-                                </li>
-                            ))}
-                        </ul>
+                        {loading ? (
+                            <>
+                                Loading <ClipLoader size={15} />
+                            </>
+                        ) : (
+                            <ul>
+                                {(updatedAttendance.absent || []).map(
+                                    (student) => (
+                                        <li key={student.student_id}>
+                                            <button
+                                                className="buttons"
+                                                onClick={() =>
+                                                    moveStudent(
+                                                        student,
+                                                        "absent",
+                                                        "present"
+                                                    )
+                                                }
+                                            >
+                                                ←
+                                            </button>
+                                            {student.name}
+                                        </li>
+                                    )
+                                )}
+                            </ul>
+                        )}
                     </div>
                 </div>
                 <button className="buttons" onClick={handleSubmit}>

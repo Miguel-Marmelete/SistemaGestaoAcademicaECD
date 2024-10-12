@@ -12,6 +12,7 @@ const StudentsList = () => {
     const [selectedCourse, setSelectedCourse] = useState("");
     const [students, setStudents] = useState([]);
     const [editedStudent, setEditedStudent] = useState({});
+    const [loading, setLoading] = useState(false); // New loading state
     const navigate = useNavigate();
     const { accessTokenData, professor, setAccessTokenData } = useAuth();
 
@@ -26,12 +27,13 @@ const StudentsList = () => {
                 setCourses(data.courses.reverse());
             })
             .catch((error) => {
-                alert("Error fetching courses: " + error.message);
+                alert(error);
             });
     }, [accessTokenData.access_token]);
 
     // Fetch students when the selected course changes
     useEffect(() => {
+        setLoading(true); // Start loading
         customFetch(
             `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
             accessTokenData,
@@ -43,6 +45,9 @@ const StudentsList = () => {
             .catch((error) => {
                 console.error("Error fetching students:", error);
                 alert("Error fetching students: " + error);
+            })
+            .finally(() => {
+                setLoading(false); // End loading
             });
 
         // Update query string
@@ -63,7 +68,7 @@ const StudentsList = () => {
     };
 
     const handleSave = (studentId) => {
-        if (!window.confirm("Are you sure you want to save the changes?")) {
+        if (!window.confirm("Tem certeza que deseja guardar as alterações?")) {
             return;
         }
 
@@ -83,15 +88,15 @@ const StudentsList = () => {
                     )
                 );
                 setEditedStudent({});
-                alert("Student updated successfully");
+                alert("Aluno atualizado com sucesso");
             })
             .catch((error) => {
-                alert("Error updating student: " + error.message);
+                alert(error);
             });
     };
 
     const handleDelete = (studentId) => {
-        if (!window.confirm("Are you sure you want to delete this student?")) {
+        if (!window.confirm("Tem certeza que deseja apagar este aluno?")) {
             return;
         }
 
@@ -107,12 +112,17 @@ const StudentsList = () => {
                         (student) => student.student_id !== studentId
                     )
                 );
-                alert("Student deleted successfully");
+                alert("Aluno apagado com sucesso");
             })
             .catch((error) => {
                 alert(error);
             });
     };
+
+    const handleCancelEdit = () => {
+        setEditedStudent({}); // Clear the edited student state to cancel editing
+    };
+
     if (!professor) {
         return (
             <div>
@@ -148,21 +158,35 @@ const StudentsList = () => {
                     </select>
                 </label>
             </div>
-            {students.length === 0 ? (
-                <p>No students enrolled in selected course</p>
-            ) : (
-                <table className="table-list" border="1" cellPadding="10">
-                    <thead>
+            <table className="table-list" border="1" cellPadding="10">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Número</th>
+                        <th>Email</th>
+                        <th>Telefone</th> {/* New column */}
+                        {professor.is_coordinator === 1 && <th>Ações</th>}
+                    </tr>
+                </thead>
+                <tbody>
+                    {loading ? (
                         <tr>
-                            <th>Nome</th>
-                            <th>Número</th>
-                            <th>Email</th>
-                            <th>Telefone</th> {/* New column */}
-                            {professor.is_coordinator === 1 && <th>Ações</th>}
+                            <td
+                                colSpan={professor.is_coordinator === 1 ? 5 : 4}
+                            >
+                                Loading <ClipLoader size={15} />
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {students.map((student) => (
+                    ) : students.length === 0 ? (
+                        <tr>
+                            <td
+                                colSpan={professor.is_coordinator === 1 ? 5 : 4}
+                            >
+                                Nenhum aluno inscrito no curso selecionado
+                            </td>
+                        </tr>
+                    ) : (
+                        students.map((student) => (
                             <tr key={student.student_id}>
                                 {editedStudent.student_id ===
                                 student.student_id ? (
@@ -216,7 +240,13 @@ const StudentsList = () => {
                                                         )
                                                     }
                                                 >
-                                                    Save
+                                                    Guardar
+                                                </button>
+                                                <button
+                                                    className="buttons"
+                                                    onClick={handleCancelEdit}
+                                                >
+                                                    Cancelar
                                                 </button>
                                             </td>
                                         )}
@@ -236,7 +266,7 @@ const StudentsList = () => {
                                                         handleEditClick(student)
                                                     }
                                                 >
-                                                    Edit
+                                                    Editar
                                                 </button>
                                                 <button
                                                     className="buttons"
@@ -246,17 +276,17 @@ const StudentsList = () => {
                                                         )
                                                     }
                                                 >
-                                                    Delete
+                                                    Apagar
                                                 </button>
                                             </td>
                                         )}
                                     </>
                                 )}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+                        ))
+                    )}
+                </tbody>
+            </table>
         </div>
     );
 };

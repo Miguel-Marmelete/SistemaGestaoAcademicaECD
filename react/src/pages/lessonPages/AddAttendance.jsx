@@ -32,7 +32,6 @@ const AddAttendance = () => {
 
     useEffect(() => {
         if (selectedCourse && selectedSubmodule) {
-            setLoadingLessons(true);
             customFetch(
                 `${endpoints.GET_FILTERED_LESSONS}?course_id=${selectedCourse}&submodule_id=${selectedSubmodule}`,
                 accessTokenData,
@@ -45,13 +44,11 @@ const AddAttendance = () => {
                     console.error(error);
                     alert(error);
                 })
-                .finally(() => {
-                    setLoadingLessons(false);
-                });
+                .finally(() => {});
         } else {
             setLessons([]);
         }
-    }, [selectedCourse, selectedSubmodule, accessTokenData.access_token]);
+    }, [selectedCourse, selectedSubmodule, accessTokenData]);
 
     useEffect(() => {
         if (selectedCourse) {
@@ -111,7 +108,7 @@ const AddAttendance = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!selectedLesson || selectedStudents.length === 0) {
-            alert("Please select a lesson and at least one student.");
+            alert("Por favor, selecione uma aula e pelo menos um aluno.");
             return;
         }
         if (loading) {
@@ -130,12 +127,10 @@ const AddAttendance = () => {
             }
         )
             .then(() => {
-                alert("Attendance registered successfully.");
+                alert("Presenças registadas com sucesso.");
                 resetForm();
             })
-            .catch((error) =>
-                alert("Failed to register attendance: " + error.message)
-            )
+            .catch((error) => alert(error))
             .finally(() => {
                 setLoading(false);
             });

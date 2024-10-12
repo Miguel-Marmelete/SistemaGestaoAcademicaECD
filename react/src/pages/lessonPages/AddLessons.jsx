@@ -379,61 +379,57 @@ const AddLesson = () => {
                         </div>
                     </div>
 
-                    {selectedCourse && (
-                        <div>
-                            <label>Alunos</label>
-                            <div className="form-table-responsive">
-                                <table className="form-table">
-                                    <thead>
+                    <div>
+                        <label>Alunos</label>
+                        <div className="form-table-responsive">
+                            <table className="form-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Número</th>
+                                        <th>Selecionar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loadingStudents ? (
                                         <tr>
-                                            <th>Nome</th>
-                                            <th>Número</th>
-                                            <th>Selecionar</th>
+                                            <td colSpan="3">
+                                                Loading <ClipLoader size={15} />
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {loadingStudents ? (
-                                            <tr>
-                                                <td colSpan="3">
-                                                    Loading{" "}
-                                                    <ClipLoader size={15} />
+                                    ) : students.length > 0 ? (
+                                        students.map((student) => (
+                                            <tr key={student.student_id}>
+                                                <td>{student.name}</td>
+                                                <td>{student.number}</td>
+                                                <td>
+                                                    <input
+                                                        type="checkbox"
+                                                        name="student_ids"
+                                                        value={
+                                                            student.student_id
+                                                        }
+                                                        checked={formData.student_ids.includes(
+                                                            student.student_id
+                                                        )}
+                                                        onChange={
+                                                            handleStudentCheckboxChange
+                                                        }
+                                                    />
                                                 </td>
                                             </tr>
-                                        ) : students.length > 0 ? (
-                                            students.map((student) => (
-                                                <tr key={student.student_id}>
-                                                    <td>{student.name}</td>
-                                                    <td>{student.number}</td>
-                                                    <td>
-                                                        <input
-                                                            type="checkbox"
-                                                            name="student_ids"
-                                                            value={
-                                                                student.student_id
-                                                            }
-                                                            checked={formData.student_ids.includes(
-                                                                student.student_id
-                                                            )}
-                                                            onChange={
-                                                                handleStudentCheckboxChange
-                                                            }
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="3">
-                                                    Nenhum aluno inscrito no
-                                                    curso
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="3">
+                                                Nenhum aluno inscrito no curso
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
-                    )}
+                    </div>
                     <div>
                         <label>Data</label>
                         <input

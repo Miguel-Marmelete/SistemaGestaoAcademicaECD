@@ -34,12 +34,12 @@ const AddEvaluationMoment = () => {
             setAccessTokenData
         )
             .then((data) => {
-                console.log("data.courseModules", data.courseModules);
                 setCourses(data.courseModules.reverse());
             })
-            .catch((error) =>
-                alert("Failed to fetch courses: " + error.message)
-            );
+            .catch((error) => {
+                console.error(error);
+                alert(error);
+            });
     }, []);
 
     // Fetch submodules when a module is selected and the type is "Trabalho"
@@ -54,8 +54,8 @@ const AddEvaluationMoment = () => {
                     setSubmodules(data.submodules.reverse());
                 })
                 .catch((error) => {
-                    console.error("Error:", error);
-                    alert("An error occurred while fetching submodules");
+                    console.error(error);
+                    alert(error);
                 });
         } else {
             setSubmodules([]);
@@ -64,7 +64,7 @@ const AddEvaluationMoment = () => {
                 submodule_id: null,
             });
         }
-    }, [formData.module_id, formData.type, accessTokenData.access_token]);
+    }, [formData.module_id, formData.type, accessTokenData]);
 
     // New useEffect hook to fetch evaluation moments
     useEffect(() => {
@@ -76,13 +76,12 @@ const AddEvaluationMoment = () => {
                 setAccessTokenData
             )
                 .then((data) => {
-                    setEvaluationMoments(data.evaluationMoments);
+                    setEvaluationMoments(data.evaluationMoments.reverse());
                 })
-                .catch((error) =>
-                    alert(
-                        "Failed to fetch evaluation moments: " + error.message
-                    )
-                )
+                .catch((error) => {
+                    console.error(error);
+                    alert(error);
+                })
                 .finally(() => {
                     setLoadingEvaluationMoments(false); // Set loading to false
                 });
@@ -121,12 +120,12 @@ const AddEvaluationMoment = () => {
         const { type, course_id, module_id, date } = formData;
 
         if (!type || !course_id || !module_id || !date) {
-            alert("All fields except submodule are required.");
+            alert("Todos os campos, exceto o submódulo, são obrigatórios.");
             return false;
         }
 
         if (!date || isNaN(new Date(date).getTime())) {
-            alert("Date is required and must be a valid date.");
+            alert("A data é obrigatória e deve ser uma data válida.");
             return false;
         }
 
@@ -154,7 +153,7 @@ const AddEvaluationMoment = () => {
             updatedFormData
         )
             .then(() => {
-                alert("Evaluation Moment added successfully!");
+                alert("Momento de avaliação adicionado com sucesso!");
                 setFormData({
                     type: "",
                     course_id: "",
@@ -165,8 +164,8 @@ const AddEvaluationMoment = () => {
                 setEvaluationMoments([]); // Clear evaluation moments
             })
             .catch((error) => {
-                console.error("Error:", error);
-                alert(error.message);
+                console.error(error);
+                alert(error);
             })
             .finally(() => {
                 setLoading(false);
@@ -187,10 +186,10 @@ const AddEvaluationMoment = () => {
 
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
-                    <h2>Add Evaluation Moment</h2>
+                    <h2>Adicionar Momento de Avaliação</h2>
 
                     <div>
-                        <label>Course</label>
+                        <label>Curso</label>
                         <select
                             name="course_id"
                             value={formData.course_id}
@@ -198,7 +197,7 @@ const AddEvaluationMoment = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a course
+                                Selecione um curso
                             </option>
                             {courses.length > 0 &&
                                 courses.map((course) => (
@@ -212,7 +211,7 @@ const AddEvaluationMoment = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Module</label>
+                        <label>Módulo</label>
                         <select
                             name="module_id"
                             value={formData.module_id}
@@ -220,7 +219,7 @@ const AddEvaluationMoment = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a module
+                                Selecione um módulo
                             </option>
                             {modules.length > 0 &&
                                 modules.map((module) => (
@@ -234,7 +233,7 @@ const AddEvaluationMoment = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Type</label>
+                        <label>Tipo</label>
                         <select
                             name="type"
                             value={formData.type}
@@ -242,7 +241,7 @@ const AddEvaluationMoment = () => {
                             required
                         >
                             <option value="" disabled>
-                                Select a type
+                                Selecione um tipo
                             </option>
                             <option value="Exame">Exame</option>
                             <option value="Trabalho">Trabalho</option>
@@ -251,14 +250,14 @@ const AddEvaluationMoment = () => {
                     </div>
                     {formData.type === "Trabalho" && (
                         <div>
-                            <label>Submodule</label>
+                            <label>Submódulo</label>
                             <select
                                 name="submodule_id"
                                 value={formData.submodule_id || ""}
                                 onChange={handleChange}
                             >
                                 <option value="" disabled>
-                                    Select a submodule
+                                    Selecione um submódulo
                                 </option>
                                 {submodules.length > 0 &&
                                     submodules.map((submodule) => (
@@ -274,7 +273,7 @@ const AddEvaluationMoment = () => {
                     )}
                     <div className="date_input_container">
                         <label className="date_input_label">
-                            Evaluation Date
+                            Data da Avaliação
                         </label>
                         <input
                             type="date"
@@ -289,34 +288,55 @@ const AddEvaluationMoment = () => {
                     </button>
                 </form>
                 <div className="list">
-                    <h2>Evaluation Moments</h2>
+                    <h2>Momentos de Avaliação</h2>
                     <table className="form-table">
                         <thead>
                             <tr>
-                                <th>Type</th>
-
-                                <th>Date</th>
+                                <th>Tipo</th>
+                                <th>Data</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {evaluationMoments.map((evaluationMoment) => (
-                                <tr key={evaluationMoment.evaluation_moment_id}>
-                                    <td>{evaluationMoment.type}</td>
-
-                                    <td>
-                                        {new Date(
-                                            evaluationMoment.date
-                                        ).toLocaleDateString()}
+                            {loadingEvaluationMoments ? (
+                                <tr>
+                                    <td colSpan="2">
+                                        Loading <ClipLoader size={15} />
                                     </td>
                                 </tr>
-                            ))}
+                            ) : !formData.course_id || !formData.module_id ? (
+                                <tr>
+                                    <td colSpan="2">
+                                        Por favor, selecione um curso e um
+                                        módulo.
+                                    </td>
+                                </tr>
+                            ) : evaluationMoments.length === 0 ? (
+                                <tr>
+                                    <td
+                                        colSpan="2"
+                                        style={{ textAlign: "center" }}
+                                    >
+                                        Nenhum momento de avaliação encontrado.
+                                    </td>
+                                </tr>
+                            ) : (
+                                evaluationMoments.map((evaluationMoment) => (
+                                    <tr
+                                        key={
+                                            evaluationMoment.evaluation_moment_id
+                                        }
+                                    >
+                                        <td>{evaluationMoment.type}</td>
+                                        <td>
+                                            {new Date(
+                                                evaluationMoment.date
+                                            ).toLocaleDateString()}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
-                    {loadingEvaluationMoments && (
-                        <p>
-                            Loading <ClipLoader size={15} />
-                        </p>
-                    )}
                 </div>
             </div>
         </div>

@@ -6,6 +6,7 @@ import { studentsMenuButtons } from "../../../scripts/buttonsData";
 import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesandModulesOfProfessor";
 import customFetch from "../../../scripts/customFetch";
 import { useNavigate } from "react-router-dom"; // Add this import
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
 
 const AddStudents = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
@@ -28,6 +29,7 @@ const AddStudents = () => {
     });
     const fileInputRef = useRef(null);
     const navigate = useNavigate(); // Add this line
+    const [loadingStudents, setLoadingStudents] = useState(false); // Add state for loading students
 
     useEffect(() => {
         fetchCoursesAndModulesOfProfessor(accessTokenData.access_token)
@@ -41,13 +43,15 @@ const AddStudents = () => {
 
     useEffect(() => {
         if (selectedCourse) {
+            setLoadingStudents(true); // Start loading animation
             customFetch(
                 `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
                 accessTokenData,
                 setAccessTokenData
             )
                 .then((data) => setStudents(data.students.reverse()))
-                .catch((error) => alert(error.message));
+                .catch((error) => alert(error))
+                .finally(() => setLoadingStudents(false)); // Stop loading animation
         }
     }, [selectedCourse]);
 
@@ -345,7 +349,7 @@ const AddStudents = () => {
 
                     <div className="button-group">
                         <button type="submit" disabled={loading}>
-                            {loading ? "Submitting..." : "Submeter"}
+                            {loading ? <ClipLoader size={15} /> : "Submeter"}
                         </button>{" "}
                         <div className="tooltip-container">
                             <button onClick={handleCSVUpload}>CSV</button>
@@ -374,22 +378,36 @@ const AddStudents = () => {
                 </form>
 
                 <div className="list">
-                    <h2>Existing Students</h2>
+                    <h2>Alunos Existentes</h2>
 
                     <table className="form-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Number</th>
+                                <th>Nome</th>
+                                <th>Número</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {students.map((student) => (
-                                <tr key={student.student_id}>
-                                    <td>{student.name}</td>
-                                    <td>{student.number}</td>
+                            {loadingStudents ? (
+                                <tr>
+                                    <td colSpan="2">
+                                        Loading <ClipLoader size={15} />
+                                    </td>
                                 </tr>
-                            ))}
+                            ) : students.length === 0 ? (
+                                <tr>
+                                    <td colSpan="2">
+                                        Nenhum aluno encontrado.
+                                    </td>
+                                </tr>
+                            ) : (
+                                students.map((student) => (
+                                    <tr key={student.student_id}>
+                                        <td>{student.name}</td>
+                                        <td>{student.number}</td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

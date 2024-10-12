@@ -110,11 +110,11 @@ const EvaluateEvaluationMoments = () => {
 
     const handleSubmitGrades = () => {
         if (!selectedEvaluationMoment) {
-            alert("Please select an evaluation moment.");
+            alert("Selecione um momento de avaliação.");
             return;
         }
         if (loading) {
-            alert("Please wait for the grades to be submitted.");
+            alert("Aguarde a submissão das notas.");
             return;
         }
 
@@ -127,7 +127,7 @@ const EvaluateEvaluationMoments = () => {
         if (
             gradeData.some((grade) => grade.evaluation_moment_grade_value === 0)
         ) {
-            alert("All students must have a grade.");
+            alert("Todos os alunos devem ter uma nota.");
             return;
         }
 
@@ -140,14 +140,13 @@ const EvaluateEvaluationMoments = () => {
             { grades: gradeData }
         )
             .then((data) => {
-                console.log("Grades submitted successfully:", data);
                 setGrades({});
                 setSelectedEvaluationMoment("");
-                alert("Grades submitted successfully!");
+                alert("Notas submetidas com sucesso!");
             })
             .catch((error) => {
-                console.error("Error submitting grades:", error);
-                setErrorMessage(error.message);
+                console.error(error);
+                setErrorMessage(error);
             })
             .finally(() => {
                 setLoading(false);
@@ -184,7 +183,7 @@ const EvaluateEvaluationMoments = () => {
                             setSelectedSubmodule("");
                         }}
                     >
-                        <option value="">Todos os Cursos</option>
+                        <option value="">Selecione um Curso</option>
                         {courses.length > 0 &&
                             courses.map((course) => (
                                 <option
@@ -203,7 +202,7 @@ const EvaluateEvaluationMoments = () => {
                         value={selectedModule}
                         onChange={(e) => setSelectedModule(e.target.value)}
                     >
-                        <option value="">Todos os Módulos</option>
+                        <option value="">Selecione um Módulo</option>
                         {modules.length > 0 &&
                             modules.map((module) => (
                                 <option
@@ -222,7 +221,7 @@ const EvaluateEvaluationMoments = () => {
                         value={selectedSubmodule}
                         onChange={(e) => setSelectedSubmodule(e.target.value)}
                     >
-                        <option value="">Todos os Submódulos</option>
+                        <option value="">Selecione um Submódulo</option>
                         {submodules.length > 0 &&
                             submodules.map((submodule) => (
                                 <option
@@ -243,7 +242,9 @@ const EvaluateEvaluationMoments = () => {
                             setSelectedEvaluationMoment(e.target.value)
                         }
                     >
-                        <option value="">Todos os Momentos de Avaliação</option>
+                        <option value="">
+                            Selecione um Momento de Avaliação
+                        </option>
                         {filteredEvaluationMoments.length > 0 &&
                             filteredEvaluationMoments.map((moment) => (
                                 <option
@@ -267,7 +268,14 @@ const EvaluateEvaluationMoments = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {students.length > 0 &&
+                    {!selectedCourse && (
+                        <tr>
+                            <td colSpan="3">Selecione um curso.</td>
+                        </tr>
+                    )}
+
+                    {selectedCourse &&
+                        students.length > 0 &&
                         students.map((student) => (
                             <tr key={student.student_id}>
                                 <td>{student.name}</td>
@@ -295,20 +303,24 @@ const EvaluateEvaluationMoments = () => {
                                 </td>
                             </tr>
                         ))}
+
+                    {selectedCourse && !loading && students.length === 0 && (
+                        <tr>
+                            <td colSpan="3">
+                                Nenhum aluno inscrito no curso selecionado
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
 
-            {loading && (
+            {selectedCourse && loading && (
                 <p>
                     Loading... <ClipLoader size={15} />
                 </p>
             )}
 
-            {!loading && students.length === 0 && (
-                <p>Nenhum aluno inscrito no curso selecionado</p>
-            )}
-
-            {students.length > 0 && (
+            {selectedCourse && students.length > 0 && (
                 <button className="buttons" onClick={handleSubmitGrades}>
                     Submeter Notas
                 </button>

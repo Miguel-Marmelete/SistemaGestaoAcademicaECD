@@ -23,7 +23,8 @@ const EvaluationMomentsList = () => {
                 setCoursesModules(data.courseModules);
             })
             .catch((error) => {
-                console.error("Error fetching courses and modules:", error);
+                console.error(error);
+                alert(error);
             });
     }, [accessTokenData]);
 
@@ -51,7 +52,8 @@ const EvaluationMomentsList = () => {
                     setEvaluationMoments(data.evaluationMoments);
                 })
                 .catch((error) => {
-                    console.error("Error fetching evaluation moments:", error);
+                    console.error(error);
+                    alert(error);
                     setEvaluationMoments([]);
                 });
         } else {
@@ -95,7 +97,7 @@ const EvaluationMomentsList = () => {
                             value={selectedCourse}
                             onChange={handleCourseChange}
                         >
-                            <option value="">Todos os Cursos</option>
+                            <option value="">Selecione um curso</option>
                             {coursesModules.map((course) => (
                                 <option
                                     key={course.course.course_id}
@@ -114,7 +116,7 @@ const EvaluationMomentsList = () => {
                             onChange={handleModuleChange}
                             disabled={!selectedCourse || modules.length === 0}
                         >
-                            <option value="">Todos os Módulos</option>
+                            <option value="">Selecione um módulo</option>
                             {modules.map((module) => (
                                 <option
                                     key={module.module_id}

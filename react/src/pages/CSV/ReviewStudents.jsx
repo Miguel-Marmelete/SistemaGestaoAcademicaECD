@@ -12,7 +12,11 @@ const ReviewStudents = () => {
     const [loading, setLoading] = useState(false);
     const [editMode, setEditMode] = useState(false);
 
-    const { students, course } = state || { students: [], course: null };
+    // Destructure students and course from state
+    const { students = [], course = null } = state || {};
+
+    // Initialize studentsData with students from state
+    const [studentsData, setStudentsData] = useState(students);
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -41,6 +45,12 @@ const ReviewStudents = () => {
         setEditMode(!editMode);
     };
 
+    const handleInputChange = (index, field, value) => {
+        const updatedStudents = [...studentsData];
+        updatedStudents[index][field] = value;
+        setStudentsData(updatedStudents);
+    };
+
     return (
         <div className="table-list-container">
             <header>
@@ -66,14 +76,20 @@ const ReviewStudents = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {students.map((student, index) => (
+                        {studentsData.map((student, index) => (
                             <tr key={index}>
                                 <td>
                                     {editMode ? (
                                         <input
                                             type="text"
                                             value={student.name}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "name",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.name
@@ -84,7 +100,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.ipbeja_email}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "ipbeja_email",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.ipbeja_email
@@ -95,7 +117,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.number}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "number",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.number
@@ -106,7 +134,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.birthday}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "birthday",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.birthday
@@ -117,7 +151,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.address}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "address",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.address
@@ -128,7 +168,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.city}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "city",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.city
@@ -139,7 +185,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.mobile}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "mobile",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.mobile
@@ -150,7 +202,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.classe}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "classe",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.classe
@@ -161,7 +219,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.posto}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "posto",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.posto
@@ -172,7 +236,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.personal_email}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "personal_email",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.personal_email
@@ -183,7 +253,13 @@ const ReviewStudents = () => {
                                         <input
                                             type="text"
                                             value={student.nim}
-                                            // Add onChange handler to update student data
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    index,
+                                                    "nim",
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     ) : (
                                         student.nim

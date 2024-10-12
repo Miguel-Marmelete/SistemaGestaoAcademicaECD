@@ -237,11 +237,7 @@ const LessonsList = () => {
                                     Loading... <ClipLoader size={15} />
                                 </td>
                             </tr>
-                        ) : filteredLessons.length === 0 ? (
-                            <tr>
-                                <td colSpan="8">Nenhuma aula encontrada</td>
-                            </tr>
-                        ) : (
+                        ) : filteredLessons.length > 0 ? (
                             filteredLessons.map((lesson) => (
                                 <tr key={lesson.lesson_id}>
                                     {editedLesson.lesson_id ===
@@ -407,6 +403,10 @@ const LessonsList = () => {
                                     )}
                                 </tr>
                             ))
+                        ) : (
+                            <tr>
+                                <td colSpan="8">Nenhuma aula encontrada</td>
+                            </tr>
                         )}
                     </tbody>
                 </table>

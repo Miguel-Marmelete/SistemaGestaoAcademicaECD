@@ -5,6 +5,7 @@ import { fetchCoursesAndModulesOfProfessor } from "../../../scripts/getCoursesan
 import ButtonMenu from "../../components/ButtonMenu";
 import { studentsMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
 
 const EnrollStudents = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
@@ -14,6 +15,8 @@ const EnrollStudents = () => {
     const [selectedCourse, setSelectedCourse] = useState("");
     const [selectedStudents, setSelectedStudents] = useState([]);
     const [loading, setLoading] = useState(false); // Add loading state
+    const [enrolledStudentsLoading, setEnrolledStudentsLoading] =
+        useState(false); // Add state for enrolled students loading
 
     // Fetch courses on component mount
     useEffect(() => {
@@ -41,6 +44,7 @@ const EnrollStudents = () => {
     // Fetch enrolled students whenever the selected course changes
     useEffect(() => {
         if (selectedCourse) {
+            setEnrolledStudentsLoading(true); // Set loading to true before fetching
             customFetch(
                 `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
                 accessTokenData,
@@ -51,6 +55,9 @@ const EnrollStudents = () => {
                 })
                 .catch((error) => {
                     console.error("Error fetching enrolled students:", error);
+                })
+                .finally(() => {
+                    setEnrolledStudentsLoading(false); // Set loading to false after fetching
                 });
         } else {
             setEnrolledStudents([]); // Reset if no course is selected
@@ -88,15 +95,15 @@ const EnrollStudents = () => {
             enrollmentData
         )
             .then(() => {
-                alert("Students enrolled successfully!");
+                alert("Alunos inscritos com sucesso!");
                 // Reset form
                 setSelectedCourse("");
                 setSelectedStudents([]);
                 setEnrolledStudents([]); // Reset enrolled students
             })
             .catch((error) => {
-                console.error("Error:", error);
-                alert(error.message);
+                console.error(error);
+                alert(error);
             })
             .finally(() => {
                 setLoading(false); // Set loading to false after request completes
@@ -132,15 +139,15 @@ const EnrollStudents = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Students</label>
                         <div className="form-table-responsive">
+                            <label>Alunos</label>
                             {students.length > 0 ? (
                                 <table className="form-table">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Number</th>
-                                            <th>Select</th>
+                                            <th>Nome</th>
+                                            <th>Número</th>
+                                            <th>Selecionar</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -170,32 +177,47 @@ const EnrollStudents = () => {
                                     </tbody>
                                 </table>
                             ) : (
-                                <p>No students available</p>
+                                <p>Não há alunos disponíveis</p>
                             )}
                         </div>
                     </div>
                     <button type="submit" disabled={loading}>
-                        {loading ? "Submitting..." : "Submit"}
+                        {loading ? <ClipLoader size={15} /> : "Submeter"}
                     </button>
                 </form>
 
                 <div className="list">
-                    <h2>
-                        Students Enrolled in{" "}
-                        {selectedCourse
-                            ? courses.find(
-                                  (course) =>
-                                      course.course_id === selectedCourse
-                              )?.name
-                            : ""}
-                    </h2>
-                    <ul>
-                        {enrolledStudents.map((student) => (
-                            <li key={student.student_id}>
-                                {student.name} - {student.number}
-                            </li>
-                        ))}
-                    </ul>
+                    <h2>Alunos inscritos</h2>
+                    <table className="form-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Número</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {enrolledStudentsLoading ? ( // Show loader when enrolled students are loading
+                                <tr>
+                                    <td colSpan="2">
+                                        Loading <ClipLoader size={15} />
+                                    </td>
+                                </tr>
+                            ) : enrolledStudents.length > 0 ? (
+                                enrolledStudents.map((student) => (
+                                    <tr key={student.student_id}>
+                                        <td>{student.name}</td>
+                                        <td>{student.number}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="2">
+                                        Não há alunos inscritos neste curso.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
