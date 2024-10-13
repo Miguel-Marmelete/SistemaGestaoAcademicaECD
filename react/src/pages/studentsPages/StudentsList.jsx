@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import { studentsMenuButtons } from "../../../scripts/buttonsData";
@@ -12,7 +12,7 @@ const StudentsList = () => {
     const [selectedCourse, setSelectedCourse] = useState("");
     const [students, setStudents] = useState([]);
     const [editedStudent, setEditedStudent] = useState({});
-    const [loading, setLoading] = useState(false); // New loading state
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { accessTokenData, professor, setAccessTokenData } = useAuth();
 
@@ -33,7 +33,7 @@ const StudentsList = () => {
 
     // Fetch students when the selected course changes
     useEffect(() => {
-        setLoading(true); // Start loading
+        setLoading(true);
         customFetch(
             `${endpoints.GET_STUDENTS}?course_id=${selectedCourse}`,
             accessTokenData,
@@ -47,7 +47,7 @@ const StudentsList = () => {
                 alert("Error fetching students: " + error);
             })
             .finally(() => {
-                setLoading(false); // End loading
+                setLoading(false);
             });
 
         // Update query string
@@ -120,7 +120,7 @@ const StudentsList = () => {
     };
 
     const handleCancelEdit = () => {
-        setEditedStudent({}); // Clear the edited student state to cancel editing
+        setEditedStudent({});
     };
 
     if (!professor) {
@@ -164,7 +164,7 @@ const StudentsList = () => {
                         <th>Nome</th>
                         <th>Número</th>
                         <th>Email</th>
-                        <th>Telefone</th> {/* New column */}
+                        <th>Telefone</th>
                         {professor.is_coordinator === 1 && <th>Ações</th>}
                     </tr>
                 </thead>
@@ -188,99 +188,38 @@ const StudentsList = () => {
                     ) : (
                         students.map((student) => (
                             <tr key={student.student_id}>
-                                {editedStudent.student_id ===
-                                student.student_id ? (
-                                    <>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value={editedStudent.name || ""}
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="number"
-                                                value={
-                                                    editedStudent.number || ""
-                                                }
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="personal_email"
-                                                value={
-                                                    editedStudent.personal_email ||
-                                                    ""
-                                                }
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="phone"
-                                                value={
-                                                    editedStudent.phone || ""
-                                                }
-                                                onChange={handleChange}
-                                            />
-                                        </td>
-                                        {professor.is_coordinator === 1 && (
-                                            <td>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={() =>
-                                                        handleSave(
-                                                            student.student_id
-                                                        )
-                                                    }
-                                                >
-                                                    Guardar
-                                                </button>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={handleCancelEdit}
-                                                >
-                                                    Cancelar
-                                                </button>
-                                            </td>
-                                        )}
-                                    </>
-                                ) : (
-                                    <>
-                                        <td>{student.name}</td>
-                                        <td>{student.number}</td>
-                                        <td>{student.personal_email}</td>
-                                        <td>{student.mobile}</td>{" "}
-                                        {/* New column */}
-                                        {professor.is_coordinator === 1 && (
-                                            <td>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={() =>
-                                                        handleEditClick(student)
-                                                    }
-                                                >
-                                                    Editar
-                                                </button>
-                                                <button
-                                                    className="buttons"
-                                                    onClick={() =>
-                                                        handleDelete(
-                                                            student.student_id
-                                                        )
-                                                    }
-                                                >
-                                                    Apagar
-                                                </button>
-                                            </td>
-                                        )}
-                                    </>
+                                <td>
+                                    <Link
+                                        to={`/student/${student.student_id}`}
+                                        style={{
+                                            textDecoration: "none",
+                                        }}
+                                    >
+                                        {student.name}
+                                    </Link>
+                                </td>
+                                <td>{student.number}</td>
+                                <td>{student.personal_email}</td>
+                                <td>{student.mobile}</td>
+                                {professor.is_coordinator === 1 && (
+                                    <td>
+                                        <button
+                                            className="buttons"
+                                            onClick={() =>
+                                                handleEditClick(student)
+                                            }
+                                        >
+                                            Editar
+                                        </button>
+                                        <button
+                                            className="buttons"
+                                            onClick={() =>
+                                                handleDelete(student.student_id)
+                                            }
+                                        >
+                                            Apagar
+                                        </button>
+                                    </td>
                                 )}
                             </tr>
                         ))

@@ -922,3 +922,32 @@ form small {
         max-width: calc(100vw - 40px);
     }
 }
+/*------------------STUDENT DETAILS CSS------------------*/
+.student-details {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #343a40; /* Changed to match the general background color */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.student-name {
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #ffffff; /* Changed to match the navbar text color */
+}
+
+.student-info {
+    font-size: 1em;
+    color: #ffffff; /* Changed to match the general text color */
+}
+
+.student-info p {
+    margin: 10px 0;
+}
+
+.student-info strong {
+    color: #ffffff; /* Changed to match the navbar text color */
+}

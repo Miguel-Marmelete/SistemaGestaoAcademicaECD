@@ -34,7 +34,7 @@ const endpoints = {
     GET_MODULES_OF_COURSE_OF_PROFESSOR: `${API_BASE_URL}/getModulesOfCourseOfProfessor`,
     GET_STUDENTS_EVALUATION_MOMENT_GRADES: `${API_BASE_URL}/getStudentsEvaluationMomentGrades`,
     GET_STUDENTS_WITH_GRADES: `${API_BASE_URL}/getStudentsWithGrades`,
-    SUBMIT_GRADES: `${API_BASE_URL}/submitGrades`,
+    GET_STUDENT: `${API_BASE_URL}/getStudent`,
     // Posts
     ADD_STUDENTS: `${API_BASE_URL}/addStudents`,
     ENROLL_STUDENTS: `${API_BASE_URL}/enrollStudents`,
@@ -53,6 +53,8 @@ const endpoints = {
     ADD_PROFESSOR: `${API_BASE_URL}/addProfessor`,
     ADD_COURSES_CSV: `${API_BASE_URL}/addCoursesCSV`,
     ADD_AND_ENROLL_STUDENTS_CSV: `${API_BASE_URL}/addAndEnrollStudentsCSV`,
+    SUBMIT_GRADES: `${API_BASE_URL}/submitGrades`,
+
     //DELETE
     DELETE_COURSE: `${API_BASE_URL}/deleteCourse`,
     DELETE_MODULE: `${API_BASE_URL}/deleteModule`,

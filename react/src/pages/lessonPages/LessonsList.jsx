@@ -175,7 +175,7 @@ const LessonsList = () => {
         <div>
             <ButtonMenu buttons={lessonsMenuButtons} />
             <div className="table-list-container">
-                <h1>Lessons</h1>
+                <h1>Aulas</h1>
                 <div className="filters">
                     <label>
                         Curso:
@@ -183,7 +183,7 @@ const LessonsList = () => {
                             value={selectedCourse}
                             onChange={(e) => setSelectedCourse(e.target.value)}
                         >
-                            <option value="">Cursos</option>
+                            <option value="">Selecione um curso</option>
                             {courses.map((course) => (
                                 <option
                                     key={course.course_id}
@@ -204,7 +204,7 @@ const LessonsList = () => {
                             }
                             disabled={!selectedCourse}
                         >
-                            <option value="">Submódulos</option>
+                            <option value="">Selecione um submódulo</option>
                             {submodules.map((submodule) => (
                                 <option
                                     key={submodule.submodule_id}

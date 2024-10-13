@@ -48,8 +48,8 @@ function Login() {
                 }
             })
             .catch((error) => {
-                console.error("Login error:", error);
-                alert(error);
+                console.error("Login error:", error.message);
+                alert(error.message);
             })
             .finally(() => {
                 setLoading(false);

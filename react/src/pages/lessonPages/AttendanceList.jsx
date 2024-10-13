@@ -110,8 +110,8 @@ const AttendanceList = () => {
                 lesson_id: selectedLesson,
             }
         )
-            .then(() => {
-                alert("Attendance updated successfully!");
+            .then((data) => {
+                alert(data.message);
             })
             .catch((error) => {
                 console.error("Error:", error.message);

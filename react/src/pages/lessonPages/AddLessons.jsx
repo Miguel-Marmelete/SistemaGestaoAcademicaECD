@@ -207,8 +207,8 @@ const AddLesson = () => {
             "POST",
             payload
         )
-            .then(() => {
-                alert("Lesson added and attendance recorded successfully!");
+            .then((data) => {
+                alert(data.message);
                 setFormData({
                     title: "",
                     type: "",

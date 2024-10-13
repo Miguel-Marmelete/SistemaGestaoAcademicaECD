@@ -7,19 +7,22 @@ use App\Models\Enrollment;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Student;
 use Illuminate\Support\Facades\Log;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
 class StudentController extends Controller
 {
 
 
     public function getStudents(Request $request)
     {
-        // Validate course_id if it's present
-        $request->validate([
-            'course_id' => 'nullable|integer|exists:courses,course_id',
-        ]);
+        
     
         try {
+
+            // Validate course_id if it's present
+            $request->validate([
+                'course_id' => 'nullable|integer|exists:courses,course_id',
+            ]);
+            $professor = JWTAuth::user();
             // Extract course_id from query parameters
             $courseId = $request->query('course_id');
     
@@ -32,7 +35,11 @@ class StudentController extends Controller
                 // Retrieve students based on the obtained student IDs
                 $students = Student::whereIn('student_id', $studentIds)->get();
             } else {
-                $students = Student::all();
+                if ($professor->is_coordinator == 1) {
+                    $students = Student::all();
+                } else {
+                    $students = [];
+                }
             }
     
             // Return students as a JSON response
