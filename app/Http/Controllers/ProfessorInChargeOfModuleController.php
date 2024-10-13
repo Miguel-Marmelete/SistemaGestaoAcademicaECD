@@ -25,8 +25,8 @@ class ProfessorInChargeOfModuleController extends Controller
             $professorsInCharge = ProfessorInChargeOfModule::with(['professor', 'module', 'course'])->get();
             return response()->json(['professorsInCharge' => $professorsInCharge], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving professors in charge of modules: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving professors in charge of modules', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter professores encarregues de módulos: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter professores encarregues de módulos'], 500);
         }
     }
 
@@ -46,8 +46,8 @@ public function getProfessorsInChargeOfModulesByCourse(Request $request)
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed: ' . $validator->errors());
-            return response()->json(['message' => $validator->errors()], 422);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 422);
         }
 
         $course_id = $request->query('course_id');
@@ -57,18 +57,13 @@ public function getProfessorsInChargeOfModulesByCourse(Request $request)
             ->where('course_id', $course_id)
             ->get();
 
-        // If no records are found
-        /*
-        if ($professorsAndModules->isEmpty()) {
-            return response()->json(['message' => 'No professors or modules found for this course'], 404);
-        }*/
+      
 
         return response()->json(['professorsAndModules' => $professorsAndModules], 200);
     } catch (\Exception $e) {
-        Log::error('An error occurred while retrieving professors and modules: ' . $e->getMessage());
+        Log::error('Erro ao obter professores e módulos: ' . $e->getMessage());
         return response()->json([
-            'message' => 'An error occurred while retrieving professors and modules',
-            'details' => $e->getMessage()
+            'message' => 'Erro ao obter professores encarregues de módulos',
         ], 500);
     }
 }
@@ -83,8 +78,8 @@ public function store(Request $request)
     ]);
     Log::info('Request data: ', $request->all());
     if ($validator->fails()) {
-        Log::error('Validation failed: ' . $validator->errors());
-        return response()->json(['message' => $validator->errors()], 422);
+        Log::error('Validação falhou: ' . $validator->errors());
+        return response()->json(['message' => 'Dados inválidos'], 422);
     }
 
     try {
@@ -95,7 +90,7 @@ public function store(Request $request)
 
         if ($professorInCharge) {
             // Delete the existing entry
-            Log::info('Existing entry found and will be deleted: ', $professorInCharge->toArray());
+            Log::info('Entrada existente encontrada e será apagada: ', $professorInCharge->toArray());
             $professorInCharge->delete();
         }
 
@@ -105,12 +100,11 @@ public function store(Request $request)
             'course_id' => (int) $request->course_id,
             'professor_id' => (int) $request->professor_id,
         ]);
-        Log::info('New entry created: ', $professorInCharge->toArray());
 
-        return response()->json(['message' => 'Professor in charge of module updated successfully', 'professorInCharge' => $professorInCharge], 200);
+        return response()->json(['message' => 'Professor encarregue de módulo atualizado com sucesso', 'professorInCharge' => $professorInCharge], 200);
     } catch (\Exception $e) {
-        Log::error('An error occurred while updating the professor in charge of module record: ' . $e->getMessage());
-        return response()->json(['message' => 'An error occurred while updating the professor in charge of module record', 'details' => $e->getMessage()], 500);
+        Log::error('Erro ao atualizar o professor encarregue de módulo: ' . $e->getMessage());
+        return response()->json(['message' => 'Erro ao atualizar o professor encarregue de módulo'], 500);
     }
 }
 
@@ -134,11 +128,11 @@ public function store(Request $request)
 
             return response()->json(['professorInCharge' => $professorInCharge], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Professor in charge of module record not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Professor in charge of module record not found'], 404);
+            Log::error('Professor encarregue de módulo não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Professor encarregue de módulo não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the professor in charge of module record: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the professor in charge of module record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter o professor encarregue de módulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter o professor encarregue de módulo'], 500);
         }
     }
 
@@ -161,8 +155,7 @@ public function store(Request $request)
                 ->first();
 
             if (!$professorInCharge) {
-                Log::error('Professor in charge of module record not found: ' . $e->getMessage());
-                return response()->json(['message' => 'Professor in charge of module record not found'], 404);
+                return response()->json(['message' => 'Professor encarregue de módulo não encontrado'], 404);
             }
 
             // Validate the incoming request data
@@ -173,16 +166,17 @@ public function store(Request $request)
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             // Update the record with the validated data
             $professorInCharge->update($validator->validated());
 
-            return response()->json(['message' => 'Professor in charge of module record updated successfully', 'professorInCharge' => $professorInCharge], 200);
+            return response()->json(['message' => 'Professor encarregue de módulo atualizado com sucesso', 'professorInCharge' => $professorInCharge], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the professor in charge of module record: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the professor in charge of module record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao atualizar o professor encarregue de módulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao atualizar o professor encarregue de módulo'], 500);
         }
     }
 
@@ -203,10 +197,10 @@ public function store(Request $request)
                 ->firstOrFail();
 
             $assignment->delete();
-            return response()->json(['message' => 'Assignment deleted successfully'], 200);
+            return response()->json(['message' => 'Professor encarregue de módulo apagado com sucesso'], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the assignment: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to delete record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar o professor encarregue de módulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar o professor encarregue de módulo'], 500);
         }
     }
     
@@ -219,7 +213,8 @@ public function store(Request $request)
             ]);
     
             if ($validator->fails()) {
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
     
             // Retrieve the authenticated professor
@@ -238,11 +233,9 @@ public function store(Request $request)
             $submodules = Submodule::whereIn('module_id', $moduleIds)->get();
             return response()->json(['submodules' => $submodules], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving submodules: ' . $e->getMessage());
+            Log::error('Erro ao obter submódulos: ' . $e->getMessage());
             return response()->json([
-                'message' => 'An error occurred while retrieving submodules',
-                'details' => $e->getMessage()
-            ], 500);
+                'message' => 'Erro ao obter submódulos'], 500);
         }
     }
     
@@ -293,11 +286,9 @@ public function store(Request $request)
             ], 200);
     
         } catch (\Exception $e) {
-            Log::error('Error retrieving courses and modules: ' . $e->getMessage());
+            Log::error('Erro ao obter cursos e módulos: ' . $e->getMessage());
             return response()->json([
-                'message' => 'An error occurred while retrieving courses and modules',
-                'details' => $e->getMessage()
-            ], 500);
+                'message' => 'Erro ao obter cursos e módulos'], 500);
         }
     }
     
@@ -340,21 +331,15 @@ public function store(Request $request)
                 'modules' => $modulesDetails  // Detalhes completos dos módulos
             ];
         }
-    
+        Log::info('Cursos e módulos: ', $courseModules);
         // Retorna a resposta JSON com os cursos e seus módulos
         return response()->json(['courseModules' => $courseModules], 200);
     } catch (\Exception $e) {
-        Log::error('Error retrieving courses and modules: ' . $e->getMessage());
+        Log::error('Erro ao obter cursos e módulos: ' . $e->getMessage());
         return response()->json([
-            'message' => 'An error occurred while retrieving courses and modules',
-            'details' => $e->getMessage()
-        ], 500);
+            'message' => 'Erro ao obter cursos e módulos'], 500);
     }
     }
-    
-
-    
-    
 
     
 }

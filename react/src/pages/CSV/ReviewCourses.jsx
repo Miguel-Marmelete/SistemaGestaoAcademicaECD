@@ -26,12 +26,13 @@ function ReviewCourses() {
             "POST",
             editableCourses
         )
-            .then(() => {
-                alert("Courses submitted successfully");
+            .then((data) => {
+                alert(data.message);
                 navigate("/addCourse");
             })
             .catch((error) => {
-                console.error("Error submitting courses:", error);
+                console.error("Erro ao submeter cursos:", error);
+                alert(error);
             });
     };
 
@@ -42,14 +43,14 @@ function ReviewCourses() {
     return (
         <div className="table-list-container">
             <header>
-                <h1>Review Courses</h1>
+                <h1>Cursos</h1>
             </header>
             <table className="table-list" border="1" cellPadding="10">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Abbreviation</th>
-                        <th>Date</th>
+                        <th>Nome</th>
+                        <th>Abreviatura</th>
+                        <th>Data</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,11 +112,13 @@ function ReviewCourses() {
                 </tbody>
             </table>
             <div className="button-group">
-                <button className="buttons" onClick={handleConfirm}>
-                    Confirm
-                </button>
+                {!editMode && (
+                    <button className="buttons" onClick={handleConfirm}>
+                        Submeter
+                    </button>
+                )}
                 <button className="buttons" onClick={toggleEditMode}>
-                    {editMode ? "Save" : "Edit"}
+                    {editMode ? "Guardar Alterações" : "Editar"}
                 </button>
             </div>
         </div>

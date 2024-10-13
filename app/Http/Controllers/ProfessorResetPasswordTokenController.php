@@ -25,8 +25,8 @@ class ProfessorResetPasswordTokenController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             $token = ProfessorResetPasswordToken::create($validator->validated());
@@ -50,13 +50,13 @@ class ProfessorResetPasswordTokenController extends Controller
             $token = ProfessorResetPasswordToken::findOrFail($id);
             $token->delete();
 
-            return response()->json(['message' => 'Token deleted successfully'], 200);
+            return response()->json(['message' => 'Token apagado com sucesso'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Token not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Token not found'], 404);
+            Log::error('Token não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Token não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the token: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the token', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar o token: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar o token'], 500);
         }
     }
 }

@@ -23,8 +23,8 @@ class AttendanceController extends Controller
             $attendances = Attendance::with(['lesson', 'student'])->get();
             return response()->json(['attendances' => $attendances], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving attendance records: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving attendance records', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter as presenças: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter as presenças'], 500);
         }
     }
 
@@ -44,8 +44,8 @@ class AttendanceController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             $lesson_id = $request->input('lesson_id');
@@ -60,10 +60,10 @@ class AttendanceController extends Controller
                 $attendances[] = $attendance;
             }
 
-            return response()->json(['message' => 'Attendance records created successfully', 'attendances' => $attendances], 201);
+            return response()->json(['message' => 'Presenças criadas com sucesso', 'attendances' => $attendances], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while creating the attendance records: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while creating the attendance records', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar as presenças: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar as presenças'], 500);
         }
     }
 
@@ -84,10 +84,10 @@ class AttendanceController extends Controller
 
             return response()->json(['attendance' => $attendance], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Attendance record not found', 'details' => $e->getMessage()], 404);
+            return response()->json(['message' => 'Registo de presença não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the attendance record: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the attendance record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter o registo de presença: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter o registo de presença'], 500);
         }
     }
 
@@ -108,8 +108,8 @@ class AttendanceController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['errors' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             $studentsPresentIds = $request->input('studentsPresent');
@@ -128,10 +128,10 @@ class AttendanceController extends Controller
                 $attendances[] = $attendance;
             }
 
-            return response()->json(['message' => 'Attendance updated successfully', 'attendances' => $attendances], 200);
+            return response()->json(['message' => 'Presenças atualizadas com sucesso', 'attendances' => $attendances], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the attendance record: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the attendance record', 'details' => $e->getMessage()], 500);
+            Log::error('Ocorreu um erro ao atualizar o registo de presença: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao atualizar o registo de presença'], 500);
         }
     }
 
@@ -150,12 +150,12 @@ class AttendanceController extends Controller
                 ->firstOrFail();
             $attendance->delete();
 
-            return response()->json(['message' => 'Attendance record deleted successfully'], 200);
+            return response()->json(['message' => 'Registo de presença apagado com sucesso'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Attendance record not found', 'details' => $e->getMessage()], 404);
+            return response()->json(['message' => 'Registo de presença não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the attendance record: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the attendance record', 'details' => $e->getMessage()], 500);
+            Log::error('Ocorreu um erro ao apagar o registo de presença: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao apagar o registo de presença'], 500);
         }
     }
 
@@ -167,7 +167,8 @@ class AttendanceController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 422);
         }
 
         $lesson_id = $request->query('lesson_id');
@@ -204,8 +205,8 @@ class AttendanceController extends Controller
                 'absentStudents' => $absentStudents,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving attendance: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving attendance', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter a presença: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter a presença'], 500);
         }
     }
     

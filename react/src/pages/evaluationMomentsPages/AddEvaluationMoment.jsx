@@ -34,6 +34,7 @@ const AddEvaluationMoment = () => {
             setAccessTokenData
         )
             .then((data) => {
+                console.log(data.courseModules);
                 setCourses(data.courseModules.reverse());
             })
             .catch((error) => {
@@ -152,8 +153,8 @@ const AddEvaluationMoment = () => {
             "POST",
             updatedFormData
         )
-            .then(() => {
-                alert("Momento de avaliação adicionado com sucesso!");
+            .then((data) => {
+                alert(data.message);
                 setFormData({
                     type: "",
                     course_id: "",
@@ -306,7 +307,7 @@ const AddEvaluationMoment = () => {
                             ) : !formData.course_id || !formData.module_id ? (
                                 <tr>
                                     <td colSpan="2">
-                                        Selecione um curso e um módulo.
+                                        Selecione um curso e um módulo
                                     </td>
                                 </tr>
                             ) : evaluationMoments.length === 0 ? (

@@ -21,11 +21,12 @@ const ProfessorsList = () => {
             })
             .catch((error) => {
                 console.error("Error fetching professors:", error);
+                alert(error);
             });
-    }, [accessTokenData.access_token, professor]);
+    }, [accessTokenData, professor]);
 
     const handleDelete = (professorId) => {
-        if (window.confirm("Are you sure you want to delete this professor?")) {
+        if (window.confirm("Tem certeza que deseja apagar este professor?")) {
             customFetch(
                 `${endpoints.DELETE_PROFESSOR}/${professorId}`,
                 accessTokenData,
@@ -33,7 +34,7 @@ const ProfessorsList = () => {
                 "DELETE"
             )
                 .then(() => {
-                    alert("Professor deleted successfully");
+                    alert("Professor apagado com sucesso");
                     setProfessors(
                         professors.filter(
                             (prof) => prof.professor_id !== professorId
@@ -41,8 +42,7 @@ const ProfessorsList = () => {
                     );
                 })
                 .catch((error) => {
-                    console.error("Error deleting professor:", error);
-                    alert("Failed to delete professor. Please try again.");
+                    console.error(error);
                     alert(error);
                 });
         }
@@ -51,7 +51,7 @@ const ProfessorsList = () => {
     if (!professor) {
         return (
             <div>
-                Loading professors... <ClipLoader size={15} />
+                Loading <ClipLoader size={15} />
             </div>
         );
     }
@@ -61,22 +61,22 @@ const ProfessorsList = () => {
             <ButtonMenu buttons={professorsMenuButtons} />
             <div className="table-list-container">
                 <header>
-                    <h1>Professors List</h1>
+                    <h1>Professores</h1>
                 </header>
                 <table className="table-list" border="1" cellPadding="10">
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Nome</th>
                             <th>Email</th>
-                            <th>Is Coordinator</th>
-                            <th>Actions</th>
+                            <th>Coordenador</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {professors.length === 0 ? (
                             <tr>
                                 <td colSpan="4">
-                                    Loading...
+                                    Loading
                                     <ClipLoader size={15} />
                                 </td>
                             </tr>
@@ -87,8 +87,8 @@ const ProfessorsList = () => {
                                     <td>{professorItem.email}</td>
                                     <td>
                                         {professorItem.is_coordinator
-                                            ? "Yes"
-                                            : "No"}
+                                            ? "Sim"
+                                            : "Não"}
                                     </td>
                                     <td>
                                         {!professorItem.is_coordinator &&
@@ -102,7 +102,7 @@ const ProfessorsList = () => {
                                                         )
                                                     }
                                                 >
-                                                    Delete
+                                                    Apagar
                                                 </button>
                                             )}
                                     </td>

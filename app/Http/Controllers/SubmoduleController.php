@@ -28,8 +28,8 @@ class SubmoduleController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             // Retrieve the authenticated professor
@@ -56,8 +56,8 @@ class SubmoduleController extends Controller
     
             return response()->json(['submodules' => $submodules], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving submodules: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving submodules', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter os submódulos: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter os submódulos'], 500);
         }
     }
     
@@ -78,16 +78,17 @@ class SubmoduleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()], 422);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 422);
         }
 
         try {
             $submodule = Submodule::create($validator->validated());
 
-            return response()->json(['message' => 'Submodule created successfully', 'submodule' => $submodule], 201);
+            return response()->json(['message' => 'Submódulo criado com sucesso', 'submodule' => $submodule], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while creating the submodule: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while creating the submodule', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar o submódulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar o submódulo'], 500);
         }
     }
 
@@ -106,11 +107,11 @@ class SubmoduleController extends Controller
 
             return response()->json(['submodule' => $submodule], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Submodule not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Submodule not found'], 404);
+            Log::error('Submódulo não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Submódulo não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the submodule: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the submodule', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter o submódulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter o submódulo'], 500);
         }
     }
 
@@ -142,13 +143,13 @@ class SubmoduleController extends Controller
         // Update the submodule with validated data
         $submodule->update($validator->validated());
 
-        return response()->json(['message' => 'Submodule updated successfully', 'submodule' => $submodule], 200);
+        return response()->json(['message' => 'Submódulo atualizado com sucesso', 'submodule' => $submodule], 200);
     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        Log::error('Submodule not found: ' . $e->getMessage());
-        return response()->json(['message' => 'Submodule not found'], 404);
+        Log::error('Submódulo não encontrado: ' . $e->getMessage());
+        return response()->json(['message' => 'Submódulo não encontrado'], 404);
     } catch (\Exception $e) {
-        Log::error('An error occurred while updating the submodule: ' . $e->getMessage());
-        return response()->json(['message' => 'An error occurred while updating the submodule', 'details' => $e->getMessage()], 500);
+        Log::error('Erro ao atualizar o submódulo: ' . $e->getMessage());
+        return response()->json(['message' => 'Erro ao atualizar o submódulo'], 500);
     }
 }
 
@@ -165,13 +166,13 @@ class SubmoduleController extends Controller
                 ->firstOrFail();
             $submodule->delete();
 
-            return response()->json(['message' => 'Submodule deleted successfully'], 200);
+            return response()->json(['message' => 'Submódulo apagado com sucesso'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Submodule not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Submodule not found'], 404);
+            Log::error('Submódulo não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Submódulo não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the submodule: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the submodule', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar o submódulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar o submódulo'], 500);
         }
     }
 
@@ -186,7 +187,7 @@ class SubmoduleController extends Controller
         // Validate the course_id
         $course = Course::find($course_id);
         if (!$course) {
-            return response()->json(['message' => 'Course not found'], 404);
+            return response()->json(['message' => 'Curso não encontrado'], 404);
         }
 
         try {
@@ -198,8 +199,8 @@ class SubmoduleController extends Controller
 
             return response()->json(['submodules' => $submodules], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving submodules: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving submodules', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter os submódulos: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter os submódulos'], 500);
         }
     }
 }

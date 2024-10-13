@@ -23,8 +23,8 @@ class LessonController extends Controller
             $lessons = Lesson::with([ 'submodule', 'course','professors'])->get();
             return response()->json(['lessons' => $lessons], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving lessons: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving lessons', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter as aulas: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter as aulas', 'details' => $e->getMessage()], 500);
         }
     }
 
@@ -42,8 +42,8 @@ class LessonController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Lesson not found'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the lesson: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the lesson', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter a aula: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter a aula'], 500);
         }
     }
 
@@ -63,8 +63,8 @@ class LessonController extends Controller
             ]);
     
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
     
             // Retrieve the authenticated professor
@@ -101,8 +101,7 @@ class LessonController extends Controller
         } catch (\Exception $e) {
             Log::error('Error retrieving lessons: ' . $e->getMessage());
             return response()->json([
-                'message' => 'An error occurred while retrieving lessons',
-                'details' => $e->getMessage()
+                'message' => 'Erro ao obter as aulas',
             ], 500);
         }
     }
@@ -134,8 +133,8 @@ class LessonController extends Controller
             ]);
     
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
     
             // Create the Lesson
@@ -150,10 +149,10 @@ class LessonController extends Controller
                 ]);
             }
     
-            return response()->json(['message' => 'Lesson created successfully', 'lesson' => $lesson], 201);
+            return response()->json(['message' => 'Aula criada com sucesso', 'lesson' => $lesson], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while creating the lesson: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while creating the lesson', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar a aula: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar a aula'], 500);
         }
     }
     
@@ -176,20 +175,19 @@ class LessonController extends Controller
                 'summary' => 'sometimes|string',
                 'date' => 'sometimes|date_format:Y-m-d H:00:00',
             ]);
-            Log::info($request['title']);
             if ($validator->fails()) {
                 Log::info($validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
             $lesson->update($validator->validated());
         
-            return response()->json(['message' => 'Lesson updated successfully', 'lesson' => $lesson], 200);
+            return response()->json(['message' => 'Aula atualizada com sucesso', 'lesson' => $lesson], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error($e->getMessage());
-            return response()->json(['message' => 'Lesson not found'], 404);
+            return response()->json(['message' => 'Aula não encontrada'], 404);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the lesson', 'details' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Erro ao atualizar a aula'], 500);
         }
     }
     
@@ -206,13 +204,13 @@ class LessonController extends Controller
             $lesson = Lesson::findOrFail($id);
             $lesson->delete();
 
-            return response()->json(['message' => 'Lesson deleted successfully'], 200);
+            return response()->json(['message' => 'Aula apagada com sucesso'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Lesson not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Lesson not found'], 404);
+            Log::error('Aula não encontrada: ' . $e->getMessage());
+            return response()->json(['message' => 'Aula não encontrada'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the lesson: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the lesson', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar a aula: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar a aula'], 500);
         }
     }
 
@@ -235,8 +233,8 @@ class LessonController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             // Create the Lesson without professor_ids and student_ids
@@ -264,10 +262,10 @@ class LessonController extends Controller
                 ]);
             }
 
-            return response()->json(['message' => 'Lesson and attendance created successfully', 'lesson' => $lesson], 201);
+            return response()->json(['message' => 'Aula e presença criadas com sucesso', 'lesson' => $lesson], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating lesson and attendance: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while creating the lesson and attendance', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar aula e presença: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar aula e presença'], 500);
         }
     }
 }

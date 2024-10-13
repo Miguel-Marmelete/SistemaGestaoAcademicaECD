@@ -26,9 +26,10 @@ const AddProfessor = () => {
         })
             .then((response) => response.json())
             .then((data) => setProfessors(data.professors.reverse()))
-            .catch((error) =>
-                alert("Error fetching professors: " + error.message)
-            )
+            .catch((error) => {
+                console.error(error);
+                alert(error);
+            })
             .finally(() => setLoading(false));
     }, []);
 
@@ -53,7 +54,7 @@ const AddProfessor = () => {
             formData
         )
             .then(() => {
-                alert("Professor added successfully!");
+                alert("Professor adicionado com sucesso");
                 setFormData({
                     name: "",
                     email: "",
@@ -70,7 +71,7 @@ const AddProfessor = () => {
             })
             .then((data) => setProfessors(data.professors.reverse()))
             .catch((error) => {
-                alert(error.message);
+                alert(error);
             })
             .finally(() => {
                 setLoading(false);
@@ -82,9 +83,9 @@ const AddProfessor = () => {
             <ButtonMenu buttons={professorsMenuButtons} />
             <div className="container">
                 <form className="submitForm" onSubmit={handleSubmit}>
-                    <h2>Add Professor</h2>
+                    <h2>Adicionar Professor</h2>
                     <div>
-                        <label>Name</label>
+                        <label>Nome</label>
                         <input
                             type="text"
                             name="name"
@@ -116,7 +117,7 @@ const AddProfessor = () => {
                         />
                     </div>
                     <div>
-                        <label>CC Expiry Date (Optional)</label>
+                        <label>Data de Validade CC (Opcional)</label>
                         <input
                             type="date"
                             name="cc_expire_date"
@@ -125,7 +126,7 @@ const AddProfessor = () => {
                         />
                     </div>
                     <div>
-                        <label>Mobile (Optional)</label>
+                        <label>Telemóvel (Opcional)</label>
                         <input
                             type="text"
                             name="mobile"
@@ -144,11 +145,11 @@ const AddProfessor = () => {
                     </button>
                 </form>
                 <div className="list">
-                    <h2>Existing Professors</h2>
+                    <h2>Professores Existentes</h2>
                     <table className="form-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
+                                <th>Nome</th>
                                 <th>Email</th>
                             </tr>
                         </thead>
@@ -156,8 +157,7 @@ const AddProfessor = () => {
                             {loading ? (
                                 <tr>
                                     <td colSpan="2">
-                                        Loading professors...{" "}
-                                        <ClipLoader size={15} />
+                                        Loading <ClipLoader size={15} />
                                     </td>
                                 </tr>
                             ) : (

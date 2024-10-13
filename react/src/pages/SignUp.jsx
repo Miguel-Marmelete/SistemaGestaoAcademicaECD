@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import endpoints from "../endpoints";
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
 
 function SignUp() {
     const navigate = useNavigate();
@@ -10,6 +11,7 @@ function SignUp() {
         password: "",
         password_confirmation: "",
     });
+    const [loading, setLoading] = useState(false); // Add loading state
 
     const handleChange = (e) => {
         setFormData({
@@ -49,6 +51,8 @@ function SignUp() {
             return;
         }
 
+        setLoading(true); // Set loading to true before fetch
+
         // Envio de dados para o backend
         fetch(endpoints.SIGNUP, {
             method: "POST",
@@ -71,6 +75,9 @@ function SignUp() {
             .catch((error) => {
                 console.error(error.message);
                 alert(error.message);
+            })
+            .finally(() => {
+                setLoading(false); // Set loading to false after fetch
             });
     };
 
@@ -81,7 +88,7 @@ function SignUp() {
                 <br />
                 <div className="name_container">
                     <label htmlFor="name" className="name_label">
-                        Name
+                        Nome
                     </label>
                     <br />
                     <input
@@ -126,7 +133,7 @@ function SignUp() {
                         htmlFor="password_confirmation"
                         className="password_confirmation_label"
                     >
-                        Confirm Password
+                        Confirmar Password
                     </label>
                     <br />
                     <input
@@ -141,7 +148,7 @@ function SignUp() {
 
                 <div className="signup_button_container">
                     <button type="submit" className="form_button">
-                        SignUp
+                        {loading ? <ClipLoader size={15} /> : "SignUp"}
                     </button>
                 </div>
             </form>

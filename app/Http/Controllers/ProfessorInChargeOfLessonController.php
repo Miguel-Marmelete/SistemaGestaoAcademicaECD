@@ -12,10 +12,10 @@ class ProfessorInChargeOfLessonController extends Controller
     {
         try {
             $assignments = ProfessorInChargeOfLesson::all();
-            return response()->json(['message' => 'Assignments retrieved successfully', 'assignments' => $assignments], 200);
+            return response()->json(['message' => 'Professores encarregues de aula encontrados com sucesso', 'assignments' => $assignments], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving assignments: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to fetch records', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao recuperar professores encarregues de aula: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao recuperar professores encarregues de aula'], 500);
         }
     }
 
@@ -26,12 +26,13 @@ class ProfessorInChargeOfLessonController extends Controller
                 'professor_id' => 'required|exists:professors,professor_id',
                 'lesson_id' => 'required|exists:lessons,lesson_id',
             ]);
+            
 
             $assignment = ProfessorInChargeOfLesson::create($validatedData);
-            return response()->json(['message' => 'Assignment created successfully', 'assignment' => $assignment], 201);
+            return response()->json(['message' => 'Professor encarregue de aula criado com sucesso', 'assignment' => $assignment], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while creating the assignment: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to create record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar o professor encarregue de aula: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar o professor encarregue de aula'], 500);
         }
     }
 
@@ -41,10 +42,10 @@ class ProfessorInChargeOfLessonController extends Controller
             $assignment = ProfessorInChargeOfLesson::where('professor_id', $professor_id)
                 ->where('lesson_id', $lesson_id)
                 ->firstOrFail();
-            return response()->json(['message' => 'Assignment retrieved successfully', 'assignment' => $assignment], 200);
+            return response()->json(['message' => 'Professor encarregue de aula encontrado com sucesso', 'assignment' => $assignment], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the assignment: ' . $e->getMessage());
-            return response()->json(['message' => 'Record not found', 'details' => $e->getMessage()], 404);
+            Log::error('Erro ao encontrar o professor encarregue de aula: ' . $e->getMessage());
+            return response()->json(['message' => 'Professor encarregue de aula não encontrado'], 404);
         }
     }
 
@@ -63,15 +64,15 @@ class ProfessorInChargeOfLessonController extends Controller
             ->first();
 
         if (!$assignment) {
-            return response()->json(['message' => 'Assignment not found'], 404);
+            return response()->json(['message' => 'Professor encarregue de aula não encontrado'], 404);
         }
 
         // Update the assignment
         $assignment->update($validatedData);
-            return response()->json(['message' => 'Assignment updated successfully', 'assignment' => $assignment], 200);
+            return response()->json(['message' => 'Professor encarregue de aula atualizado com sucesso', 'assignment' => $assignment], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the assignment: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to update record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao atualizar o professor encarregue de aula: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao atualizar o professor encarregue de aula'], 500);
         }
 }
 
@@ -84,10 +85,10 @@ class ProfessorInChargeOfLessonController extends Controller
                 ->firstOrFail();
 
             $assignment->delete();
-            return response()->json(['message' => 'Assignment deleted successfully'], 200);
+            return response()->json(['message' => 'Professor encarregue de aula apagado com sucesso'], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the assignment: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to delete record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar o professor encarregue de aula: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar o professor encarregue de aula'], 500);
         }
     }
 }

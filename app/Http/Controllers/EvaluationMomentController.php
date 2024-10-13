@@ -21,7 +21,7 @@ class EvaluationMomentController extends Controller
             $evaluationMoments = EvaluationMoment::with(['course', 'professor', 'module', 'submodule'])->get();
             return response()->json(['evaluationMoments' => $evaluationMoments], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred while retrieving evaluation moments', 'details' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Ocorreu um erro ao recuperar os momentos de avaliação'], 500);
         }
     }
     
@@ -44,16 +44,17 @@ class EvaluationMomentController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 422);
         }
 
         try {
             $evaluationMoment = EvaluationMoment::create($validator->validated());
 
-            return response()->json(['message' => 'Evaluation moment created successfully', 'evaluationMoment' => $evaluationMoment], 201);
+            return response()->json(['message' => 'Momento de avaliação criado com sucesso', 'evaluationMoment' => $evaluationMoment], 201);
         } catch (\Exception $e) {
-            Log::info($e->getMessage());
-            return response()->json(['message' => 'An error occurred while creating the evaluation moment', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar o momento de avaliação: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao criar o momento de avaliação'], 500);
         }
     }
 
@@ -70,11 +71,11 @@ class EvaluationMomentController extends Controller
 
             return response()->json(['evaluationMoment' => $evaluationMoment], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Evaluation moment not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Evaluation moment not found', 'details' => $e->getMessage()], 404);
+            Log::error('Momento de avaliação não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Momento de avaliação não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the evaluation moment: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the evaluation moment', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao recuperar o momento de avaliação: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao recuperar o momento de avaliação'], 500);
         }
     }
 
@@ -92,7 +93,7 @@ class EvaluationMomentController extends Controller
             $evaluationMoment = EvaluationMoment::find($id);
 
             if (!$evaluationMoment) {
-                return response()->json(['message' => 'Evaluation moment not found'], 404);
+                return response()->json(['message' => 'Momento de avaliação não encontrado'], 404);
             }
 
             // Validate the incoming request data
@@ -105,17 +106,17 @@ class EvaluationMomentController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             // Update the evaluation moment with the validated data
             $evaluationMoment->update($validator->validated());
 
-            return response()->json(['message' => 'Evaluation moment updated successfully', 'evaluationMoment' => $evaluationMoment], 200);
+            return response()->json(['message' => 'Momento de avaliação atualizado com sucesso', 'momento de avaliação' => $momento_de_avaliação], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the evaluation moment: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the evaluation moment', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao atualizar o momento de avaliação: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao atualizar o momento de avaliação'], 500);
         }
     }
 
@@ -131,13 +132,13 @@ class EvaluationMomentController extends Controller
             $evaluationMoment = EvaluationMoment::findOrFail($id);
             $evaluationMoment->delete();
 
-            return response()->json(['message' => 'Evaluation moment deleted successfully'], 200);
+            return response()->json(['message' => 'Momento de avaliação apagado com sucesso'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Evaluation moment not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Evaluation moment not found', 'details' => $e->getMessage()], 404);
+            Log::error('Momento de avaliação não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Momento de avaliação não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the evaluation moment: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the evaluation moment', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao deletar o momento de avaliação: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao apagar o momento de avaliação'], 500);
         }
     }
 
@@ -159,15 +160,14 @@ class EvaluationMomentController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             // Get the authenticated professor
             $professor = JWTAuth::user();
             if (!$professor) {
-                Log::error('Unauthorized: ' . $e->getMessage());
-                return response()->json(['message' => 'Unauthorized'], 401);
+                return response()->json(['message' => 'Não autorizado'], 401);
             }
 
             // Start building the query
@@ -192,11 +192,8 @@ class EvaluationMomentController extends Controller
             $evaluationMoments = $query->get();
             return response()->json(['evaluationMoments' => $evaluationMoments], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving evaluation moments: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'An error occurred while retrieving evaluation moments',
-                'details' => $e->getMessage()
-            ], 500);
+            Log::error('Erro ao recuperar momentos de avaliação: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao obter os momentos de avaliação'], 500);
         }
     }
 }

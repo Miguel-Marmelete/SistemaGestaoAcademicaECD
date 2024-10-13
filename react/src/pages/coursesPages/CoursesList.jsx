@@ -32,7 +32,7 @@ const CoursesList = () => {
     }, []);
 
     const handleDelete = (courseId) => {
-        if (!window.confirm("Are you sure you want to delete this course?")) {
+        if (!window.confirm("Tem certeza que deseja apagar este curso?")) {
             return;
         }
         customFetch(
@@ -47,9 +47,12 @@ const CoursesList = () => {
                         (course) => course.course_id !== courseId
                     )
                 );
-                alert("Course deleted successfully");
+                alert("Curso apagado com sucesso");
             })
-            .catch((error) => console.error(error));
+            .catch((error) => {
+                console.error(error);
+                alert(error);
+            });
     };
 
     const handleEditClick = (course) => {
@@ -62,7 +65,7 @@ const CoursesList = () => {
     };
 
     const handleSave = (courseId) => {
-        if (!window.confirm("Are you sure you want to update this course?")) {
+        if (!window.confirm("Tem certeza que deseja atualizar este curso?")) {
             return;
         }
         console.log("editedCourse", editedCourse);
@@ -82,9 +85,12 @@ const CoursesList = () => {
                     )
                 );
                 setEditedCourse({});
-                alert("Course updated successfully");
+                alert("Curso atualizado com sucesso");
             })
-            .catch((error) => console.error(error));
+            .catch((error) => {
+                console.error(error);
+                alert(error);
+            });
     };
 
     const handleCancelEdit = () => {

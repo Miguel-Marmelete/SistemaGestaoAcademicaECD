@@ -28,7 +28,7 @@ class GradeEvaluationMomentController extends Controller
 
             if ($validator->fails()) {
                 Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             // Check if the professor is associated with the evaluation moment
@@ -38,8 +38,7 @@ class GradeEvaluationMomentController extends Controller
                     ->where('professor_id', $professor->professor_id)
                     ->first();
                 if (!$evaluationMoment) {
-                    Log::error('You are not authorized to access this evaluation moment');
-                    return response()->json(['message' => 'You are not authorized to access this evaluation moment'], 403);
+                    return response()->json(['message' => 'Não tem permissão para aceder a este momento de avaliação'], 403);
                 }    
             }
             
@@ -61,8 +60,8 @@ class GradeEvaluationMomentController extends Controller
 
             return response()->json(['students_grades' => $studentsGrades], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving grade evaluation moments: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving grade evaluation moments', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter notas dos momentos de avaliação: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter notas dos momentos de avaliação'], 500);
         }
     }
 
@@ -85,7 +84,7 @@ class GradeEvaluationMomentController extends Controller
 
             if ($validator->fails()) {
                 Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                return response()->json(['message' => 'Dados Inválidos'], 422);
             }
 
             $grades = $request->input('grades');
@@ -105,14 +104,14 @@ class GradeEvaluationMomentController extends Controller
                 } catch (\Exception $e) {
                     // Log the error
                     Log::error("Error updating/creating grade: " . $e->getMessage());
-                    return response()->json(['message' => 'An error occurred while creating the grade evaluation moments', 'details' => $e->getMessage()], 500);
+                    return response()->json(['message' => 'Ocorreu um erro ao criar as notas dos momentos de avaliação'], 500);
                 }
             }
 
-            return response()->json(['message' => 'Grade evaluation moments created successfully', 'gradeEvaluationMoments' => $createdRecords], 201);
+            return response()->json(['message' => 'Notas dos momentos de avaliação criadas com sucesso', 'gradeEvaluationMoments' => $createdRecords], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating grade evaluation moments: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while creating the grade evaluation moments', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar as notas dos momentos de avaliação: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar as notas dos momentos de avaliação'], 500);
         }
     }
 
@@ -133,11 +132,11 @@ class GradeEvaluationMomentController extends Controller
 
             return response()->json(['gradeEvaluationMoment' => $gradeEvaluationMoment], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Grade evaluation moment not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Grade evaluation moment not found'], 404);
+            Log::error('Nota do momento de avaliação não encontrada: ' . $e->getMessage());
+            return response()->json(['message' => 'Nota do momento de avaliação não encontrada'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the grade evaluation moment: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the grade evaluation moment', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter a nota do momento de avaliação: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter a nota do momento de avaliação'], 500);
         }
     }
 
@@ -165,8 +164,8 @@ class GradeEvaluationMomentController extends Controller
             );
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             // Check if the grade evaluation moment exists
@@ -175,7 +174,7 @@ class GradeEvaluationMomentController extends Controller
                 ->first();
 
             if (!$gradeEvaluationMoment) {
-                return response()->json(['message' => 'Grade evaluation moment not found'], 404);
+                return response()->json(['message' => 'Nota do momento de avaliação não encontrada'], 404);
             }
 
             // Validate the incoming request data
@@ -184,8 +183,8 @@ class GradeEvaluationMomentController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             // Update the grade evaluation moment with the validated data
@@ -194,14 +193,13 @@ class GradeEvaluationMomentController extends Controller
             ]);
 
             return response()->json([
-                'message' => 'Grade evaluation moment updated successfully', 
+                'message' => 'Nota do momento de avaliação atualizada com sucesso', 
                 'gradeEvaluationMoment' => $gradeEvaluationMoment
             ], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the grade evaluation moment: ' . $e->getMessage());
+            Log::error('Erro ao atualizar o momento de avaliação de nota: ' . $e->getMessage());
             return response()->json([
-                'message' => 'An error occurred while updating the grade evaluation moment', 
-                'details' => $e->getMessage()
+                'message' => 'Erro ao atualizar o momento de avaliação de nota', 
             ], 500);
         }
     }
@@ -221,13 +219,13 @@ class GradeEvaluationMomentController extends Controller
                 ->firstOrFail();
             $gradeEvaluationMoment->delete();
 
-            return response()->json(['message' => 'Grade evaluation moment deleted successfully'], 200);
+            return response()->json(['message' => 'Nota do momento de avaliação apagada com sucesso'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Grade evaluation moment not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Grade evaluation moment not found'], 404);
+            Log::error('Nota do momento de avaliação não encontrada: ' . $e->getMessage());
+            return response()->json(['message' => 'Nota do momento de avaliação não encontrada'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the grade evaluation moment: ' . $e->getMessage());   
-            return response()->json(['message' => 'An error occurred while deleting the grade evaluation moment', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar a nota do momento de avaliação: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar a nota do momento de avaliação'], 500);
         }
     }
 }

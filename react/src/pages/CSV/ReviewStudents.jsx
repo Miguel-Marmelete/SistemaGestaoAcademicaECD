@@ -18,27 +18,29 @@ const ReviewStudents = () => {
     // Initialize studentsData with students from state
     const [studentsData, setStudentsData] = useState(students);
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         setLoading(true);
-        try {
-            await customFetch(
-                endpoints.ADD_AND_ENROLL_STUDENTS_CSV,
-                accessTokenData,
-                setAccessTokenData,
-                "POST",
-                {
-                    students, // Send all students
-                    course_id: course, // Include course_id
-                }
-            );
-            alert("Students added successfully!");
-            navigate("/addStudents");
-        } catch (error) {
-            alert(error);
-            console.log(error);
-        } finally {
-            setLoading(false);
-        }
+        customFetch(
+            endpoints.ADD_AND_ENROLL_STUDENTS_CSV,
+            accessTokenData,
+            setAccessTokenData,
+            "POST",
+            {
+                students, // Send all students
+                course_id: course, // Include course_id
+            }
+        )
+            .then((data) => {
+                alert(data.message);
+                navigate("/addStudents");
+            })
+            .catch((error) => {
+                console.log(error);
+                alert(error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
     };
 
     const toggleEditMode = () => {
@@ -54,24 +56,24 @@ const ReviewStudents = () => {
     return (
         <div className="table-list-container">
             <header>
-                <h1>Review Students</h1>
+                <h1>Alunos</h1>
             </header>
             {students.length === 0 ? (
-                <p>No students to review</p>
+                <p>Não há alunos para submeter</p>
             ) : (
                 <table className="table-list" border="1" cellPadding="10">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>IPBEJA Email</th>
-                            <th>Number</th>
-                            <th>Birthday</th>
-                            <th>Address</th>
-                            <th>City</th>
-                            <th>Mobile</th>
-                            <th>Class</th>
+                            <th>Nome</th>
+                            <th>Email IPBEJA</th>
+                            <th>Número</th>
+                            <th>Data de Nascimento</th>
+                            <th>Morada</th>
+                            <th>Cidade</th>
+                            <th>Telemóvel</th>
+                            <th>Classe</th>
                             <th>Posto</th>
-                            <th>Personal Email</th>
+                            <th>Email Pessoal</th>
                             <th>NIM</th>
                         </tr>
                     </thead>
@@ -271,21 +273,17 @@ const ReviewStudents = () => {
                 </table>
             )}
             <div className="button-group">
-                <button
-                    className="buttons"
-                    onClick={handleSubmit}
-                    disabled={loading}
-                >
-                    {loading ? <ClipLoader size={15} /> : "Submit"}
-                </button>
+                {!editMode && (
+                    <button
+                        className="buttons"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                    >
+                        {loading ? <ClipLoader size={15} /> : "Submeter"}
+                    </button>
+                )}
                 <button className="buttons" onClick={toggleEditMode}>
-                    {editMode ? "Save" : "Edit"}
-                </button>
-                <button
-                    className="buttons"
-                    onClick={() => navigate("/addStudents")}
-                >
-                    Cancel
+                    {editMode ? "Guardar Alterações" : "Editar"}
                 </button>
             </div>
         </div>

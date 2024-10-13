@@ -19,7 +19,7 @@ class CourseModuleController extends Controller
             $courseModules = CourseModule::with(['module', 'course'])->get();
             return response()->json(['courseModules' => $courseModules], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred while retrieving course-module relationships', 'details' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Ocorreu um erro ao recuperar as relações curso-módulo'], 500);
         }
     }
 
@@ -39,8 +39,8 @@ class CourseModuleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            
-            return response()->json(['errors' => $validator->errors()], 422);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 422);
         }
 
         try {
@@ -55,12 +55,8 @@ class CourseModuleController extends Controller
 
             return response()->json(['modules' => $modules], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while returning modules by course: ' . $e->getMessage());
-
-            return response()->json([
-                'message' => 'An error occurred while retrieving modules for the course',
-                'details' => $e->getMessage()
-            ], 500);
+            Log::error('Erro ao obter módulos por curso: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter módulos para o curso'], 500);
         }
     }
 
@@ -81,8 +77,8 @@ class CourseModuleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed: ' . $validator->errors());
-            return response()->json(['message' => $validator->errors()], 422);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 422);
         }
 
         // Retrieve the validated data
@@ -99,13 +95,10 @@ class CourseModuleController extends Controller
                 );
             }
 
-            return response()->json(['message' => 'Modules associated with the course successfully.'], 201);
+            return response()->json(['message' => 'Módulos associados ao curso com sucesso.'], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while associating modules with the course: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'An error occurred while associating modules with the course',
-                'details' => $e->getMessage()
-            ], 500);
+            Log::error('Erro ao associar módulos ao curso: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao associar módulos ao curso'], 500);
         }
     }
 
@@ -126,11 +119,11 @@ class CourseModuleController extends Controller
 
             return response()->json(['courseModule' => $courseModule], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Course-Module relationship not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Course-Module relationship not found'], 404);
+            Log::error('Relação Curso-Módulo não encontrada: ' . $e->getMessage());
+            return response()->json(['message' => 'Relação Curso-Módulo não encontrada'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the course-module relationship: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the course-module relationship', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao recuperar a relação curso-módulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao recuperar a relação curso-módulo'], 500);
         }
     }
 
@@ -150,8 +143,8 @@ class CourseModuleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed: ' . $validator->errors());
-            return response()->json(['message' => $validator->errors()], 422);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 422);
         }
 
         try {
@@ -161,12 +154,13 @@ class CourseModuleController extends Controller
 
             $courseModule->update($validator->validated());
 
-            return response()->json(['message' => 'Course-Module relationship updated successfully', 'courseModule' => $courseModule], 200);
+            return response()->json(['message' => 'Relação Curso-Módulo atualizada com sucesso', 'courseModule' => $courseModule], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Course-Module relationship not found'], 404);
+            Log::error('Relação Curso-Módulo não encontrada: ' . $e->getMessage());
+            return response()->json(['message' => 'Relação Curso-Módulo não encontrada'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the course-module relationship: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the course-module relationship', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao atualizar a relação curso-módulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao atualizar a relação curso-módulo'], 500);
         }
     }
 
@@ -186,8 +180,8 @@ class CourseModuleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed: ' . $validator->errors());
-            return response()->json(['message' => $validator->errors()], 422);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 422);
         }
 
         try {
@@ -204,13 +198,13 @@ class CourseModuleController extends Controller
             // Delete the relationship
             $courseModule->delete();
 
-            return response()->json(['message' => 'Module removed from course successfully.'], 200);
+            return response()->json(['message' => 'Módulo removido do curso com sucesso.'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Course-Module relationship not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Course-Module relationship not found'], 404);
+            Log::error('Relação Curso-Módulo não encontrada: ' . $e->getMessage());
+            return response()->json(['message' => 'Relação Curso-Módulo não encontrada'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the course-module relationship: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the course-module relationship', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao deletar a relação curso-módulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao deletar a relação curso-módulo'], 500);
         }
     }
 }

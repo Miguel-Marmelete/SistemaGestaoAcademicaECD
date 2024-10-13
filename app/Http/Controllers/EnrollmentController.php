@@ -20,8 +20,8 @@ class EnrollmentController extends Controller
             $enrollments = Enrollment::with(['student', 'course'])->get();
             return response()->json(['enrollments' => $enrollments], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving enrollments: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving enrollments', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao recuperar as inscrições: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao recuperar as inscrições'], 500);
         }
     }
 
@@ -40,9 +40,9 @@ class EnrollmentController extends Controller
     ]);
 
     if ($validator->fails()) {
-        Log::error('Validation failed: ' . $validator->errors());
-        return response()->json(['message' => $validator->errors()], 422);
-    }
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 422);
+        }
 
     try {
         $enrollments = []; // Initialize the enrollments array
@@ -65,15 +65,12 @@ class EnrollmentController extends Controller
         }
 
         return response()->json([
-            'message' => 'Enrollments created successfully',
+            'message' => 'Inscrições criadas com sucesso',
             'enrollments' => $enrollments
         ], 201);
     } catch (\Exception $e) {
-        Log::error('Error creating enrollments: ', ['error' => $e->getMessage()]);
-        return response()->json([
-            'message' => 'An error occurred while creating the enrollments',
-            'details' => $e->getMessage()
-        ], 500);
+        Log::error('Erro ao criar as inscrições: ' . $e->getMessage());
+        return response()->json(['message' => 'Ocorreu um erro ao criar as inscrições'], 500);
     }
 }
 
@@ -96,11 +93,11 @@ class EnrollmentController extends Controller
 
             return response()->json(['enrollment' => $enrollment], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Enrollment record not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Enrollment record not found', 'details' => $e->getMessage()], 404);
+            Log::error('Inscrição não encontrada: ' . $e->getMessage());
+            return response()->json(['message' => 'Inscrição não encontrada'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the enrollment record: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the enrollment record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao recuperar a inscrição: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao recuperar a inscrição'], 500);
         }
     }
 
@@ -121,7 +118,7 @@ class EnrollmentController extends Controller
                 ->first();
 
             if (!$enrollment) {
-                return response()->json(['error' => 'Enrollment record not found'], 404);
+                return response()->json(['message' => 'Inscrição não encontrada'], 404);
             }
 
             // Validate the incoming request data
@@ -131,17 +128,17 @@ class EnrollmentController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 422);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 422);
             }
 
             // Update the enrollment record with the validated data
             $enrollment->update($validator->validated());
 
-            return response()->json(['message' => 'Enrollment updated successfully', 'enrollment' => $enrollment], 200);
+            return response()->json(['message' => 'Inscrição atualizada com sucesso', 'inscrição' => $enrollment], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the enrollment record: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the enrollment record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao atualizar a inscrição: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao atualizar a inscrição'], 500);
         }
     }
 
@@ -160,13 +157,13 @@ class EnrollmentController extends Controller
                 ->firstOrFail();
             $enrollment->delete();
 
-            return response()->json(['message' => 'Enrollment deleted successfully'], 200);
+            return response()->json(['message' => 'Inscrição apagada com sucesso'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Enrollment record not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Enrollment record not found', 'details' => $e->getMessage()], 404);
+            Log::error('Inscrição não encontrada: ' . $e->getMessage());
+            return response()->json(['message' => 'Inscrição não encontrada'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the enrollment record: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the enrollment record', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar a inscrição: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocorreu um erro ao apagar a inscrição'], 500);
         }
     }
 }

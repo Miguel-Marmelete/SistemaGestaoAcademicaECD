@@ -7,7 +7,6 @@ use App\Models\Enrollment;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Student;
 use Illuminate\Support\Facades\Log;
-use PhpParser\Node\Expr\Throw_;
 
 class StudentController extends Controller
 {
@@ -45,9 +44,7 @@ class StudentController extends Controller
     
             // Return a JSON response with the error message
             return response()->json([
-                'message' => 'An unexpected error occurred.',
-                'details' => $e->getMessage()
-            ], 500);
+                'message' => 'Erro ao obter alunos.'], 500);
         }
     }
 
@@ -63,11 +60,11 @@ class StudentController extends Controller
             $student = Student::findOrFail($id);
             return response()->json(['student' => $student], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Student not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Student not found'], 404);
+            Log::error('Aluno não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Aluno não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the student: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the student', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter o aluno: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter o aluno'], 500);
         }
     }
 
@@ -96,17 +93,17 @@ class StudentController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 400);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 400);
             }
 
             $student = Student::create($validator->validated());
             
 
-            return response()->json(['message' => 'Student created successfully', 'student' => $student], 201);
+            return response()->json(['message' => 'Aluno criado com sucesso', 'student' => $student], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while creating the student: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while creating the student', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar o aluno: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar o aluno'], 500);
         }
     }
 
@@ -139,8 +136,8 @@ class StudentController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 400);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 400);
             }
 
             // Update the student with the provided data
@@ -149,13 +146,13 @@ class StudentController extends Controller
                 'city', 'mobile', 'posto', 'nii', 'classe', 'personal_email'
             ]));
 
-            return response()->json(['message' => 'Student updated successfully', 'student' => $student], 200);
+            return response()->json(['message' => 'Aluno atualizado com sucesso', 'student' => $student], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Student not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Student not found'], 404);
+            Log::error('Aluno não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Aluno não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the student: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the student', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao atualizar o aluno: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao atualizar o aluno'], 500);
         }
     }
 
@@ -173,10 +170,11 @@ class StudentController extends Controller
 
             return response()->json(['message' => 'Student deleted successfully'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Student not found'], 404);
+            Log::error('Aluno não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Aluno não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the student: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the student', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar o aluno: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar o aluno'], 500);
         }
     }
 
@@ -206,8 +204,7 @@ class StudentController extends Controller
             if ($validator->fails()) {
                 Log::error('Validation failed: ' . $validator->errors());
                 return response()->json([
-                    'message' => 'Validation failed. Please check the input fields for errors.',
-                    'details' => implode(', ', $validator->errors()->all())
+                    'message' => 'Dados inválidos',
                 ], 400);
             }
 
@@ -222,10 +219,10 @@ class StudentController extends Controller
                 'course_id' => $request->input('course_id'),
             ]);
 
-            return response()->json(['message' => 'Student created and enrolled successfully'], 201);
+            return response()->json(['message' => 'Aluno criado e inscrito com sucesso'], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while creating and enrolling the student: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while creating and enrolling the student', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar e inscrever o aluno: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar e inscrever o aluno'], 500);
         }
     }
 
@@ -250,11 +247,8 @@ class StudentController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json([
-                    'message' => 'Validation failed. Please check the input fields for errors.',
-                    'details' => implode(', ', $validator->errors()->all())
-                ], 400);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 400);
             }
 
             $studentsData = $request->input('students');
@@ -274,10 +268,10 @@ class StudentController extends Controller
                 ]);
             }
 
-            return response()->json(['message' => 'Students added and enrolled successfully'], 201);
+            return response()->json(['message' => 'Alunos adicionados e inscritos com sucesso'], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while adding and enrolling students: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while adding and enrolling students', 'details' => $e->getMessage()], 500);
+                Log::error('Erro ao adicionar e inscrever os alunos: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao adicionar e inscrever os alunos'], 500);
         }
     }
 }

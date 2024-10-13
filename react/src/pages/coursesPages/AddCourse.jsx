@@ -81,8 +81,8 @@ const AddCourse = () => {
             "POST",
             formData
         )
-            .then(() => {
-                alert("Course added successfully!");
+            .then((data) => {
+                alert(data.message);
                 setFormData({
                     abbreviation: "",
                     name: "",

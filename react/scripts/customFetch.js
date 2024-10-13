@@ -45,10 +45,9 @@ const customFetch = async (
             // Attempt to parse the response as JSON
             const errorResponse = await response.json().catch(() => null);
             const errorMessage = errorResponse?.message || response.statusText;
-            const errorDetails = errorResponse?.details || "";
 
             throw new Error(
-                `Error: ${response.status}\nMessage: ${errorMessage}\nDetails: ${errorDetails}`
+                `Error: ${response.status}\nMessage: ${errorMessage}\n`
             );
         }
 

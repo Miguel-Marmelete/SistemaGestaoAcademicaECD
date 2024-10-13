@@ -33,12 +33,14 @@ class AuthController extends Controller
 
         // Return validation errors if validation fails
         if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 400);
         }
         // Check if the email is already in the pending_professors table
         $pendingProfessor = PendingProfessor::where('email', $request->email)->first();
         if ($pendingProfessor) {
-            return response()->json(['message' => 'Email is awaiting approval. Please check your inbox.'], 400);
+            Log::error('Email já está a aguardar aprovação: ' . $request->email);
+            return response()->json(['message' => 'A aguardar aprovação. Verifique a sua caixa de entrada.'], 400);
         }
 
         
@@ -63,12 +65,12 @@ class AuthController extends Controller
         });
 
         // Return success response
-        return response()->json(['message' => 'Registration initiated, please check your email for verification'], 201);
+        return response()->json(['message' => 'Registo iniciado, por favor verifique o seu email.'], 201);
 
     } catch (\Exception $e) {
         // Log the error and return error response
-        Log::error('Error during registration: ' . $e->getMessage());
-        return response()->json(['message' => 'Registration failed', 'details' => $e->getMessage()], 500);
+        Log::error('Erro durante o registro: ' . $e->getMessage());
+        return response()->json(['message' => 'Falha no registo'], 500);
     }
 }
 
@@ -107,8 +109,8 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             // Log the error and return error response
-            Log::error('Error during email verification: ' . $e->getMessage());
-            return response()->json(['message' => 'Email verification failed', 'details' => $e->getMessage()], 500);
+            Log::error('Erro durante a verificação de email: ' . $e->getMessage());
+            return response()->json(['message' => 'Falha na verificação de email'], 500);
         }
     }
 
@@ -140,12 +142,12 @@ class AuthController extends Controller
             $pendingProfessor->delete();
 
             // Return success response
-            return response()->json(['message' => 'Professor account created successfully']);
+            return response()->json(['message' => 'Professor criado com sucesso']);
 
         } catch (\Exception $e) {
             // Log the error and return error response
-            Log::error('Error during professor approval: ' . $e->getMessage());
-            return response()->json(['message' => 'Professor approval failed', 'details' => $e->getMessage()], 500);
+            Log::error('Erro durante a aprovação do professor: ' . $e->getMessage());
+            return response()->json(['message' => 'Falha na aprovação do professor'], 500);
         }
     }
 
@@ -165,13 +167,14 @@ class AuthController extends Controller
     
             // Return validation errors if validation fails
             if ($validator->fails()) {
-                return response()->json($validator->errors()->toJson(), 400);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 400);
             }
     
             // Check if the email is in pending professors
             $pendingProfessor = PendingProfessor::where('email', $request->email)->first();
             if ($pendingProfessor) {
-                return response()->json(['message' => 'Email is awaiting approval. Please check your inbox for verification.'], 400);
+                return response()->json(['message' => 'A aguardar aprovação. Verifique a sua caixa de entrada.'], 400);
             }
     
             // Get credentials from request
@@ -195,8 +198,8 @@ class AuthController extends Controller
     
         } catch (\Exception $e) {
             // Log the error and return error response
-            Log::error('Error during login: ' . $e->getMessage());
-            return response()->json(['message' => 'Login failed', 'details' => $e->getMessage()], 500);
+            Log::error('Erro durante o login: ' . $e->getMessage());
+            return response()->json(['message' => 'Falha no login'], 500);
         }
     }
 
@@ -213,8 +216,8 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             // Log the error and return error response
-            Log::error('Error fetching authenticated professor: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to fetch authenticated professor', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao buscar o professor autenticado: ' . $e->getMessage());
+            return response()->json(['message' => 'Falha ao buscar o professor autenticado'], 500);
         }
     }
 
@@ -234,8 +237,8 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             // Log the error and return error response
-            Log::error('Error during logout: ' . $e->getMessage());
-            return response()->json(['message' => 'Logout failed', 'details' => $e->getMessage()], 500);
+            Log::error('Erro durante o logout: ' . $e->getMessage());
+            return response()->json(['message' => 'Falha no logout'], 500);
         }
     }
 
@@ -255,8 +258,8 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             // Log the error and return error response
-            Log::error('Error refreshing token: ' . $e->getMessage());
-            return response()->json(['message' => 'Token refresh failed', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao atualizar o token: ' . $e->getMessage());
+            return response()->json(['message' => 'Falha ao atualizar o token'], 500);
         }
     }
 
@@ -275,8 +278,8 @@ class AuthController extends Controller
         ]);
     } catch (\Exception $e) {
         // Log the error and return error response
-        Log::error('Error responding with token: ' . $e->getMessage());
-        return response()->json(['message' => 'Failed to respond with token', 'details' => $e->getMessage()], 500);
+        Log::error('Erro ao responder com o token: ' . $e->getMessage());
+        return response()->json(['message' => 'Falha ao responder com o token'], 500);
     }
 }
 }

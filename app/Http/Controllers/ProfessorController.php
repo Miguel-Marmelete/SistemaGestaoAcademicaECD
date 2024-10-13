@@ -26,8 +26,8 @@ class ProfessorController extends Controller
             $professors = Professor::all();
             return response()->json(['professors' => $professors], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving professors: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving professors', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter os professores: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter os professores'], 500);
         }
     }
 
@@ -44,11 +44,11 @@ class ProfessorController extends Controller
             $professor = Professor::findOrFail($id);
             return response()->json(['professor' => $professor], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Professor not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Professor not found'], 404);
+            Log::error('Professor não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Professor não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the professor: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the professor', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter o professor: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter o professor'], 500);
         }
     }
 
@@ -71,8 +71,8 @@ class ProfessorController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 400);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 400);
             }
 
             // Generate a random password
@@ -93,14 +93,14 @@ class ProfessorController extends Controller
             Mail::send('emails.professor_password', ['professor' => $professor, 'password' => $password], function ($message) use ($professor) {
                 $message->from('SGAED@sgaed.pt', 'Sistema de Gestão Académica');
                 $message->to($professor->email, $professor->name)
-                ->subject('Your Account Password');
+                ->subject('Senha de Acesso');
             });
 
             return response()->json([
-                'message' => 'Professor created successfully. Password sent to email.'], 201);
+                'message' => 'Professor criado com sucesso. Senha enviada para o email.'], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while creating the professor: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while creating the professor', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao criar o professor: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar o professor'], 500);
         }
     }
 
@@ -130,8 +130,8 @@ class ProfessorController extends Controller
             ]);
 
             if ($validator->fails()) {
-                Log::error('Validation failed: ' . $validator->errors());
-                return response()->json(['message' => $validator->errors()], 400);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 400);
             }
 
             // Update the professor with the provided data
@@ -150,13 +150,13 @@ class ProfessorController extends Controller
                 $professor->update(['password' => Hash::make($request->password)]);
             }
 
-            return response()->json(['message' => 'Professor updated successfully', 'professor' => $professor], 200);
+            return response()->json(['message' => 'Professor atualizado com sucesso', 'professor' => $professor], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Professor not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Professor not found'], 404);
+            Log::error('Professor não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Professor não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the professor: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the professor', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao atualizar o professor: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao atualizar o professor'], 500);
         }
     }
 
@@ -173,13 +173,13 @@ class ProfessorController extends Controller
             $professor = Professor::findOrFail($id);
             $professor->delete();
 
-            return response()->json(['message' => 'Professor deleted successfully'], 200);
+            return response()->json(['message' => 'Professor apagado com sucesso'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Professor not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Professor not found'], 404);
+            Log::error('Professor não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Professor não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the professor: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the professor', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar o professor: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar o professor'], 500);
         }
     }
 
@@ -202,13 +202,13 @@ class ProfessorController extends Controller
             Mail::send('emails.confirm_admin', ['token' => $token], function($message) use ($professor) {
                 $message->from('SGAED@sgaed.pt', 'Sistema de Gestão Académica');
                 $message->to('20431@stu.ipbeja.pt');
-                $message->subject('Confirm Admin Status');
+                $message->subject('Confirmar Coordenador');
             });
 
-            return response()->json(['message' => 'Admin setting initiated, please check your email for confirmation'], 201);
+            return response()->json(['message' => 'Configuração de coordenador iniciada, por favor verifique o seu email para confirmar'], 201);
         } catch (\Exception $e) {
-            Log::error('An error occurred while initiating admin setting: ' . $e->getMessage());
-            return response()->json(['message' => 'Admin setting initiation failed', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao iniciar a configuração de coordenador: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao iniciar a configuração de coordenador'], 500);
         }
     }
 
@@ -220,7 +220,7 @@ class ProfessorController extends Controller
 
             // Return error if token is invalid
             if (!$professorAdminToken) {
-                return response()->json(['message' => 'Invalid token'], 400);
+                return response()->json(['message' => 'Token inválido'], 400);
             }
 
             // Find the professor by ID
@@ -233,10 +233,10 @@ class ProfessorController extends Controller
             // Delete the professor admin token entry
             $professorAdminToken->delete();
 
-            return response()->json(['message' => 'Professor set as admin successfully']);
+            return response()->json(['message' => 'Professor mudado para coordenador com sucesso']);
         } catch (\Exception $e) {
-            Log::error('An error occurred while confirming admin: ' . $e->getMessage());
-            return response()->json(['message' => 'Admin confirmation failed', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao confirmar o coordenador: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao confirmar o coordenador'], 500);
         }
     }
 

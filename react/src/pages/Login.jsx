@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.jsx";
 import endpoints from "../endpoints.js";
+import ClipLoader from "react-spinners/ClipLoader";
 
 function Login() {
     const { login } = useAuth();
@@ -89,8 +90,12 @@ function Login() {
                     />
                 </div>
                 <div className="login_button_container">
-                    <button type="submit" className="form_button">
-                        Login
+                    <button
+                        type="submit"
+                        className="form_button"
+                        disabled={loading}
+                    >
+                        {loading ? <ClipLoader size={15} /> : "Login"}
                     </button>
                 </div>
             </form>

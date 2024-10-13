@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CourseModule;
 use Illuminate\Http\Request;
 use App\Models\Module;
-use App\Models\ProfessorInChargeOfModule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 
@@ -24,8 +22,8 @@ class ModuleController extends Controller
             $modules = Module::all();
             return response()->json(['modules' => $modules], 200);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving modules: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving modules', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter os módulos: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter os módulos'], 500);
         }
     }
 
@@ -42,10 +40,10 @@ class ModuleController extends Controller
             $module = Module::findOrFail($id);
             return response()->json(['module' => $module], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Module not found'], 404);
+            return response()->json(['message' => 'Módulo não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while retrieving the module: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while retrieving the module', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao obter o módulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao obter o módulo'], 500);
         }
     }
 
@@ -68,17 +66,17 @@ class ModuleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed: ' . $validator->errors());
-            return response()->json(['message' => $validator->errors()], 400);
+            Log::error('Validação falhou: ' . $validator->errors());
+            return response()->json(['message' => 'Dados inválidos'], 400);
         }
 
         // Create the Module
         $module = Module::create($validator->validated());
         
-        return response()->json(['message' => 'Module created successfully', 'module' => $module], 201);
+        return response()->json(['message' => 'Módulo criado com sucesso', 'module' => $module], 201);
     } catch (\Exception $e) {
-        Log::error('An error occurred while creating the module: ' . $e->getMessage());
-        return response()->json(['message' => 'An error occurred while creating the module', 'details' => $e->getMessage()], 500);
+        Log::error('Erro ao criar o módulo: ' . $e->getMessage());
+        return response()->json(['message' => 'Erro ao criar o módulo'], 500);
     }
 }
 
@@ -104,19 +102,20 @@ class ModuleController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['message' => $validator->errors()], 400);
+                Log::error('Validação falhou: ' . $validator->errors());
+                return response()->json(['message' => 'Dados inválidos'], 400);
             }
 
             // Update the module with the provided data
             $module->update($request->only(['name', 'contact_hours', 'abbreviation', 'ects']));
 
-            return response()->json(['message' => 'Module updated successfully', 'module' => $module], 200);
+            return response()->json(['message' => 'Módulo atualizado com sucesso', 'module' => $module], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Module not found: ' . $e->getMessage());
-            return response()->json(['message' => 'Module not found'], 404);
+            Log::error('Módulo não encontrado: ' . $e->getMessage());
+            return response()->json(['message' => 'Módulo não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while updating the module: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the module', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao atualizar o módulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao atualizar o módulo'], 500);
         }
     }
 
@@ -133,12 +132,12 @@ class ModuleController extends Controller
             $module = Module::findOrFail($id);
             $module->delete();
 
-            return response()->json(['message' => 'Module deleted successfully'], 200);
+            return response()->json(['message' => 'Módulo apagado com sucesso'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Module not found'], 404);
+            return response()->json(['message' => 'Módulo não encontrado'], 404);
         } catch (\Exception $e) {
-            Log::error('An error occurred while deleting the module: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while deleting the module', 'details' => $e->getMessage()], 500);
+            Log::error('Erro ao apagar o módulo: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao apagar o módulo'], 500);
         }
     }
 }
