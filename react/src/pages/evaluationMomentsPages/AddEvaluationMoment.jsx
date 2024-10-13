@@ -306,16 +306,12 @@ const AddEvaluationMoment = () => {
                             ) : !formData.course_id || !formData.module_id ? (
                                 <tr>
                                     <td colSpan="2">
-                                        Por favor, selecione um curso e um
-                                        módulo.
+                                        Selecione um curso e um módulo.
                                     </td>
                                 </tr>
                             ) : evaluationMoments.length === 0 ? (
                                 <tr>
-                                    <td
-                                        colSpan="2"
-                                        style={{ textAlign: "center" }}
-                                    >
+                                    <td colSpan="2">
                                         Nenhum momento de avaliação encontrado.
                                     </td>
                                 </tr>

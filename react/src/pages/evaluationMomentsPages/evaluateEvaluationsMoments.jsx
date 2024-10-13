@@ -179,8 +179,8 @@ const EvaluateEvaluationMoments = () => {
                         value={selectedCourse}
                         onChange={(e) => {
                             setSelectedCourse(e.target.value);
-                            setSelectedModule("");
-                            setSelectedSubmodule("");
+                            setSelectedModule(""); // Reset module when selecting a new course
+                            setSelectedSubmodule(""); // Reset submodule
                         }}
                     >
                         <option value="">Selecione um Curso</option>
@@ -201,6 +201,7 @@ const EvaluateEvaluationMoments = () => {
                     <select
                         value={selectedModule}
                         onChange={(e) => setSelectedModule(e.target.value)}
+                        disabled={!selectedCourse} // Disable if no course is selected
                     >
                         <option value="">Selecione um Módulo</option>
                         {modules.length > 0 &&
@@ -220,6 +221,7 @@ const EvaluateEvaluationMoments = () => {
                     <select
                         value={selectedSubmodule}
                         onChange={(e) => setSelectedSubmodule(e.target.value)}
+                        disabled={!selectedModule} // Disable if no module is selected
                     >
                         <option value="">Selecione um Submódulo</option>
                         {submodules.length > 0 &&
@@ -241,6 +243,7 @@ const EvaluateEvaluationMoments = () => {
                         onChange={(e) =>
                             setSelectedEvaluationMoment(e.target.value)
                         }
+                        disabled={!selectedCourse || !selectedModule} // Disable if no course or module is selected
                     >
                         <option value="">
                             Selecione um Momento de Avaliação
@@ -270,7 +273,9 @@ const EvaluateEvaluationMoments = () => {
                 <tbody>
                     {!selectedCourse && (
                         <tr>
-                            <td colSpan="3">Selecione um curso.</td>
+                            <td colSpan="3">
+                                Selecione um curso para continuar.
+                            </td>
                         </tr>
                     )}
 

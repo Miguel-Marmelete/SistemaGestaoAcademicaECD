@@ -4,6 +4,7 @@ import endpoints from "../../endpoints";
 import ButtonMenu from "../../components/ButtonMenu";
 import { evaluationMomentsMenuButtons } from "../../../scripts/buttonsData";
 import customFetch from "../../../scripts/customFetch";
+import ClipLoader from "react-spinners/ClipLoader"; // Import ClipLoader
 
 const EvaluationMomentsGradesList = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();
@@ -18,6 +19,7 @@ const EvaluationMomentsGradesList = () => {
         useState("");
     const [students, setStudents] = useState([]);
     const [editedGrade, setEditedGrade] = useState({});
+    const [loading, setLoading] = useState(false); // Add loading state
 
     useEffect(() => {
         // Fetch all courses
@@ -25,7 +27,10 @@ const EvaluationMomentsGradesList = () => {
             .then((data) => {
                 setCourses(data.courses);
             })
-            .catch((error) => setErrorMessage(error.message));
+            .catch((error) => {
+                console.error(error);
+                alert(error);
+            });
     }, [accessTokenData]);
 
     useEffect(() => {
@@ -75,7 +80,10 @@ const EvaluationMomentsGradesList = () => {
                     setModules(uniqueModules);
                     setSubmodules(uniqueSubmodules);
                 })
-                .catch((error) => setErrorMessage(error.message));
+                .catch((error) => {
+                    console.error(error);
+                    alert(error);
+                });
         } else {
             setEvaluationMoments([]);
             setModules([]);
@@ -85,7 +93,7 @@ const EvaluationMomentsGradesList = () => {
 
     useEffect(() => {
         if (selectedEvaluationMoment) {
-            // Fetch students for the selected course
+            setLoading(true); // Start loading
             customFetch(
                 `${endpoints.GET_STUDENTS_EVALUATION_MOMENT_GRADES}/${selectedEvaluationMoment}`,
                 accessTokenData,
@@ -94,7 +102,11 @@ const EvaluationMomentsGradesList = () => {
                 .then((data) => {
                     setStudents(data.students_grades);
                 })
-                .catch((error) => setErrorMessage(error.message));
+                .catch((error) => {
+                    console.error(error);
+                    alert(error);
+                })
+                .finally(() => setLoading(false)); // Stop loading
         } else {
             setStudents([]);
         }
@@ -122,7 +134,7 @@ const EvaluationMomentsGradesList = () => {
     };
 
     const handleSave = (studentId) => {
-        if (!window.confirm("Are you sure you want to update this grade?")) {
+        if (!window.confirm("Tem certeza que deseja atualizar esta nota?")) {
             return;
         }
         customFetch(
@@ -164,16 +176,19 @@ const EvaluationMomentsGradesList = () => {
                             : student
                     )
                 );
-                alert("Grade deleted successfully");
+                alert("Nota apagada com sucesso");
             })
-            .catch((error) => console.error(error));
+            .catch((error) => {
+                console.error(error);
+                alert(error);
+            });
     };
 
     return (
         <div className="table-list-container">
             <ButtonMenu buttons={evaluationMomentsMenuButtons} />
             <header>
-                <h1>Avaliação dos Estudantes</h1>
+                <h1>Avaliação dos Alunos</h1>
             </header>
 
             <div className="filters">
@@ -187,7 +202,7 @@ const EvaluationMomentsGradesList = () => {
                             setSelectedSubmodule(""); // Reset submodule
                         }}
                     >
-                        <option value="">Todos os Cursos</option>
+                        <option value="">Selecione um curso</option>
                         {courses.length > 0 &&
                             courses.map((course) => (
                                 <option
@@ -205,8 +220,9 @@ const EvaluationMomentsGradesList = () => {
                     <select
                         value={selectedModule}
                         onChange={(e) => setSelectedModule(e.target.value)}
+                        disabled={!selectedCourse} // Disable if no course is selected
                     >
-                        <option value="">Todos os Módulos</option>
+                        <option value="">Selecione um módulo</option>
                         {modules.length > 0 &&
                             modules.map((module) => (
                                 <option
@@ -224,8 +240,9 @@ const EvaluationMomentsGradesList = () => {
                     <select
                         value={selectedSubmodule}
                         onChange={(e) => setSelectedSubmodule(e.target.value)}
+                        disabled={!selectedModule} // Disable if no module is selected
                     >
-                        <option value="">Todos os Submódulos</option>
+                        <option value="">Selecione um submódulo</option>
                         {submodules.length > 0 &&
                             submodules.map((submodule) => (
                                 <option
@@ -245,8 +262,11 @@ const EvaluationMomentsGradesList = () => {
                         onChange={(e) =>
                             setSelectedEvaluationMoment(e.target.value)
                         }
+                        disabled={!selectedCourse || !selectedModule} // Disable if no course or module is selected
                     >
-                        <option value="">Todos os Momentos de Avaliação</option>
+                        <option value="">
+                            Selecione um momento de avaliação
+                        </option>
                         {filteredEvaluationMoments.length > 0 &&
                             filteredEvaluationMoments.map((moment) => (
                                 <option
@@ -260,7 +280,7 @@ const EvaluationMomentsGradesList = () => {
                 </label>
             </div>
 
-            <h2>Estudantes</h2>
+            <h2>Alunos</h2>
             <table className="table-list" border="1" cellPadding="10">
                 <thead>
                     <tr>
@@ -271,61 +291,87 @@ const EvaluationMomentsGradesList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {students.map((student) => (
-                        <tr key={student.student_id}>
-                            {editedGrade.student_id === student.student_id ? (
-                                <>
-                                    <td>{student.student_name}</td>
-                                    <td>{student.student_number}</td>
-                                    <td>
-                                        <input
-                                            type="number"
-                                            name="grade"
-                                            value={editedGrade.grade}
-                                            onChange={handleChange}
-                                            min="0"
-                                            max="20"
-                                            step="0.01"
-                                        />
-                                    </td>
-                                    <td>
-                                        <button
-                                            className="buttons"
-                                            onClick={() =>
-                                                handleSave(student.student_id)
-                                            }
-                                        >
-                                            Save
-                                        </button>
-                                    </td>
-                                </>
-                            ) : (
-                                <>
-                                    <td>{student.student_name}</td>
-                                    <td>{student.student_number}</td>
-                                    <td>{student.grade}</td>
-                                    <td>
-                                        <button
-                                            className="buttons"
-                                            onClick={() =>
-                                                handleEditClick(student)
-                                            }
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className="buttons"
-                                            onClick={() =>
-                                                handleDelete(student.student_id)
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
-                                </>
-                            )}
+                    {loading ? (
+                        <tr>
+                            <td colSpan="4">
+                                Loading <ClipLoader size={15} />
+                            </td>
                         </tr>
-                    ))}
+                    ) : !selectedEvaluationMoment ? (
+                        <tr>
+                            <td colSpan="4">
+                                Selecione um momento de avaliação.
+                            </td>
+                        </tr>
+                    ) : students.length === 0 ? (
+                        <tr>
+                            <td colSpan="4">
+                                Não existem notas atribuídas a este momento de
+                                avaliação.
+                            </td>
+                        </tr>
+                    ) : (
+                        students.map((student) => (
+                            <tr key={student.student_id}>
+                                {editedGrade.student_id ===
+                                student.student_id ? (
+                                    <>
+                                        <td>{student.student_name}</td>
+                                        <td>{student.student_number}</td>
+                                        <td>
+                                            <input
+                                                type="number"
+                                                name="grade"
+                                                value={editedGrade.grade}
+                                                onChange={handleChange}
+                                                min="0"
+                                                max="20"
+                                                step="0.01"
+                                            />
+                                        </td>
+                                        <td>
+                                            <button
+                                                className="buttons"
+                                                onClick={() =>
+                                                    handleSave(
+                                                        student.student_id
+                                                    )
+                                                }
+                                            >
+                                                Save
+                                            </button>
+                                        </td>
+                                    </>
+                                ) : (
+                                    <>
+                                        <td>{student.student_name}</td>
+                                        <td>{student.student_number}</td>
+                                        <td>{student.grade}</td>
+                                        <td>
+                                            <button
+                                                className="buttons"
+                                                onClick={() =>
+                                                    handleEditClick(student)
+                                                }
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="buttons"
+                                                onClick={() =>
+                                                    handleDelete(
+                                                        student.student_id
+                                                    )
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </>
+                                )}
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </table>
         </div>
