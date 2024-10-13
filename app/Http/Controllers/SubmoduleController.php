@@ -48,7 +48,13 @@ class SubmoduleController extends Controller
                 // If the professor is not a coordinator, retrieve only their submodules
                 $moduleIds = ProfessorInChargeOfModule::where('professor_id', $professor->professor_id)
                     ->pluck('module_id');
-                $submodulesQuery->whereIn('module_id', $moduleIds);
+
+                // Check if the received module_id is among the professor's modules
+                if ($moduleId && $moduleIds->contains($moduleId)) {
+                    $submodulesQuery->where('module_id', $moduleId);
+                } else {
+                    return response()->json(['message' => 'Não tem permissão para ver este submódulo'], 403);
+                }
             }
     
             // Execute the query

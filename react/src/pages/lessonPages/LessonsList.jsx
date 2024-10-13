@@ -113,15 +113,18 @@ const LessonsList = () => {
 
         // Extract only the editable fields
         const { title, type, summary, date } = editedLesson;
+        // Format the date to yyyy-MM-dd HH:00:00
         const formattedDate = new Date(date)
             .toISOString()
             .slice(0, 19)
             .replace("T", " ");
+        const adjustedDate = formattedDate.slice(0, 13) + ":00:00";
+
         const formattedEditedLesson = {
             title,
             type,
             summary,
-            date: formattedDate,
+            date: adjustedDate, // Use the adjusted date
         };
 
         customFetch(
@@ -254,14 +257,23 @@ const LessonsList = () => {
                                                 />
                                             </td>
                                             <td>
-                                                <input
-                                                    type="text"
+                                                <select
                                                     name="type"
                                                     value={
                                                         editedLesson.type || ""
                                                     }
                                                     onChange={handleChange}
-                                                />
+                                                >
+                                                    <option value="Teórica">
+                                                        Teórica
+                                                    </option>
+                                                    <option value="Laboratorial">
+                                                        Laboratorial
+                                                    </option>
+                                                    <option value="Teórica-Prática">
+                                                        Teórica-Prática
+                                                    </option>
+                                                </select>
                                             </td>
                                             <td>
                                                 <input
@@ -278,12 +290,17 @@ const LessonsList = () => {
                                             <td>{lesson.course.name}</td>
                                             <td>
                                                 <input
-                                                    type="date"
+                                                    type="datetime-local"
                                                     name="date"
                                                     value={
                                                         editedLesson.date || ""
                                                     }
                                                     onChange={handleChange}
+                                                    style={{
+                                                        width: "100%",
+                                                        boxSizing: "border-box",
+                                                        maxWidth: "150px",
+                                                    }}
                                                 />
                                             </td>
                                             <td>

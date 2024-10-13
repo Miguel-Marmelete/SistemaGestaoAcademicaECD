@@ -25,7 +25,7 @@ const EvaluationMomentsGradesList = () => {
         // Fetch all courses
         customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
-                setCourses(data.courses);
+                setCourses(data.courses.reverse());
             })
             .catch((error) => {
                 console.error(error);

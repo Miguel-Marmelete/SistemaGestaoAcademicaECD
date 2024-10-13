@@ -24,7 +24,7 @@ const EvaluateEvaluationMoments = () => {
     useEffect(() => {
         customFetch(endpoints.GET_COURSES, accessTokenData, setAccessTokenData)
             .then((data) => {
-                setCourses(data.courses);
+                setCourses(data.courses.reverse());
             })
             .catch((error) => setErrorMessage(error.message));
     }, [accessTokenData]);

@@ -20,7 +20,7 @@ const EvaluationMomentsList = () => {
             setAccessTokenData
         )
             .then((data) => {
-                setCoursesModules(data.courseModules);
+                setCoursesModules(data.courseModules.reverse());
             })
             .catch((error) => {
                 console.error(error);

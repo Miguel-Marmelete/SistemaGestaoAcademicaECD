@@ -52,6 +52,7 @@ const AddEvaluationMoment = () => {
                 setAccessTokenData
             )
                 .then((data) => {
+                    console.log("submodules", data.submodules);
                     setSubmodules(data.submodules.reverse());
                 })
                 .catch((error) => {
@@ -108,13 +109,21 @@ const AddEvaluationMoment = () => {
                 (course) => course.course.course_id === parseInt(value)
             );
             setModules(selectedCourse ? selectedCourse.modules : []); // Set modules of the selected course
-        }
 
-        setFormData({
-            ...formData,
-            [name]: value,
-            ...(name === "type" && { submodule_id: null }), // Reset submodule if type changes
-        });
+            // Reset module_id and submodule_id when course changes
+            setFormData({
+                ...formData,
+                course_id: value,
+                module_id: "",
+                submodule_id: null,
+            });
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value,
+                ...(name === "type" && { submodule_id: null }), // Reset submodule if type changes
+            });
+        }
     };
 
     const validateForm = () => {
