@@ -273,7 +273,7 @@ const AddLesson = () => {
                         </select>
                     </div>
                     <div>
-                        <label>Submódulo</label>
+                        <label>Módulo/Submódulo</label>
                         <select
                             name="submodule_id"
                             value={formData.submodule_id}

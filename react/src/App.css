@@ -951,3 +951,38 @@ form small {
 .student-info strong {
     color: #ffffff; /* Changed to match the navbar text color */
 }
+
+/*------------------------IMPRIMIR PAUTA---------------------------------*/
+
+.pauta-container {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+.dados-pauta p {
+    margin: 5px 0;
+}
+
+.tabela-alunos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.tabela-alunos th,
+.tabela-alunos td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.tabela-alunos th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.tabela-alunos tr:nth-child(even) {
+    background-color: #f9f9f9;
+}

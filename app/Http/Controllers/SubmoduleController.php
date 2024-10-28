@@ -53,7 +53,7 @@ class SubmoduleController extends Controller
                 if ($moduleId && $moduleIds->contains($moduleId)) {
                     $submodulesQuery->where('module_id', $moduleId);
                 } else {
-                    return response()->json(['message' => 'Não tem permissão para ver este submódulo'], 403);
+                    $submodulesQuery->whereIn('module_id', $moduleIds);
                 }
             }
     

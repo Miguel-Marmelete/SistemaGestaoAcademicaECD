@@ -4,6 +4,7 @@ import endpoints from "../../endpoints";
 import { useAuth } from "../../auth/AuthContext";
 import { professorsMenuButtons } from "../../../scripts/buttonsData";
 import { ClipLoader } from "react-spinners";
+import customFetch from "../../../scripts/customFetch"; // Import customFetch
 
 const AddProfessor = () => {
     const { accessTokenData, setAccessTokenData } = useAuth();

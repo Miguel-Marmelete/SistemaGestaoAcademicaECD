@@ -244,10 +244,10 @@ const AttendanceList = () => {
                         )}
                     </div>
                 </div>
-                <button className="buttons" onClick={handleSubmit}>
-                    Submeter
-                </button>
             </div>
+            <button className="buttons" onClick={handleSubmit}>
+                Submeter
+            </button>
         </div>
     );
 };

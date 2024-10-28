@@ -55,7 +55,6 @@ const ProfessorsInChargeOfModulesList = () => {
     }, [selectedCourse, professorsInCharge]);
 
     const handleDelete = (module_id, professor_id, course_id) => {
-        console.log(typeof module_id, typeof professor_id, typeof course_id);
         if (
             !window.confirm(
                 "Are you sure you want to remove this professor from the module?"

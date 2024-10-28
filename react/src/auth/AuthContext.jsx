@@ -8,7 +8,6 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import endpoints from "../endpoints";
 import customFetch from "../../scripts/customFetch";
-import { ClipLoader } from "react-spinners";
 
 const AuthContext = createContext();
 
