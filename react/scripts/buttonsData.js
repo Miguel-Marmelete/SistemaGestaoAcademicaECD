@@ -49,5 +49,8 @@ export const professorsMenuButtons = [
 export const printMenuButtons = [
     { name: "Imprimir Pautas", link: "/printGrades" },
 ];
+export const printCertificateButtons = [
+    { name: "Imprimir Diplomas", link: "/printCertificate" },
+];
 
 export const gradesMenuButtons = [{ name: "Pauta", link: "/grades" }];

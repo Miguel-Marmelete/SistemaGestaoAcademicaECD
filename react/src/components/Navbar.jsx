@@ -3,6 +3,9 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthContext.jsx";
 import endpoints from "../endpoints.js";
 import ipbejaLogo from "../assets/ipbejaLogo.png";
+import img1 from "../assets/WhatsApp_Image_2024-11-04_at_11.50.14-removebg-preview.png";
+import img2 from "../assets/WhatsApp_Image_2024-11-04_at_11.50.18-removebg-preview.png";
+import portugalIcon from "../assets/portugalIcon.png";
 import { ClipLoader } from "react-spinners";
 function Navbar() {
     const { accessTokenData, professor, logout, loading } = useAuth();
@@ -35,7 +38,7 @@ function Navbar() {
                 <img
                     src={ipbejaLogo}
                     className="logo"
-                    style={{ width: "15%", height: "15%" }}
+                    style={{ width: "18%", height: "5%" }}
                 />
 
                 <h3>

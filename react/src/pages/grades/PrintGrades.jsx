@@ -1,9 +1,11 @@
 import React, { useState, useRef } from "react";
-import ipbejaLogo from "../../assets/ipbejaLogo.png";
+import img1 from "../../assets/WhatsApp_Image_2024-11-04_at_11.50.14-removebg-preview.png";
+import img2 from "../../assets/WhatsApp_Image_2024-11-04_at_11.50.18-removebg-preview.png";
+import img3 from "../../assets/emgfa.png";
 
 const PrintGrades = () => {
-    const [dadosDocente, setDadosDocente] = useState(null);
-    const [alunos, setAlunos] = useState([]);
+    const [dadosPauta, setDadosPauta] = useState(null);
+    const [notasAlunos, setNotasAlunos] = useState([]);
     const fileInputRef = useRef(null);
     const printRef = useRef(null);
 
@@ -19,36 +21,60 @@ const PrintGrades = () => {
         }
     };
 
-    const processCSVData = (csvData) => {
-        const rows = csvData.split("\n").map((row) => row.split(","));
+    const obterDescricao = (chave) => {
+        const texto =
+            "Global Final : Resultados Globais Finais; " +
+            "Teste: Resultados do Teste Global; " +
+            "Exame: Resultados do Exame Global";
+        const pares = texto.split(";");
 
-        const docenteData = {
-            docente: rows[1][0],
-            ano: rows[1][1],
-            semestre: rows[1][2],
-            disciplina: rows[1][3],
-            turma: rows[1][4],
-            situacao: rows[1][5],
-            epoca: rows[1][6],
-        };
-
-        const parsedAlunos = rows.slice(4).map((row) => ({
-            curso: row[0],
-            alunoId: row[1],
-            nome: row[2],
-            data: row[3],
-            nota: row[4],
-            status: row[5],
-            epoca: row[6],
-            tipo: row[7],
-        }));
-
-        setDadosDocente(docenteData);
-        setAlunos(parsedAlunos);
+        for (let par of pares) {
+            const [chaveAtual, descricao] = par.split(":").map((s) => s.trim());
+            if (chaveAtual === chave) {
+                return descricao;
+            }
+        }
+        return "Descrição não encontrada";
     };
 
-    const handleImportClick = () => {
-        fileInputRef.current.click();
+    const formatarDataAtual = () => {
+        const dataAtual = new Date();
+        const formatador = new Intl.DateTimeFormat("pt-BR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        });
+        return formatador.format(dataAtual);
+    };
+
+    const processCSVData = (csvData) => {
+        const rows = csvData.split("\n").map((row) => row.split(","));
+        const pautaData = {
+            curso: rows[1][0],
+            modulo: rows[1][1],
+            dataCurso: rows[1][2],
+            tipoPauta: rows[1][3],
+            descricaoPauta: obterDescricao(rows[1][3]),
+            dataLançamento: formatarDataAtual(),
+        };
+
+        const parsedNotasAlunos = rows.slice(4).map((row) => ({
+            numero: row[0],
+            nome: row[1],
+            t1: row[2],
+            t2: row[3],
+            t3: row[4],
+            t4: row[5],
+            t5: row[6],
+            t6: row[7],
+            mediaTrab: row[8],
+            notaTeste: row[9],
+            notaFinal: row[10],
+            notaExameRec: row[11],
+        }));
+
+        setDadosPauta(pautaData);
+        setNotasAlunos(parsedNotasAlunos);
     };
 
     const handlePrint = () => {
@@ -57,14 +83,15 @@ const PrintGrades = () => {
         document.body.innerHTML = printContents;
         window.print();
         document.body.innerHTML = originalContents;
-        window.location.reload(); // reload to restore the original state
     };
 
     return (
         <div className="pauta-container">
-            {!dadosDocente && (
+            {!dadosPauta && (
                 <div>
-                    <button onClick={handleImportClick}>Importar CSV</button>
+                    <button onClick={() => fileInputRef.current.click()}>
+                        Importar CSV
+                    </button>
                     <input
                         type="file"
                         ref={fileInputRef}
@@ -75,70 +102,180 @@ const PrintGrades = () => {
                 </div>
             )}
 
-            {dadosDocente && (
+            {dadosPauta && (
                 <>
                     <div ref={printRef}>
-                        <img
-                            src={ipbejaLogo}
-                            className="logo"
-                            style={{ width: "20%", height: "15%" }}
-                        />
-                        <h2>Dados de Pauta</h2>
-                        <div className="dados-pauta">
-                            <p>
-                                <strong>DOCENTE:</strong> {dadosDocente.docente}
-                            </p>
-                            <p>
-                                <strong>ANO:</strong> {dadosDocente.ano} -{" "}
-                                {dadosDocente.semestre}
-                            </p>
-                            <p>
-                                <strong>DISCIPLINA:</strong>{" "}
-                                {dadosDocente.disciplina}
-                            </p>
-                            <p>
-                                <strong>TURMA:</strong> {dadosDocente.turma}
-                            </p>
-                            <p>
-                                <strong>SITUAÇÃO:</strong>{" "}
-                                {dadosDocente.situacao}
-                            </p>
-                            <p>
-                                <strong>ÉPOCA:</strong> {dadosDocente.epoca}
-                            </p>
+                        <div className="page">
+                            <div className="image-container">
+                                <img
+                                    src={img3}
+                                    className="logo"
+                                    style={{ width: "65px", height: "15%" }}
+                                />
+                                <img
+                                    src={img1}
+                                    className="logo"
+                                    style={{ width: "90px", height: "15%" }}
+                                />
+                                <img
+                                    src={img2}
+                                    className="logo"
+                                    style={{
+                                        width: "63px",
+                                        height: "15%",
+                                    }}
+                                />
+                                <h1 style={{ marginLeft: "20px" }}>
+                                    Escola de Ciberdefesa
+                                </h1>{" "}
+                            </div>
+                            <h2>Dados de Pauta</h2>
+                            <div className="dados-pauta">
+                                <p>
+                                    <strong>Curso:</strong> {dadosPauta.curso}
+                                </p>
+                                <p>
+                                    <strong>Módulo:</strong> {dadosPauta.modulo}
+                                </p>
+                                <p>
+                                    <strong>Data do Curso:</strong>{" "}
+                                    {dadosPauta.dataCurso}
+                                </p>
+                                <p>
+                                    <strong>Tipo de Pauta:</strong>{" "}
+                                    {dadosPauta.tipoPauta}
+                                </p>
+                                <p>
+                                    <strong>Descrição da Pauta:</strong>{" "}
+                                    {dadosPauta.descricaoPauta}
+                                </p>
+                                <p>
+                                    <strong>Data de Lançamento:</strong>{" "}
+                                    {dadosPauta.dataLançamento}
+                                </p>
+                            </div>
+                            <h2>Listagem de Alunos</h2>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <table className="tabela-alunos">
+                                    <thead>
+                                        <tr>
+                                            <th>Número</th>
+                                            <th>Nome</th>
+                                            <th>T1</th>
+                                            <th>T2</th>
+                                            <th>T3</th>
+                                            <th>T4</th>
+                                            <th>T5</th>
+                                            <th>T6</th>
+                                            <th>MT</th>
+                                            <th>T</th>
+                                            <th>EN</th>
+                                            <th>E</th>
+                                            <th>ER</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {notasAlunos
+                                            .filter(
+                                                (aluno) => aluno && aluno.nome
+                                            )
+                                            .map((aluno, index) => (
+                                                <tr key={index}>
+                                                    <td>{aluno.numero}</td>
+                                                    <td>{aluno.nome}</td>
+                                                    <td>
+                                                        {parseFloat(
+                                                            aluno.t1
+                                                        ).toFixed(2)}
+                                                    </td>
+                                                    <td>
+                                                        {parseFloat(
+                                                            aluno.t2
+                                                        ).toFixed(2)}
+                                                    </td>
+                                                    <td>
+                                                        {parseFloat(
+                                                            aluno.t3
+                                                        ).toFixed(2)}
+                                                    </td>
+                                                    <td>
+                                                        {parseFloat(
+                                                            aluno.t4
+                                                        ).toFixed(2)}
+                                                    </td>
+                                                    <td>
+                                                        {parseFloat(
+                                                            aluno.t5
+                                                        ).toFixed(2)}
+                                                    </td>
+                                                    <td>
+                                                        {parseFloat(
+                                                            aluno.t6
+                                                        ).toFixed(2)}
+                                                    </td>
+                                                    <td>
+                                                        {parseFloat(
+                                                            aluno.mediaTrab
+                                                        ).toFixed(2)}
+                                                    </td>
+                                                    <td>
+                                                        {parseFloat(
+                                                            aluno.notaTeste
+                                                        ).toFixed(2)}
+                                                    </td>
+                                                    <td>{aluno.notaFinal}</td>
+                                                    <td>
+                                                        {aluno.notaExameRec}
+                                                    </td>
+                                                    <td>
+                                                        {aluno.notaExameRec ===
+                                                        "\r"
+                                                            ? ""
+                                                            : Math.round(
+                                                                  aluno.notaExameRec
+                                                              )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <p className="small-text">
+                                    <strong>Legenda:</strong> Tx = Trabalho; MT:
+                                    Média dos Trabalhos; T: Teste; EN: Nota
+                                    Final de Avaliação por Época Normal; ER:
+                                    Nota Final de Avaliação por Época de
+                                    Recurso; E: Exame de Recurso;
+                                </p>
+                            </div>
+                            <div className="signature-container">
+                                <div className="signature-left">
+                                    <hr className="signature-line" />
+                                    <p className="signature-text">
+                                        Diretor da Escola de Ciberdefesa
+                                    </p>
+                                </div>
+                                <div className="signature-right">
+                                    <hr className="signature-line" />
+                                    <p className="signature-text">
+                                        Coordenador da prestação de Serviços do
+                                        IPBeja
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <h2>Listagem de Alunos</h2>
-
-                        <table className="tabela-alunos">
-                            <thead>
-                                <tr>
-                                    <th>Curso</th>
-                                    <th>Aluno</th>
-                                    <th>Nome</th>
-                                    <th>Data</th>
-                                    <th>Nota</th>
-                                    <th>Status</th>
-                                    <th>Época</th>
-                                    <th>Tipo de Aluno</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {alunos.map((aluno, index) => (
-                                    <tr key={index}>
-                                        <td>{aluno.curso}</td>
-                                        <td>{aluno.alunoId}</td>
-                                        <td>{aluno.nome}</td>
-                                        <td>{aluno.data}</td>
-                                        <td>{aluno.nota}</td>
-                                        <td>{aluno.status}</td>
-                                        <td>{aluno.epoca}</td>
-                                        <td>{aluno.tipo}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
                     </div>
-
                     <button onClick={handlePrint}>Imprimir</button>
                 </>
             )}

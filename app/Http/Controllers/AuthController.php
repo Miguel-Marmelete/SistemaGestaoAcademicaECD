@@ -58,7 +58,7 @@ class AuthController extends Controller
 
         // Send verification email to the professor
         Mail::send('emails.verify_professor', ['token' => $token], function($message) use ($request) {
-            $message->from('SGAED@sgaed.pt', 'Sistema de Gestão Académica');
+            $message->from('SGAED@sgaed.pt', 'Sistema de Gestão Académica da Ecola de Ciberdefesa');
             $message->to($request->email);
             $message->subject('Verify Email Address');
             
@@ -94,7 +94,7 @@ class AuthController extends Controller
 
             // Notify admin about email verification
             Mail::send('emails.notify_admin', ['pendingProfessor' => $pendingProfessor], function($message) {
-                $message->from('SGAED@sgaed.pt', 'Sistema de Gestão Académica');
+                $message->from('SGAED@sgaed.pt', 'Sistema de Gestão Académica da Ecola de Ciberdefesa');
                 $message->to('20431@stu.ipbeja.pt'); // Replace with the admin's email
                 $message->subject('Professor Email Verified');
             });

@@ -58,8 +58,8 @@ function PrintLesson() {
         minute: "2-digit",
     });
 
-    // Calculate "Hora Final" (1 hour after "Hora Inicial")
-    const lessonEndDate = new Date(lessonDate.getTime() + 60 * 60 * 1000);
+    // Calcula "Hora Final" (2 horas depois da "Hora Inicial")
+    const lessonEndDate = new Date(lessonDate.getTime() + 120 * 60 * 1000);
     const horaFinal = lessonEndDate.toLocaleTimeString("pt-PT", {
         hour: "2-digit",
         minute: "2-digit",

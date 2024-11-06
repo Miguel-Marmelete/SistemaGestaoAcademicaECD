@@ -961,12 +961,28 @@ form small {
     border: 1px solid #ccc;
 }
 
+.page-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    background-color: #f8f8f8;
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+}
+
+.page-number {
+    font-size: 14px;
+    color: #333;
+}
+
 .dados-pauta p {
     margin: 5px 0;
 }
 
 .tabela-alunos {
-    width: 100%;
+    font-size: 10px;
+    width: 80%;
     border-collapse: collapse;
     margin-top: 20px;
 }
@@ -985,4 +1001,119 @@ form small {
 
 .tabela-alunos tr:nth-child(even) {
     background-color: #f9f9f9;
+}
+
+.small-text {
+    font-size: 0.5em; /* Adjust the size as needed */
+}
+/*------------------------CSS PARA AS IMAGENS----------------------------*/
+/* Styling for the container to evenly space images */
+.image-container {
+    display: flex;
+    align-items: center;
+}
+
+/* Image styling */
+.logo {
+}
+
+/*------------------------CSS PARA ASSINATURA----------------------------*/
+.signature-container {
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Alinha a linha e o texto na vertical */
+}
+
+.signature-left,
+.signature-right {
+    text-align: center;
+    flex: 1;
+}
+
+.signature-line {
+    width: 60%; /* Aumenta o comprimento da linha */
+    border: none;
+    border-top: 2px solid black;
+    margin: 0 auto;
+}
+
+.signature-text {
+    margin-top: 10px; /* Espaço entre a linha e o texto */
+}
+
+/*------------------------CSS PARA CERTIFICADO----------------------------*/
+
+@media print {
+    .certificate {
+        border: 2px solid black !important; /* Ensure border is printed */
+        padding: 20px;
+        margin: 0; /* Remove any margin that might affect printing */
+        box-sizing: border-box;
+    }
+}
+
+.certificate-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.certificate-logo {
+    width: 60px; /* Adjust size as needed */
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.certificate-headers {
+    text-align: center;
+    flex-grow: 1;
+    margin-left: 60px; /* Adjust to provide space for the logo */
+}
+
+.certificate-symbols {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: row; /* Align symbols in a row */
+    align-items: center;
+}
+
+.certificate-symbol {
+    width: 40px; /* Adjust size as needed */
+    margin-left: 5px; /* Space between symbols */
+}
+
+.certificate-headers h3 {
+    font-size: 1em; /* Slightly larger than normal text */
+    margin: 5px 0;
+}
+
+.certificate-title {
+    margin: 10px 0; /* Reduce margin to bring title and subtitle closer */
+    text-align: center;
+    font-size: 1em; /* Make the title smaller */
+}
+
+.certificate-title .title {
+    margin-bottom: 0; /* Remove bottom margin */
+}
+
+.certificate-title .subtitle {
+    margin-top: 0; /* Remove top margin */
+}
+
+.certificate-text {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.certificate-signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
 }
