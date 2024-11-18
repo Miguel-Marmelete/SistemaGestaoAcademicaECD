@@ -120,14 +120,18 @@ const PrintCertificate2 = () => {
                                 }}
                             >
                                 <img
-                                    src={cociber}
-                                    alt="Logo"
-                                    style={{ width: "61px", height: "61px" }}
-                                />
-                                <img
                                     src={ccice}
                                     alt="Logo"
-                                    style={{ width: "85px", height: "auto" }}
+                                    style={{ width: "70px", height: "50px" }}
+                                />
+                                <img
+                                    src={cociber}
+                                    alt="Logo"
+                                    style={{
+                                        width: "46px",
+                                        height: "45px",
+                                        marginTop: "3px",
+                                    }}
                                 />
                             </div>
                         </div>
@@ -163,7 +167,7 @@ const PrintCertificate2 = () => {
                         >
                             <div style={{ textAlign: "center" }}>
                                 <div style={{ marginBottom: "20px" }}>
-                                    O Diretor da Escola de Ciberdefesa
+                                    Diretor da Escola de Ciberdefesa
                                 </div>
                                 <div>_______________________________</div>
                                 <div>
@@ -179,7 +183,8 @@ const PrintCertificate2 = () => {
                                 }}
                             >
                                 <div style={{ marginBottom: "20px" }}>
-                                    O Coordenador do Lab. UBINET, IPBeja
+                                    Coordenador da Equipa de Professores do
+                                    IPBeja
                                 </div>
                                 <div>_______________________________</div>
                                 <div>
