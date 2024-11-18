@@ -21,13 +21,16 @@ use App\Http\Middleware\CheckCoordinatorMiddleware;
 //------------------AUTH ROUTES--------------------------------------
  Route::post('/login', [AuthController::class, 'login']);
  Route::post('/signup', [AuthController::class, 'register']);
-     Route::get('/confirmAdmin/{token}', [ProfessorController::class, 'confirmAdmin']);
-
  // Rota para verificação de e-mail do professor
  Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail']);
  
  // Rota para aprovação do registro pelo administrador
  Route::get('/approve-professor/{token}', [AuthController::class, 'approveProfessor']);
+
+
+ Route::get('/confirmAdmin/{token}', [ProfessorController::class, 'confirmAdmin']);
+
+
 //--------------------------------------------------------------------
 
 
@@ -65,10 +68,6 @@ Route::middleware(['auth:api'])->group(function () {
     //------------------ASSOCIATE MODULES TO COURSE ROUTES-------------------------------
      // Create a new Enrollment
      Route::post('/associateModulesToCourse', [CourseModuleController::class, 'store']);
-     // Update an existing course by ID
-     Route::put('/updateModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'update']);
-     // Delete a Enrollment by ID
-     Route::delete('/deleteModulesCourseAssociation/{student_id}/{course_id}', [CourseModuleController::class, 'destroy']);
      // Delete a Module from Course
      Route::delete('/deleteModuleFromCourse', [CourseModuleController::class, 'deleteModuleFromCourse']);
     //---------------------------------------------------------------------
@@ -112,8 +111,7 @@ Route::middleware(['auth:api'])->group(function () {
   //-----------------------------------------------------------------------
 
   //------------------STUDENT ROUTES--------------------------------------
-    // Get all students
-    Route::post('/createAndEnroll', [StudentController::class, 'createAndEnroll']);
+
     // Create a new student
     Route::post('/addStudents', [StudentController::class, 'store']);
     // Update an existing student by ID
@@ -209,15 +207,15 @@ Route::middleware(['auth:api'])->group(function () {
 
   //------------------GRADE ROUTES---------------------------------------
      // Get all Grade
-     Route::get('/getAllGrade', [GradeController::class, 'index']);
+     //Route::get('/getAllGrade', [GradeController::class, 'index']);
      // Get a specific Grade by ID
-     Route::get('/getGrade/{id}', [GradeController::class, 'show']);
+     //Route::get('/getGrade/{id}', [GradeController::class, 'show']);
      // Create a new Grade
-     Route::post('/createGrade', [GradeController::class, 'store']);
+     //Route::post('/createGrade', [GradeController::class, 'store']);
      // Update an existing Grade by ID
-     Route::put('/updateGrade/{id}', [GradeController::class, 'update']);
+     //Route::put('/updateGrade/{id}', [GradeController::class, 'update']);
      // Delete a Grade by ID
-     Route::delete('/deleteGrade/{id}', [GradeController::class, 'destroy']);
+     //Route::delete('/deleteGrade/{id}', [GradeController::class, 'destroy']);
      Route::get('/getStudentsWithGrades', [GradeController::class, 'getStudentsWithGrades']);
      Route::post('/submitGrades', [GradeController::class, 'submitGrades']);
   //---------------------------------------------------------------------
@@ -238,12 +236,12 @@ Route::middleware(['auth:api'])->group(function () {
 
   //------------------LESSON ROUTES--------------------------------------
     // Get all lessons
-    Route::get('/getAllLessons', [LessonController::class, 'index']);
+    //Route::get('/getAllLessons', [LessonController::class, 'index']);
     // Get a specific lesson by ID
-    Route::get('/getLessonById/{id}', [LessonController::class, 'show']);
-    Route::get('/getLessonsOfSubmodule', [LessonController::class, 'getLessonsOfSubmodule']);
+    //Route::get('/getLessonById/{id}', [LessonController::class, 'show']);
+    //Route::get('/getLessonsOfSubmodule', [LessonController::class, 'getLessonsOfSubmodule']);
     // Create a new lesson
-    Route::post('/addLessons', [LessonController::class, 'store']);
+    //Route::post('/addLessons', [LessonController::class, 'store']);
     // Create a new lesson and attendance
     Route::post('/addLessonAndAttendance', [LessonController::class, 'addLessonAndAttendance']);
     // Update an existing lesson by ID
@@ -299,10 +297,6 @@ Route::middleware(['auth:api'])->group(function () {
   //------------------STUDENT ROUTES--------------------------------------
     // Get all students
     Route::get('/getStudents', [StudentController::class, 'getStudents']);
-    Route::post('/createAndEnroll', [StudentController::class, 'createAndEnroll']);
-    // Get filtered students
-    Route::get('/students/search', [StudentController::class, 'search']);
-    Route::get('/getStudentsByCourse', [StudentController::class, 'getStudentsByCourse']);
     // Get a specific student by ID
     Route::get('/getStudent/{id}', [StudentController::class, 'show']);
 
@@ -314,7 +308,6 @@ Route::middleware(['auth:api'])->group(function () {
      Route::get('/getSubModules', [SubmoduleController::class, 'getSubModules']);
      // Get a specific Submodule by ID
      Route::get('/getSubmodule/{id}', [SubmoduleController::class, 'show']);
-     Route::get('/getSubmodulesByCourse/{course_id}', [SubmoduleController::class, 'getSubmodulesByCourse']);
   //---------------------------------------------------------------------
 
 

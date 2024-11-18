@@ -1,12 +1,12 @@
-/*
 import React, { useState, useRef } from "react";
-import img1 from "../../assets/WhatsApp_Image_2024-11-04_at_11.50.14-removebg-preview.png";
-import img2 from "../../assets/WhatsApp_Image_2024-11-04_at_11.50.18-removebg-preview.png";
-import img3 from "../../assets/emgfa.png";
+import ccice from "../../assets/CCICE.png";
+import cociber from "../../assets/COCIBER.png";
+import emgfa from "../../assets/emgfa.png";
 
 const PrintGrades = () => {
     const [dadosPauta, setDadosPauta] = useState(null);
     const [notasAlunos, setNotasAlunos] = useState([]);
+    const [tableHeaders, setTableHeaders] = useState([]);
     const fileInputRef = useRef(null);
     const printRef = useRef(null);
 
@@ -48,8 +48,35 @@ const PrintGrades = () => {
         return formatador.format(dataAtual);
     };
 
+    const generateLegenda = (headers) => {
+        const legendaMap = {
+            T1: "Trabalho",
+            MT: "Média dos Trabalhos",
+            T: "Teste",
+            EN: "Nota Final de Avaliação por Época Normal",
+            ER: "Nota Final de Avaliação por Época de Recurso",
+            E: "Exame de Recurso",
+        };
+
+        return headers
+            .map((header) => {
+                const trimmedHeader = header.trim();
+                if (trimmedHeader === "T1") {
+                    return `Tx: ${legendaMap[trimmedHeader]}`;
+                }
+                return legendaMap[trimmedHeader]
+                    ? `${trimmedHeader}: ${legendaMap[trimmedHeader]}`
+                    : null;
+            })
+            .filter(Boolean)
+            .join("; ");
+    };
+
     const processCSVData = (csvData) => {
         const rows = csvData.split("\n").map((row) => row.split(","));
+        const headers = rows[3].map((header) => header.trim());
+        setTableHeaders(headers);
+
         const pautaData = {
             curso: rows[1][0],
             modulo: rows[1][1],
@@ -59,20 +86,17 @@ const PrintGrades = () => {
             dataLançamento: formatarDataAtual(),
         };
 
-        const parsedNotasAlunos = rows.slice(4).map((row) => ({
-            numero: row[0],
-            nome: row[1],
-            t1: row[2],
-            t2: row[3],
-            t3: row[4],
-            t4: row[5],
-            t5: row[6],
-            t6: row[7],
-            mediaTrab: row[8],
-            notaTeste: row[9],
-            notaFinal: row[10],
-            notaExameRec: row[11],
-        }));
+        const parsedNotasAlunos = rows
+            .slice(4)
+            .filter((row) => row.some((cell) => cell.trim() !== ""))
+            .map((row) => {
+                const alunoData = {};
+                headers.forEach((header, index) => {
+                    const key = header.toLowerCase().replace(/\s+/g, "");
+                    alunoData[key] = row[index];
+                });
+                return alunoData;
+            });
 
         setDadosPauta(pautaData);
         setNotasAlunos(parsedNotasAlunos);
@@ -109,17 +133,17 @@ const PrintGrades = () => {
                         <div className="page">
                             <div className="image-container">
                                 <img
-                                    src={img3}
+                                    src={emgfa}
                                     className="logo"
                                     style={{ width: "65px", height: "15%" }}
                                 />
                                 <img
-                                    src={img1}
+                                    src={ccice}
                                     className="logo"
                                     style={{ width: "90px", height: "15%" }}
                                 />
                                 <img
-                                    src={img2}
+                                    src={cociber}
                                     className="logo"
                                     style={{
                                         width: "63px",
@@ -165,84 +189,35 @@ const PrintGrades = () => {
                                 <table className="tabela-alunos">
                                     <thead>
                                         <tr>
-                                            <th>Número</th>
-                                            <th>Nome</th>
-                                            <th>T1</th>
-                                            <th>T2</th>
-                                            <th>T3</th>
-                                            <th>T4</th>
-                                            <th>T5</th>
-                                            <th>T6</th>
-                                            <th>MT</th>
-                                            <th>T</th>
-                                            <th>EN</th>
-                                            <th>E</th>
-                                            <th>ER</th>
+                                            {tableHeaders.map(
+                                                (header, index) => (
+                                                    <th key={index}>
+                                                        {header}
+                                                    </th>
+                                                )
+                                            )}
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {notasAlunos
-                                            .filter(
-                                                (aluno) => aluno && aluno.nome
-                                            )
-                                            .map((aluno, index) => (
-                                                <tr key={index}>
-                                                    <td>{aluno.numero}</td>
-                                                    <td>{aluno.nome}</td>
-                                                    <td>
-                                                        {parseFloat(
-                                                            aluno.t1
-                                                        ).toFixed(2)}
-                                                    </td>
-                                                    <td>
-                                                        {parseFloat(
-                                                            aluno.t2
-                                                        ).toFixed(2)}
-                                                    </td>
-                                                    <td>
-                                                        {parseFloat(
-                                                            aluno.t3
-                                                        ).toFixed(2)}
-                                                    </td>
-                                                    <td>
-                                                        {parseFloat(
-                                                            aluno.t4
-                                                        ).toFixed(2)}
-                                                    </td>
-                                                    <td>
-                                                        {parseFloat(
-                                                            aluno.t5
-                                                        ).toFixed(2)}
-                                                    </td>
-                                                    <td>
-                                                        {parseFloat(
-                                                            aluno.t6
-                                                        ).toFixed(2)}
-                                                    </td>
-                                                    <td>
-                                                        {parseFloat(
-                                                            aluno.mediaTrab
-                                                        ).toFixed(2)}
-                                                    </td>
-                                                    <td>
-                                                        {parseFloat(
-                                                            aluno.notaTeste
-                                                        ).toFixed(2)}
-                                                    </td>
-                                                    <td>{aluno.notaFinal}</td>
-                                                    <td>
-                                                        {aluno.notaExameRec}
-                                                    </td>
-                                                    <td>
-                                                        {aluno.notaExameRec ===
-                                                        "\r"
-                                                            ? ""
-                                                            : Math.round(
-                                                                  aluno.notaExameRec
-                                                              )}
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                        {notasAlunos.map((aluno, index) => (
+                                            <tr key={index}>
+                                                {tableHeaders.map(
+                                                    (header, i) => {
+                                                        const key = header
+                                                            .toLowerCase()
+                                                            .replace(
+                                                                /\s+/g,
+                                                                ""
+                                                            );
+                                                        return (
+                                                            <td key={i}>
+                                                                {aluno[key]}
+                                                            </td>
+                                                        );
+                                                    }
+                                                )}
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
@@ -253,11 +228,8 @@ const PrintGrades = () => {
                                 }}
                             >
                                 <p className="small-text">
-                                    <strong>Legenda:</strong> Tx = Trabalho; MT:
-                                    Média dos Trabalhos; T: Teste; EN: Nota
-                                    Final de Avaliação por Época Normal; ER:
-                                    Nota Final de Avaliação por Época de
-                                    Recurso; E: Exame de Recurso;
+                                    <strong>Legenda:</strong>{" "}
+                                    {generateLegenda(tableHeaders)}
                                 </p>
                             </div>
                             <div className="signature-container">
@@ -285,4 +257,3 @@ const PrintGrades = () => {
 };
 
 export default PrintGrades;
-*/

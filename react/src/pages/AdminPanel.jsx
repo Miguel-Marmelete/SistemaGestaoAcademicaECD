@@ -70,7 +70,7 @@ function AdminPanel() {
         <div className="panel-container">
             {currentPanel ? (
                 <>
-                    <h2>Painel de Administrador - {currentPanel}</h2>
+                    <h2>Painel de Coordenador - {currentPanel}</h2>
                     <ButtonMenu buttons={subButtons} />
                     <button className="back-button" onClick={handleBackClick}>
                         Voltar
@@ -78,7 +78,7 @@ function AdminPanel() {
                 </>
             ) : (
                 <>
-                    <h2>Painel de Administrador</h2>
+                    <h2>Painel de Coordenador</h2>
                     <div className="button-container">
                         {panelButtons.map((button, index) => (
                             <button

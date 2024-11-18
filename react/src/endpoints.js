@@ -1,6 +1,6 @@
 // src/config/apiEndpoints.js
 
-const API_BASE_URL = "http://localhost:8000/api"; // Replace with your actual base URL
+const API_BASE_URL = "http://192.168.1.10:8000/api"; // Use your backend IP
 
 const endpoints = {
     // Authentication

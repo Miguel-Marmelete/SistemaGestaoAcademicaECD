@@ -195,17 +195,17 @@ class StudentController extends Controller
             // Validate the request
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
-                'ipbeja_email' => 'required|string|email|max:255|unique:students',
                 'number' => 'required|integer|unique:students',
-                'birthday' => 'required|date',
-                'address' => 'required|string|max:255',
-                'city' => 'required|string|max:255',
-                'mobile' => 'required|integer',
-                'posto' => 'required|string|max:255',
-                'nim' => 'required|integer',
-                'classe' => 'required|string|max:255',
-                'personal_email' => 'required|string|email|max:255|unique:students',
-                'course_id' => 'required|integer|exists:courses,course_id',
+                'ipbeja_email' => 'nullable|string|email|max:255|unique:students',
+                'birthday' => 'nullable|date',
+                'address' => 'nullable|string|max:255',
+                'city' => 'nullable|string|max:255',
+                'mobile' => 'nullable|integer',
+                'posto' => 'nullable|string|max:255',
+                'nim' => 'nullable|integer',
+                'classe' => 'nullable|string|max:255',
+                'personal_email' => 'nullable|string|email|max:255|unique:students',
+                'course_id' => 'nullable|integer|exists:courses,course_id',
             ]);
 
             if ($validator->fails()) {
@@ -240,16 +240,16 @@ class StudentController extends Controller
             $validator = Validator::make($request->all(), [
                 'students' => 'required|array',
                 'students.*.name' => 'required|string|max:255',
-                'students.*.ipbeja_email' => 'required|string|email|max:255|unique:students,ipbeja_email',
-                'students.*.number' => 'required|integer|unique:students,number',
-                'students.*.birthday' => 'required|date',
-                'students.*.address' => 'required|string|max:255',
-                'students.*.city' => 'required|string|max:255',
-                'students.*.mobile' => 'required|integer',
-                'students.*.posto' => 'required|string|max:255',
-                'students.*.nim' => 'required|integer',
-                'students.*.classe' => 'required|string|max:255',
-                'students.*.personal_email' => 'required|string|email|max:255|unique:students,personal_email',
+                'students.*.number' => 'required|integer',
+                'students.*.ipbeja_email' => 'nullable|string|email|max:255',
+                'students.*.birthday' => 'nullable|date',
+                'students.*.address' => 'nullable|string|max:255',
+                'students.*.city' => 'nullable|string|max:255',
+                'students.*.mobile' => 'nullable|integer',
+                'students.*.posto' => 'nullable|string|max:255',
+                'students.*.nim' => 'nullable|integer',
+                'students.*.classe' => 'nullable|string|max:255',
+                'students.*.personal_email' => 'nullable|string|email|max:255',
                 'course_id' => 'required|integer|exists:courses,course_id',
             ]);
 
@@ -262,11 +262,14 @@ class StudentController extends Controller
             $courseId = $request->input('course_id');
 
             foreach ($studentsData as $studentData) {
-                // Remove course_id from student data
-                unset($studentData['course_id']);
+                // Clean and format the name
+                $studentData['name'] = ucwords(strtolower(trim($studentData['name'])));
                 
-                // Create the student
-                $student = Student::firstOrCreate($studentData);
+                // Find by number first, then create or update
+                $student = Student::updateOrCreate(
+                    ['number' => $studentData['number']], // Find by number
+                    $studentData // Update/create with all data
+                );
 
                 // Enroll the student in the course
                 Enrollment::firstOrCreate([

@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
-import img1 from "../../assets/WhatsApp_Image_2024-11-04_at_11.50.14-removebg-preview.png";
-import img2 from "../../assets/WhatsApp_Image_2024-11-04_at_11.50.18-removebg-preview.png";
-import img3 from "../../assets/emgfa.png";
+
+import ccice from "../../assets/CCICE.png";
+import cociber from "../../assets/COCIBER.png";
+import emgfa from "../../assets/emgfa.png";
 
 const PrintCertificate = () => {
     const [dados, setDados] = useState(null);
@@ -82,7 +83,7 @@ const PrintCertificate = () => {
                                 style={{ textAlign: "center" }}
                             >
                                 <img
-                                    src={img3}
+                                    src={emgfa}
                                     alt="Logo"
                                     className="certificate-logo"
                                 />
@@ -107,14 +108,14 @@ const PrintCertificate = () => {
                                 </div>
                                 <div className="certificate-symbols">
                                     <img
-                                        src={img1}
+                                        src={ccice}
                                         alt="Symbol 1"
                                         className="certificate-symbol"
                                         style={{ width: "57px" }}
                                     />
 
                                     <img
-                                        src={img2}
+                                        src={cociber}
                                         alt="Symbol 2"
                                         className="certificate-symbol"
                                     />

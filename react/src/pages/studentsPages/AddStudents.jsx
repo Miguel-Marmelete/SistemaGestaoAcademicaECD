@@ -175,26 +175,38 @@ const AddStudents = () => {
     };
 
     const processAndUploadCSV = (csvData) => {
-        const rows = csvData.split("\n").map((row) => row.split(","));
-        const parsedStudents = rows.slice(1).map((row) => ({
-            name: row[0],
-            ipbeja_email: row[1],
-            number: row[2],
-            birthday: row[3],
-            address: row[4],
-            city: row[5],
-            mobile: row[6],
-            classe: row[7],
-            posto: row[8],
-            personal_email: row[9],
-            nim: row[10],
-            course_id: selectedCourse, // Ensure course_id is included
-        }));
+        // Split into rows and filter out empty rows
+        const rows = csvData
+            .split("\n")
+            .map((row) => row.trim().split(","))
+            .filter((row) => row.some((cell) => cell.trim() !== "")); // Only keep rows that have at least one non-empty cell
 
-        // Navigate to the review page with the parsed students and selected course
-        navigate("/reviewStudents", {
-            state: { students: parsedStudents, course: selectedCourse },
-        });
+        const parsedStudents = rows
+            .slice(1) // Skip header row
+            .filter((row) => row[0]?.trim() && row[2]?.trim()) // Ensure name and number exist
+            .map((row) => ({
+                name: row[0]?.trim() || "",
+                ipbeja_email: row[1]?.trim() || "",
+                number: row[2]?.trim() || "",
+                birthday: row[3]?.trim() || "",
+                address: row[4]?.trim() || "",
+                city: row[5]?.trim() || "",
+                mobile: row[6]?.trim() || "",
+                classe: row[7]?.trim() || "",
+                posto: row[8]?.trim() || "",
+                personal_email: row[9]?.trim() || "",
+                nim: row[10]?.trim() || "",
+                course_id: selectedCourse,
+            }));
+
+        // Only proceed if there are valid students to process
+        if (parsedStudents.length > 0) {
+            navigate("/reviewStudents", {
+                state: { students: parsedStudents, course: selectedCourse },
+            });
+        } else {
+            alert("No valid student data found in CSV file");
+        }
     };
 
     return (

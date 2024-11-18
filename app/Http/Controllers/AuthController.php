@@ -20,7 +20,7 @@ class AuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request)
+public function register(Request $request)
 {
     try {
         
@@ -102,7 +102,7 @@ class AuthController extends Controller
             // return redirect
             // Return success response
             //return response()->json(['message' => 'Email verified successfully, awaiting admin approval']);
-            $reactFrontendUrl = 'http://localhost:3000/verify-email';
+            $reactFrontendUrl = config('app.frontend_url') . '/verify-email';
 
         // Redirect to the React frontend page
             return redirect()->away($reactFrontendUrl);
