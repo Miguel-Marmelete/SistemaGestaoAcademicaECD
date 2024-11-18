@@ -46,11 +46,12 @@ export const professorsMenuButtons = [
     { name: "Listar Professores", link: "/professors" },
     { name: "Adicionar Professores", link: "/addProfessor" },
 ];
-export const printMenuButtons = [
+
+export const printMenu = [
     { name: "Imprimir Pautas", link: "/printGrades" },
-];
-export const printCertificateButtons = [
-    { name: "Imprimir Diplomas", link: "/printCertificate" },
+    //{ name: "Imprimir Certificados", link: "/printCertificate" },
+    { name: "Imprimir Certificados", link: "/printCertificate" },
+    { name: "Imprimir Diploma", link: "/printDiploma" },
 ];
 
 export const gradesMenuButtons = [{ name: "Pauta", link: "/grades" }];

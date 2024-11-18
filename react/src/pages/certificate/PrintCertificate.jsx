@@ -1,176 +1,180 @@
-import React, { useState, useRef } from "react";
-
+import React, { useState } from "react";
+import Papa from "papaparse";
+import emgfaPreto from "../../assets/emgfaPretoBranco.png";
 import ccice from "../../assets/CCICE.png";
 import cociber from "../../assets/COCIBER.png";
-import emgfa from "../../assets/emgfa.png";
+import ubinet from "../../assets/ubinet.jpg";
+import ipbeja from "../../assets/ipbejaLogo.png";
+import emgfaComTexto from "../../assets/emgfaComTexto2.png";
+const PrintCertificate3 = () => {
+    const [certificate, setCertificate] = useState(null);
 
-const PrintCertificate = () => {
-    const [dados, setDados] = useState(null);
-    const fileInputRef = useRef(null);
-    const printRef = useRef(null);
-
-    const handleCSVUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const csvData = event.target.result;
-                processCSVData(csvData);
-            };
-            reader.readAsText(file);
-        }
-    };
-
-    const processCSVData = (csvData) => {
-        const rows = csvData.split("\n").map((row) => row.split(","));
-        const dados = {
-            nome: rows[1][0],
-            cartao: rows[1][1],
-            curso: rows[1][2],
-            data: rows[1][3],
-            media: rows[1][4],
-            horas: rows[1][5],
-            horasEstagio: rows[1][6],
-            local: rows[1][7],
-            dataEmissao: rows[1][8],
-        };
-        setDados(dados);
-    };
-
-    const formatDate = (date) => {
-        const options = { day: "numeric", month: "long", year: "numeric" };
-        return new Intl.DateTimeFormat("pt-PT", options).format(date);
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        Papa.parse(file, {
+            header: true,
+            complete: (results) => {
+                if (results.data.length > 0) {
+                    setCertificate(results.data[0]);
+                }
+            },
+        });
     };
 
     const handlePrint = () => {
-        const printContents = printRef.current.innerHTML;
-        const originalContents = document.body.innerHTML;
-        document.body.innerHTML = printContents;
         window.print();
-        document.body.innerHTML = originalContents;
     };
 
     return (
-        <div className="pauta-container">
-            {!dados && (
+        <div>
+            <style>
+                {`
+                    .certificate {
+                        border: 0.2px solid #000;
+                        padding: 20px;
+                        margin: 20px;
+                        width: 80%;
+                        max-width: 800px;
+                        margin: auto;
+                        font-family: 'Times New Roman', Times, serif;
+                        position: relative;
+                    }
+
+                    .certificate h1 {
+                        text-align: center;
+                        font-size: 24px;
+                        margin-bottom: 20px;
+                    }
+
+                    .certificate p {
+                        font-size: 16px;
+                        line-height: 1.5;
+                        margin: 10px 0;
+                        word-wrap: break-word;
+                    }
+
+                    .signatures {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-top: 40px;
+                    }
+
+                    .signatures div {
+                        text-align: center;
+                    }
+
+                    .signatures p {
+                        margin: 5px 0;
+                    }
+
+                    input[type="file"] {
+                        display: block;
+                        margin: 20px auto;
+                    }
+
+                    .header-images {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        margin-bottom: 20px;
+                    }
+
+                    
+
+                    .right-images {
+                        display: flex;
+                        gap: 10px;
+                        flex: 1;
+                        justify-content: flex-end;
+                    }
+
+                    img {
+                        max-height: 100px;
+                    }
+
+                    @media print {
+                        body * {
+                            visibility: hidden;
+                        }
+                        .certificate, .certificate * {
+                            visibility: visible;
+                        }
+                        .certificate {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                        }
+                    }
+                `}
+            </style>
+            <input type="file" accept=".csv" onChange={handleFileChange} />
+            {certificate && (
                 <div>
-                    <button onClick={() => fileInputRef.current.click()}>
-                        Importar CSV
-                    </button>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: "none" }}
-                        onChange={handleCSVUpload}
-                        accept=".csv"
-                    />
-                </div>
-            )}
-
-            {dados && (
-                <>
-                    <div ref={printRef} className="certificate">
-                        <div
-                            className="certificate-container"
-                            style={{
-                                border: "2px solid black",
-                                padding: "20px",
-                                margin: "20px",
-                            }}
-                        >
-                            <div
-                                className="certificate-header"
-                                style={{ textAlign: "center" }}
-                            >
+                    <button onClick={handlePrint}>Imprimir Certificado</button>
+                    <div className="certificate">
+                        <div className="header-images">
+                            <div className="left-image">
                                 <img
-                                    src={emgfa}
-                                    alt="Logo"
-                                    className="certificate-logo"
+                                    src={emgfaComTexto}
+                                    style={{ width: "150px" }}
                                 />
-                                <div
-                                    className="certificate-headers"
+                            </div>
+                            <div className="right-images">
+                                <img
+                                    src={ccice}
                                     style={{
-                                        display: "inline-block",
-                                        textAlign: "center",
-                                        marginLeft: "10px",
+                                        width: "70px",
+                                        height: "50px",
+                                        paddingTop: "10px",
                                     }}
-                                >
-                                    <br></br>
-                                    <h3>
-                                        Estado Maior - General das forças
-                                        Armadas
-                                    </h3>
-                                    <h3>
-                                        Centro de Comunicações e Informação,
-                                        Ciberspaço e Espaço
-                                    </h3>
-                                    <h3>Comando de Operações de Ciberdefesa</h3>
-                                </div>
-                                <div className="certificate-symbols">
-                                    <img
-                                        src={ccice}
-                                        alt="Symbol 1"
-                                        className="certificate-symbol"
-                                        style={{ width: "57px" }}
-                                    />
-
-                                    <img
-                                        src={cociber}
-                                        alt="Symbol 2"
-                                        className="certificate-symbol"
-                                    />
-                                </div>
-                            </div>
-                            <div
-                                className="certificate-title"
-                                style={{ textAlign: "center" }}
-                            >
-                                <h3 className="title">Escola de Ciberdefesa</h3>
-                                <h3 className="subtitle">Certificado</h3>
-                            </div>
-                            <div className="certificate-text">
-                                <p>
-                                    Certifica-se que {dados.nome}, portador do
-                                    Cartão de Cidadão n.º {dados.cartao},
-                                    concluiu o Curso {dados.curso}, a{" "}
-                                    {dados.data} , com média final de{" "}
-                                    {dados.media} valores, num total de{" "}
-                                    {dados.horas} horas letivas e{" "}
-                                    {dados.horasEstagio} horas de Estágio.
-                                </p>
-                                <div
-                                    className="certificate-location-date"
+                                />
+                                <img
+                                    src={cociber}
                                     style={{
-                                        textAlign: "right",
-                                        marginTop: "20px",
+                                        width: "46px",
+                                        height: "45px",
+                                        paddingTop: "13px",
                                     }}
-                                >
-                                    <p>
-                                        {dados.local},{formatDate(new Date())}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="certificate-signatures">
-                                <div className="signature-left">
-                                    <hr className="signature-line" />
-                                    <p className="signature-text">
-                                        Diretor da Escola de Ciberdefesa
-                                    </p>
-                                </div>
-                                <div className="signature-right">
-                                    <hr className="signature-line" />
-                                    <p className="signature-text">
-                                        Coordenador da prestação de Serviços do
-                                        IPBeja
-                                    </p>
-                                </div>
+                                />{" "}
                             </div>
                         </div>
+                        <h1>CERTIDÃO</h1>
+                        <p>
+                            {certificate.name}, nascido(a) a{" "}
+                            {certificate.birthday}, portador do cartão do
+                            cidadão n.º {certificate.ccNumber}, concluiu o Curso
+                            de {certificate.courseName}, da escola de
+                            ciberdefesa, tendo obtido aproveitamento nas
+                            seguintes unidades curriculares da área
+                            Classificação Nacional das Áreas de Educação e
+                            Formação (CNAEF), aprovada pela Portaria n.º
+                            256/2005, de 16 de março, {certificate.text}
+                        </p>
+                        <p style={{ textAlign: "right" }}>
+                            Lisboa, {certificate.day} de {certificate.month} de{" "}
+                            {certificate.year}
+                        </p>
+                        <div className="signatures">
+                            <div>
+                                <p>O Diretor da Escola de Ciberdefesa</p>
+                                <p>_________________________</p>
+                                <p>Vasco Miguel Ramos Marques Prates</p>
+                                <p>Capitão-de-mar-e-guerra</p>
+                            </div>
+                            <div>
+                                <p>O Coordenador do Lab UbiNET, IPBeja</p>
+                                <p>_________________________</p>
+                                <p>Rui Miguel Soares Silva</p>
+                                <p>Professor Coordenador</p>
+                            </div>
+                        </div>
+                        <p>Número Certidão: {certificate.certificateNumber}</p>
                     </div>
-                    <button onClick={handlePrint}>Imprimir</button>
-                </>
+                </div>
             )}
         </div>
     );
 };
-export default PrintCertificate;
+
+export default PrintCertificate3;

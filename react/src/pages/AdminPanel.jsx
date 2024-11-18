@@ -8,8 +8,7 @@ import {
     evaluationMomentsMenuButtons,
     gradesMenuButtons,
     professorsMenuButtons,
-    printMenuButtons,
-    printCertificateButtons,
+    printMenu,
 } from "../../scripts/buttonsData";
 
 function AdminPanel() {
@@ -47,12 +46,8 @@ function AdminPanel() {
             subButtons: professorsMenuButtons,
         },
         {
-            label: "Imprimir Pautas",
-            subButtons: printMenuButtons,
-        },
-        {
-            label: "Imprimir Diplomas",
-            subButtons: printCertificateButtons,
+            label: "Imprimir",
+            subButtons: printMenu,
         },
     ];
 

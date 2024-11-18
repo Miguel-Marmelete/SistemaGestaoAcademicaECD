@@ -1179,3 +1179,22 @@ form small {
     word-wrap: break-word; /* Permite a quebra de linha */
     white-space: pre-wrap; /* Mantém os espaços e quebras de linha */
 }
+/*------------------------CSS PARA CERTIFICADO 2----------------------------*/
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .diploma,
+    .diploma * {
+        visibility: visible;
+    }
+    .diploma {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    .print-button {
+        display: none; /* Hide the print button during printing */
+    }
+}

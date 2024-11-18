@@ -39,6 +39,8 @@ import ReviewStudents from "./pages/CSV/ReviewStudents.jsx";
 import StudentDetails from "./pages/studentsPages/StudentDetails.jsx";
 import PrintGrades from "./pages/grades/PrintGrades2.jsx";
 import PrintCertificate from "./pages/certificate/PrintCertificate.jsx";
+
+import PrintDiploma from "./pages/certificate/PrintDiploma.jsx";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
         <AuthProvider>
@@ -278,6 +280,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         element={
                             <PrivateRoute>
                                 <PrintCertificate />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/printDiploma"
+                        element={
+                            <PrivateRoute>
+                                <PrintDiploma />
                             </PrivateRoute>
                         }
                     />
